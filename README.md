@@ -1,6 +1,6 @@
-py# 🚀 AI Personalized Learning Path Generator
+🚀 AI Personalized Learning Path Generator
 
-An AI-powered web application that creates **personalized 4-week learning roadmaps** based on user goals, skill level, and learning preferences.
+An AI-powered web application that creates **personalized learning roadmaps** based on user goals, skill level, and learning preferences.
 
 Users can enter a learning objective (for example, **"Learn Quantum Physics"** or **"Master Data Structures & Algorithms"**) and receive a structured AI-generated roadmap with weekly plans, recommended resources, and progress tracking.
 
