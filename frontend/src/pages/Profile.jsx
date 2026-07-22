@@ -52,7 +52,26 @@ export default function Profile() {
         
         <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
           <ThemeToggle />
-          <button title="Logout" style={{ background: 'var(--surface-muted)', border: 'none', width: 44, height: 44, borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }} onClick={logout}>
+          <button 
+            title="Logout" 
+            style={{ 
+              background: 'transparent', 
+              border: '1px solid var(--border-color)', 
+              color: 'var(--text-primary)',
+              width: 36, 
+              height: 36, 
+              borderRadius: 8, 
+              cursor: 'pointer', 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center', 
+              fontSize: 18,
+              transition: 'all 0.2s ease'
+            }} 
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--border-color)'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+            onClick={logout}
+          >
             🚪
           </button>
         </div>

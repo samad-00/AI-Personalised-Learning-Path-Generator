@@ -101,7 +101,10 @@ export default function Dashboard() {
       {/* Top Navbar */}
       <nav style={{ padding: '1.5rem 2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative', zIndex: 10 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 32 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div 
+            onClick={() => navigate('/')} 
+            style={{ display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer' }}
+          >
             <div style={{ width: 40, height: 40, borderRadius: '50%', background: 'var(--accent-pink)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>
               📖
             </div>
@@ -116,7 +119,26 @@ export default function Dashboard() {
         
         <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
           <ThemeToggle />
-          <button title="Logout" style={{ background: 'var(--surface-muted)', border: 'none', width: 44, height: 44, borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }} onClick={logout}>
+          <button 
+            title="Logout" 
+            style={{ 
+              background: 'transparent', 
+              border: '1px solid var(--border-color)', 
+              color: 'var(--text-primary)',
+              width: 36, 
+              height: 36, 
+              borderRadius: 8, 
+              cursor: 'pointer', 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center', 
+              fontSize: 18,
+              transition: 'all 0.2s ease'
+            }} 
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--border-color)'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+            onClick={logout}
+          >
             🚪
           </button>
         </div>
@@ -129,6 +151,9 @@ export default function Dashboard() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
           
           <div>
+            <div style={{ fontSize: '1.25rem', fontWeight: 600, color: 'var(--accent-teal)', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              Welcome back, {user?.username || 'Learner'} 👋
+            </div>
             <h1 style={{ fontSize: 'clamp(2.5rem, 4vw, 3.5rem)', fontWeight: 800, margin: '0 0 1rem', lineHeight: 1.1, letterSpacing: '-1px' }}>
               Your Platform <span style={{ opacity: 0.5, fontWeight: 500 }}>for</span><br/>Unlimited Learning
             </h1>
@@ -144,7 +169,7 @@ export default function Dashboard() {
                 placeholder="e.g. Learn React Native in 4 weeks"
                 value={goal}
                 onChange={e => setGoal(e.target.value)}
-                style={{ width: '100%', boxSizing: 'border-box', padding: '16px 24px', borderRadius: 100, border: 'none', fontSize: 15, fontFamily: 'Inter', outline: 'none', background: 'rgba(0,0,0,0.2)', color: '#FAF6F0' }}
+                style={{ width: '100%', boxSizing: 'border-box', padding: '16px 24px', borderRadius: 100, border: 'none', fontSize: 15, fontFamily: 'Inter', outline: 'none', background: '#ffffff', color: 'var(--text-primary)' }}
               />
               
               <div style={{ display: 'flex', gap: 8, background: 'rgba(0,0,0,0.2)', padding: 6, borderRadius: 100 }}>

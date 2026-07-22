@@ -89,7 +89,26 @@ export default function Settings() {
         
         <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
           <ThemeToggle />
-          <button title="Logout" style={{ background: 'var(--surface-muted)', border: 'none', width: 44, height: 44, borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }} onClick={logout}>
+          <button 
+            title="Logout" 
+            style={{ 
+              background: 'transparent', 
+              border: '1px solid var(--border-color)', 
+              color: 'var(--text-primary)',
+              width: 36, 
+              height: 36, 
+              borderRadius: 8, 
+              cursor: 'pointer', 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center', 
+              fontSize: 18,
+              transition: 'all 0.2s ease'
+            }} 
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--border-color)'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+            onClick={logout}
+          >
             🚪
           </button>
         </div>
@@ -111,35 +130,35 @@ export default function Settings() {
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           
           {/* Account Info */}
-          <div className="bento-card" style={{ padding: '2rem' }}>
+          <div className="bento-card" style={{ padding: '2rem', backgroundColor: 'var(--bg-color)', borderColor: 'var(--accent-teal)', borderWidth: '2px' }}>
             <h2 style={{ fontSize: 20, margin: '0 0 1.5rem', color: 'var(--text-primary)' }}>Basic Information</h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <div>
-                <label style={{ display: 'block', marginBottom: 8, fontSize: 14, color: 'var(--text-secondary)', fontWeight: 600 }}>Username</label>
-                <input type="text" name="username" value={formData.username} onChange={handleChange} placeholder="Username" className="input-field" style={{ borderRadius: 12 }} />
+                <label style={{ display: 'block', marginBottom: 8, fontSize: 14, color: 'var(--accent-teal)', fontWeight: 700 }}>Username</label>
+                <input type="text" name="username" value={formData.username} onChange={handleChange} placeholder="Username" className="input-field" style={{ borderRadius: 12, borderColor: 'var(--accent-teal)' }} />
               </div>
               <div>
-                <label style={{ display: 'block', marginBottom: 8, fontSize: 14, color: 'var(--text-secondary)', fontWeight: 600 }}>Email Address</label>
-                <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="Email Address" className="input-field" style={{ borderRadius: 12 }} />
+                <label style={{ display: 'block', marginBottom: 8, fontSize: 14, color: 'var(--accent-teal)', fontWeight: 700 }}>Email Address</label>
+                <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="Email Address" className="input-field" style={{ borderRadius: 12, borderColor: 'var(--accent-teal)' }} />
               </div>
               <div>
-                <label style={{ display: 'block', marginBottom: 8, fontSize: 14, color: 'var(--text-secondary)', fontWeight: 600 }}>New Password</label>
-                <input type="password" name="password" value={formData.password} onChange={handleChange} placeholder="Leave blank to keep current password" className="input-field" style={{ borderRadius: 12 }} />
+                <label style={{ display: 'block', marginBottom: 8, fontSize: 14, color: 'var(--accent-teal)', fontWeight: 700 }}>New Password</label>
+                <input type="password" name="password" value={formData.password} onChange={handleChange} placeholder="Leave blank to keep current password" className="input-field" style={{ borderRadius: 12, borderColor: 'var(--accent-teal)' }} />
               </div>
             </div>
           </div>
 
           {/* Personal Details */}
-          <div className="bento-card" style={{ padding: '2rem' }}>
+          <div className="bento-card" style={{ padding: '2rem', backgroundColor: 'var(--bg-color)', borderColor: 'var(--accent-teal)', borderWidth: '2px' }}>
             <h2 style={{ fontSize: 20, margin: '0 0 1.5rem', color: 'var(--text-primary)' }}>Personal Details</h2>
             <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap' }}>
               <div style={{ flex: '1 1 200px' }}>
-                <label style={{ display: 'block', marginBottom: 8, fontSize: 14, color: 'var(--text-secondary)', fontWeight: 600 }}>Date of Birth</label>
-                <input type="date" name="dob" value={formData.dob} onChange={handleChange} className="input-field" style={{ borderRadius: 12, width: '100%', boxSizing: 'border-box' }} />
+                <label style={{ display: 'block', marginBottom: 8, fontSize: 14, color: 'var(--accent-teal)', fontWeight: 700 }}>Date of Birth</label>
+                <input type="date" name="dob" value={formData.dob} onChange={handleChange} className="input-field" style={{ borderRadius: 12, width: '100%', boxSizing: 'border-box', borderColor: 'var(--accent-teal)' }} />
               </div>
               <div style={{ flex: '1 1 200px' }}>
-                <label style={{ display: 'block', marginBottom: 8, fontSize: 14, color: 'var(--text-secondary)', fontWeight: 600 }}>Gender</label>
-                <select name="gender" value={formData.gender} onChange={handleChange} className="input-field" style={{ borderRadius: 12, width: '100%', boxSizing: 'border-box', appearance: 'none', cursor: 'pointer' }}>
+                <label style={{ display: 'block', marginBottom: 8, fontSize: 14, color: 'var(--accent-teal)', fontWeight: 700 }}>Gender</label>
+                <select name="gender" value={formData.gender} onChange={handleChange} className="input-field" style={{ borderRadius: 12, width: '100%', boxSizing: 'border-box', appearance: 'none', cursor: 'pointer', borderColor: 'var(--accent-teal)' }}>
                   <option value="">Select Gender</option>
                   <option value="male">Male</option>
                   <option value="female">Female</option>
@@ -151,22 +170,22 @@ export default function Settings() {
           </div>
 
           {/* Professional Details */}
-          <div className="bento-card" style={{ padding: '2rem' }}>
+          <div className="bento-card" style={{ padding: '2rem', backgroundColor: 'var(--bg-color)', borderColor: 'var(--accent-teal)', borderWidth: '2px' }}>
             <h2 style={{ fontSize: 20, margin: '0 0 1.5rem', color: 'var(--text-primary)' }}>Professional Details</h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <div>
-                <label style={{ display: 'block', marginBottom: 8, fontSize: 14, color: 'var(--text-secondary)', fontWeight: 600 }}>Career Goal</label>
-                <input type="text" name="career" value={formData.career} onChange={handleChange} placeholder="e.g. Senior Frontend Developer" className="input-field" style={{ borderRadius: 12 }} />
+                <label style={{ display: 'block', marginBottom: 8, fontSize: 14, color: 'var(--accent-teal)', fontWeight: 700 }}>Career Goal</label>
+                <input type="text" name="career" value={formData.career} onChange={handleChange} placeholder="e.g. Senior Frontend Developer" className="input-field" style={{ borderRadius: 12, borderColor: 'var(--accent-teal)' }} />
               </div>
               <div>
-                <label style={{ display: 'block', marginBottom: 8, fontSize: 14, color: 'var(--text-secondary)', fontWeight: 600 }}>Skills</label>
-                <textarea name="skills" value={formData.skills} onChange={handleChange} placeholder="e.g. React, Python, UI/UX (comma separated)" className="input-field" rows="3" style={{ borderRadius: 12, resize: 'vertical' }} />
+                <label style={{ display: 'block', marginBottom: 8, fontSize: 14, color: 'var(--accent-teal)', fontWeight: 700 }}>Skills</label>
+                <textarea name="skills" value={formData.skills} onChange={handleChange} placeholder="e.g. React, Python, UI/UX (comma separated)" className="input-field" rows="3" style={{ borderRadius: 12, resize: 'vertical', borderColor: 'var(--accent-teal)' }} />
               </div>
             </div>
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '1rem' }}>
-            <button type="submit" disabled={saving} className="btn-primary" style={{ padding: '16px 32px', fontSize: 16 }}>
+            <button type="submit" disabled={saving} className="btn-primary" style={{ padding: '16px 32px', fontSize: 16, backgroundColor: 'var(--accent-teal)', color: 'white', border: 'none' }}>
               {saving ? 'Saving Changes...' : 'Save Changes'}
             </button>
           </div>

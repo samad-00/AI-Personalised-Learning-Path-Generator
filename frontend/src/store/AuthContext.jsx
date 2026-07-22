@@ -38,7 +38,7 @@ export function AuthProvider({ children }) {
   };
 
   const loginWithGoogle = async (googleToken) => {
-    const res = await axios.post('http://127.0.0.1:8008/api/accounts/google/', {
+    const res = await axios.post('http://127.0.0.1:8010/api/accounts/google/', {
       token: googleToken
     });
     localStorage.setItem('token', res.data.access);

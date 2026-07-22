@@ -7,7 +7,6 @@ export default function Landing() {
   const { user, loading } = useAuth();
 
   if (loading) return null;
-  if (user) return <Navigate to="/dashboard" replace />;
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden' }}>
@@ -49,12 +48,20 @@ export default function Landing() {
           </div>
           
           <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-            <Link to="/register" className="btn-primary" style={{ background: 'var(--text-primary)', color: 'var(--bg-color)', textDecoration: 'none', padding: '18px 40px', fontSize: 18, borderRadius: 100 }}>
-              Start Learning Free
-            </Link>
-            <Link to="/login" className="btn-secondary" style={{ textDecoration: 'none', padding: '18px 40px', fontSize: 18, borderRadius: 100, border: '2px solid var(--border-color)', background: 'var(--surface-color)' }}>
-              Log in to account
-            </Link>
+            {user ? (
+              <Link to="/dashboard" className="btn-primary" style={{ background: 'var(--text-primary)', color: 'var(--bg-color)', textDecoration: 'none', padding: '18px 40px', fontSize: 18, borderRadius: 100 }}>
+                Go to Dashboard
+              </Link>
+            ) : (
+              <>
+                <Link to="/register" className="btn-primary" style={{ background: 'var(--text-primary)', color: 'var(--bg-color)', textDecoration: 'none', padding: '18px 40px', fontSize: 18, borderRadius: 100 }}>
+                  Start Learning Free
+                </Link>
+                <Link to="/login" className="btn-secondary" style={{ textDecoration: 'none', padding: '18px 40px', fontSize: 18, borderRadius: 100, border: '2px solid var(--border-color)', background: 'var(--surface-color)' }}>
+                  Log in to account
+                </Link>
+              </>
+            )}
           </div>
         </div>
 
