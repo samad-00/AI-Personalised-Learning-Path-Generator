@@ -1,0 +1,17 @@
+# Python / Django
+.env
+backend/.env
+venv/
+__pycache__/
+*.pyc
+db.sqlite3
+
+# Node / Vite
+node_modules/
+dist/
+
+# VS Code
+.vscode/
+
+# Logs
+*.log

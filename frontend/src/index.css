@@ -1,0 +1,212 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800;900&display=swap');
+
+:root {
+  /* Core Typography */
+  font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  
+  color-scheme: light dark;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  /* LIGHT THEME (EduMaster Inspiration) */
+  --bg-color: #fcf9f2; /* Soft warm cream */
+  --surface-color: #ffffff; /* Pure white for contrast */
+  --surface-muted: #f0ede6; /* slightly darker cream for secondary cards */
+  --text-primary: #1e1e1e; /* Dark charcoal */
+  --text-secondary: #6e6b66; /* Muted warm grey */
+  --border-color: rgba(0, 0, 0, 0.8); /* Black thin border */
+  
+  /* Accent Palette */
+  --accent-pink: #eb6383; /* Watermelon Pink */
+  --accent-teal: #2a766a; /* Deep Teal/Forest */
+  --accent-orange: #f4a259; /* Warm Honey/Orange */
+  --accent-mint: #e8f5e9; /* Light mint for positive stats */
+  
+  --shadow-bento: 0 10px 30px rgba(0,0,0,0.03);
+}
+
+body.dark-mode {
+  /* DARK THEME (Adapted) */
+  --bg-color: #1a1918; /* Deep warm charcoal */
+  --surface-color: #262422; /* Dark grey/brown */
+  --surface-muted: #302d2a;
+  --text-primary: #f5f5f5; /* Off-white */
+  --text-secondary: #a3a09c; /* Muted light grey */
+  --border-color: rgba(245, 245, 220, 0.5); /* Light beige border */
+  
+  /* Accents remain vibrant, but we might tweak text color inside them if needed via components */
+  --accent-pink: #eb6383; 
+  --accent-teal: #2a766a; 
+  --accent-orange: #f4a259;
+  --accent-mint: #253328; /* Dark mint background for positive stats */
+  
+  --shadow-bento: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+body {
+  margin: 0;
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Outfit', sans-serif; /* Use Outfit for headings */
+  color: var(--text-primary);
+  margin-top: 0;
+  letter-spacing: -0.5px;
+}
+
+a {
+  color: var(--text-primary);
+  text-decoration: none;
+}
+
+/* Utilities */
+.bento-card {
+  background-color: var(--surface-color);
+  border-radius: 32px; /* Very large border radius */
+  box-shadow: var(--shadow-bento);
+  padding: 1.5rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: 1px solid var(--border-color);
+}
+
+.bento-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 40px rgba(0,0,0,0.05);
+}
+
+body.dark-mode .bento-card:hover {
+  box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+}
+
+/* Specific Solid Colored Cards */
+.card-pink {
+  background-color: var(--accent-pink);
+  color: #ffffff;
+}
+.card-teal {
+  background-color: var(--accent-teal);
+  color: #ffffff;
+}
+.card-orange {
+  background-color: var(--accent-orange);
+  color: #ffffff;
+}
+
+.pill-tag {
+  background-color: var(--surface-muted);
+  color: var(--text-primary);
+  padding: 6px 16px;
+  border-radius: 100px;
+  font-size: 13px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--border-color);
+}
+
+.btn-primary {
+  background-color: var(--text-primary); /* Use dark primary color for buttons */
+  color: var(--bg-color);
+  border: 1px solid var(--border-color);
+  padding: 12px 24px;
+  border-radius: 100px;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+  transition: transform 0.1s ease, opacity 0.2s ease;
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
+}
+
+.btn-primary:active {
+  transform: scale(0.98);
+}
+
+.btn-solid-dark {
+  background-color: #1e1e1e;
+  color: #ffffff;
+}
+body.dark-mode .btn-solid-dark {
+  background-color: #ffffff;
+  color: #1e1e1e;
+}
+
+/* Input Fields */
+.input-field {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 14px 20px;
+  border-radius: 100px;
+  border: 1px solid var(--border-color);
+  background-color: var(--surface-color);
+  color: var(--text-primary);
+  outline: none;
+  font-family: 'Inter', sans-serif;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.input-field:focus {
+  border-color: var(--text-primary);
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
+}
+
+body.dark-mode .input-field:focus {
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
+}
+
+/* Animations */
+@keyframes float {
+  0% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-15px) rotate(3deg); }
+  100% { transform: translateY(0px) rotate(0deg); }
+}
+
+@keyframes float-reverse {
+  0% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(15px) rotate(-3deg); }
+  100% { transform: translateY(0px) rotate(0deg); }
+}
+
+@keyframes float-horizontal {
+  0% { transform: translateX(0px) rotate(0deg); }
+  50% { transform: translateX(15px) rotate(2deg); }
+  100% { transform: translateX(0px) rotate(0deg); }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+.animate-float-reverse {
+  animation: float-reverse 7s ease-in-out infinite;
+}
+.animate-float-horizontal {
+  animation: float-horizontal 8s ease-in-out infinite;
+}

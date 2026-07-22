@@ -1,0 +1,11 @@
+django>=4.2,<5.0
+djangorestframework
+django-cors-headers
+djangorestframework-simplejwt
+django-environ
+django-allauth
+groq
+requests
+reportlab
+boto3
+psycopg2-binary
