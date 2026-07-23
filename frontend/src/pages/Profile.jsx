@@ -136,13 +136,13 @@ export default function Profile() {
               <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)' }}>Total Plans</div>
             </div>
             
-            <div className="bento-card" style={{ background: '#f8f4e6', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '2rem 1rem' }}>
+            <div className="bento-card" style={{ background: 'var(--accent-yellow)', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '2rem 1rem' }}>
               <div style={{ fontSize: 24, opacity: 0.8, marginBottom: 12 }}>✅</div>
               <div style={{ fontSize: 36, fontWeight: 800, fontFamily: 'Outfit', color: 'var(--text-primary)', lineHeight: 1, marginBottom: 8 }}>{profile?.total_resources_completed || 0}</div>
               <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)' }}>Lessons Done</div>
             </div>
 
-            <div className="bento-card" style={{ background: '#eaf2f0', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '2rem 1rem' }}>
+            <div className="bento-card" style={{ background: 'var(--accent-blue)', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '2rem 1rem' }}>
               <div style={{ fontSize: 24, opacity: 0.8, marginBottom: 12 }}>⏱️</div>
               <div style={{ fontSize: 36, fontWeight: 800, fontFamily: 'Outfit', color: 'var(--text-primary)', lineHeight: 1, marginBottom: 8 }}>{profile?.total_weeks_completed || 0}</div>
               <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)' }}>Weeks Passed</div>
@@ -161,7 +161,7 @@ export default function Profile() {
                 <h2 style={{ fontSize: 28, margin: '0 0 0.5rem', color: '#ffffff' }}>Your Learning Activity</h2>
                 <p style={{ opacity: 0.9, fontSize: 15, margin: 0 }}>Keep up the great work to reach your next level!</p>
               </div>
-              <button style={{ background: '#ffffff', color: 'var(--accent-pink)', border: 'none', padding: '12px 24px', borderRadius: 100, fontWeight: 800, cursor: 'pointer' }}>
+              <button onClick={() => navigate('/stats')} style={{ background: '#ffffff', color: 'var(--accent-pink)', border: 'none', padding: '12px 24px', borderRadius: 100, fontWeight: 800, cursor: 'pointer' }}>
                 View Full Stats
               </button>
             </div>

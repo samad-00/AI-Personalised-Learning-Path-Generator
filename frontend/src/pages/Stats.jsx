@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../store/AuthContext';
 import { getProfile, getLeaderboard } from '../services/api';
+import ThemeToggle from '../components/ThemeToggle';
+import AnimatedBackground from '../components/AnimatedBackground';
 
 const LEVEL_TITLES = {
   1:'Novice',2:'Apprentice',3:'Student',4:'Scholar',5:'Adept',
@@ -9,7 +11,7 @@ const LEVEL_TITLES = {
 };
 
 export default function Stats() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
   const [leaderboard, setLeaderboard] = useState([]);
@@ -32,12 +34,50 @@ export default function Stats() {
   return (
     <div style={s.page}>
       <style>{css}</style>
-      <div style={s.orb1}/><div style={s.orb2}/>
+      <AnimatedBackground />
 
-      <nav style={s.nav}>
-        <button style={s.back} onClick={() => navigate('/dashboard')}>← back</button>
-        <span style={s.navLogo}>⚡ learnpath</span>
-        <div/>
+      {/* Top Navbar */}
+      <nav style={{ padding: '1.5rem 2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative', zIndex: 10 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 32 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <div style={{ width: 40, height: 40, borderRadius: '50%', background: 'var(--accent-pink)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>
+              📖
+            </div>
+            <span style={{ fontSize: 24, fontWeight: 800, fontFamily: 'Outfit, sans-serif', color: 'var(--text-primary)' }}>LearnPath</span>
+          </div>
+          
+          <div style={{ display: 'flex', gap: 24, fontSize: 15, fontWeight: 600, color: 'var(--text-primary)' }}>
+            <span style={{ cursor: 'pointer', opacity: 0.7 }} onClick={() => navigate('/dashboard')}>Home</span>
+            <span style={{ cursor: 'pointer', opacity: 0.7 }} onClick={() => navigate('/profile')}>Profile</span>
+            <span style={{ color: 'var(--accent-pink)' }}>Stats</span>
+          </div>
+        </div>
+        
+        <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
+          <ThemeToggle />
+          <button 
+            title="Logout" 
+            style={{ 
+              background: 'transparent', 
+              border: '1px solid var(--border-color)', 
+              color: 'var(--text-primary)',
+              width: 36, 
+              height: 36, 
+              borderRadius: 8, 
+              cursor: 'pointer', 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center', 
+              fontSize: 18,
+              transition: 'all 0.2s ease'
+            }} 
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--border-color)'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+            onClick={logout}
+          >
+            🚪
+          </button>
+        </div>
       </nav>
 
       <div style={s.content}>
@@ -78,14 +118,14 @@ export default function Stats() {
         {tab === 'stats' && (
           <div style={s.statsGrid}>
             {[
-              { icon: '⚡', val: profile.xp, label: 'Total XP' },
-              { icon: '🎯', val: profile.level, label: 'Current Level' },
-              { icon: '🔥', val: profile.streak, label: 'Day Streak' },
-              { icon: '✅', val: profile.total_resources_completed, label: 'Resources Done' },
-              { icon: '📅', val: profile.total_weeks_completed, label: 'Weeks Completed' },
-              { icon: '🗺️', val: profile.total_roadmaps_completed, label: 'Roadmaps Done' },
+              { icon: '⚡', val: profile.xp, label: 'Total XP', bg: 'var(--accent-yellow)' },
+              { icon: '🎯', val: profile.level, label: 'Current Level', bg: 'var(--accent-blue)' },
+              { icon: '🔥', val: profile.streak, label: 'Day Streak', bg: 'var(--surface-muted)' },
+              { icon: '✅', val: profile.total_resources_completed, label: 'Resources Done', bg: 'var(--accent-mint)' },
+              { icon: '📅', val: profile.total_weeks_completed, label: 'Weeks Completed', bg: 'var(--surface-color)' },
+              { icon: '🗺️', val: profile.total_roadmaps_completed, label: 'Roadmaps Done', bg: 'var(--accent-yellow)' },
             ].map((stat, i) => (
-              <div key={i} style={s.statCard} className="stat-card">
+              <div key={i} style={{ ...s.statCard, background: stat.bg }} className="stat-card">
                 <span style={s.statIcon}>{stat.icon}</span>
                 <span style={s.statVal}>{stat.val}</span>
                 <span style={s.statLabel}>{stat.label}</span>
@@ -145,71 +185,68 @@ export default function Stats() {
 }
 
 const css = `
-  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Syne:wght@700;800&display=swap');
-  * { font-family: 'Space Grotesk', sans-serif; box-sizing: border-box; }
-  h1,h2,h3,h4 { font-family: 'Syne', sans-serif; }
   .xp-fill { transition: width 1s cubic-bezier(0.34,1.56,0.64,1); }
   .stat-card { transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1); }
-  .stat-card:hover { transform: translateY(-4px); border-color: rgba(168,85,247,0.4) !important; box-shadow: 0 12px 40px rgba(168,85,247,0.1); }
+  .stat-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-bento); }
   .badge-card { transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1); }
-  .badge-card:hover { transform: translateY(-4px) scale(1.02); border-color: rgba(168,85,247,0.4) !important; box-shadow: 0 12px 40px rgba(168,85,247,0.1); }
+  .badge-card:hover { transform: translateY(-4px) scale(1.02); box-shadow: var(--shadow-bento); }
   .leader-row { transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1); }
-  .leader-row:hover { background: rgba(168,85,247,0.1) !important; }
+  .leader-row:hover { background: var(--surface-muted) !important; }
 `;
 
 const s = {
-  page: { minHeight: '100vh', background: '#0a0a0f', color: 'white', position: 'relative', overflow: 'hidden' },
-  loading: { minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0a0a0f' },
-  spinner: { width: 40, height: 40, border: '4px solid rgba(168,85,247,0.2)', borderTopColor: '#a855f7', borderRadius: '50%' },
-  orb1: { position: 'fixed', width: 500, height: 500, background: 'rgba(168,85,247,0.1)', borderRadius: '50%', filter: 'blur(100px)', top: -100, right: -100, pointerEvents: 'none' },
-  orb2: { position: 'fixed', width: 400, height: 400, background: 'rgba(236,72,153,0.07)', borderRadius: '50%', filter: 'blur(100px)', bottom: -100, left: -100, pointerEvents: 'none' },
-  nav: { padding: '1rem 2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.06)', position: 'sticky', top: 0, background: 'rgba(10,10,15,0.8)', backdropFilter: 'blur(20px)', zIndex: 100 },
-  back: { padding: '0.4rem 1rem', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 20, color: 'rgba(255,255,255,0.6)', cursor: 'pointer', fontSize: 13, fontWeight: 600 },
-  navLogo: { fontSize: 18, fontWeight: 800, fontFamily: 'Syne, sans-serif', background: 'linear-gradient(135deg, #a855f7, #ec4899)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' },
+  page: { minHeight: '100vh', background: 'var(--bg-color)', color: 'var(--text-primary)', position: 'relative', overflow: 'hidden' },
+  loading: { minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-color)' },
+  spinner: { width: 40, height: 40, border: '4px solid var(--accent-pink)', borderTopColor: 'transparent', borderRadius: '50%' },
+  orb1: { position: 'fixed', width: 500, height: 500, background: 'var(--accent-pink)', opacity: 0.1, borderRadius: '50%', filter: 'blur(100px)', top: -100, right: -100, pointerEvents: 'none' },
+  orb2: { position: 'fixed', width: 400, height: 400, background: 'var(--accent-orange)', opacity: 0.07, borderRadius: '50%', filter: 'blur(100px)', bottom: -100, left: -100, pointerEvents: 'none' },
+  nav: { padding: '1rem 2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-color)', position: 'sticky', top: 0, background: 'var(--bg-color)', zIndex: 100 },
+  back: { padding: '0.4rem 1rem', background: 'var(--surface-color)', border: '1px solid var(--border-color)', borderRadius: 20, color: 'var(--text-secondary)', cursor: 'pointer', fontSize: 13, fontWeight: 600 },
+  navLogo: { fontSize: 18, fontWeight: 800, fontFamily: 'Outfit, sans-serif', color: 'var(--accent-pink)' },
   content: { maxWidth: 900, margin: '0 auto', padding: '2rem', position: 'relative', zIndex: 1 },
-  profileHero: { background: 'linear-gradient(135deg, rgba(255,255,255,0.04), rgba(168,85,247,0.04))', border: '1px solid rgba(168,85,247,0.1)', borderRadius: 28, padding: '2rem', display: 'flex', alignItems: 'center', gap: '2rem', marginBottom: '2rem', flexWrap: 'wrap', boxShadow: '0 16px 48px rgba(0,0,0,0.15)' },
-  avatarBig: { width: 80, height: 80, borderRadius: '50%', background: 'linear-gradient(135deg, #a855f7, #ec4899)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32, fontWeight: 900, flexShrink: 0 },
+  profileHero: { background: 'var(--accent-teal)', border: '1px solid var(--border-color)', borderRadius: 28, padding: '2rem', display: 'flex', alignItems: 'center', gap: '2rem', marginBottom: '2rem', flexWrap: 'wrap', boxShadow: 'var(--shadow-bento)' },
+  avatarBig: { width: 80, height: 80, borderRadius: '50%', background: 'var(--bg-color)', color: 'var(--accent-teal)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32, fontWeight: 900, flexShrink: 0 },
   profileInfo: { flex: 1 },
-  profileName: { fontSize: 28, fontWeight: 800, margin: '0 0 0.5rem' },
+  profileName: { fontSize: 28, fontWeight: 800, margin: '0 0 0.5rem', color: 'white' },
   levelBadge: { display: 'flex', alignItems: 'center', gap: 8, marginBottom: '0.75rem' },
-  levelNum: { background: 'linear-gradient(135deg, #a855f7, #ec4899)', padding: '0.2rem 0.75rem', borderRadius: 100, fontSize: 13, fontWeight: 800 },
-  levelTitle: { color: 'rgba(255,255,255,0.6)', fontSize: 14, fontWeight: 600 },
+  levelNum: { background: 'rgba(255,255,255,0.2)', color: 'white', padding: '0.2rem 0.75rem', borderRadius: 100, fontSize: 13, fontWeight: 800 },
+  levelTitle: { color: 'rgba(255,255,255,0.8)', fontSize: 14, fontWeight: 600 },
   xpBarWrap: {},
-  xpBarBg: { height: 8, background: 'rgba(255,255,255,0.1)', borderRadius: 100, overflow: 'hidden', marginBottom: 6 },
-  xpBarFill: { height: '100%', background: 'linear-gradient(135deg, #a855f7, #ec4899)', borderRadius: 100 },
-  xpText: { fontSize: 12, color: 'rgba(255,255,255,0.4)', fontWeight: 600 },
+  xpBarBg: { height: 8, background: 'rgba(0,0,0,0.2)', borderRadius: 100, overflow: 'hidden', marginBottom: 6 },
+  xpBarFill: { height: '100%', background: 'white', borderRadius: 100 },
+  xpText: { fontSize: 12, color: 'rgba(255,255,255,0.8)', fontWeight: 600 },
   streakBig: { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 },
   streakFire: { fontSize: 40 },
-  streakNum: { fontSize: 32, fontWeight: 900, fontFamily: 'Syne, sans-serif', color: '#f97316' },
-  streakLabel: { fontSize: 12, color: 'rgba(255,255,255,0.4)', fontWeight: 600 },
+  streakNum: { fontSize: 32, fontWeight: 900, fontFamily: 'Outfit, sans-serif', color: 'white' },
+  streakLabel: { fontSize: 12, color: 'rgba(255,255,255,0.8)', fontWeight: 600 },
   tabs: { display: 'flex', gap: 8, marginBottom: '1.5rem' },
-  tab: { padding: '0.6rem 1.25rem', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 100, color: 'rgba(255,255,255,0.5)', cursor: 'pointer', fontSize: 14, fontWeight: 700, fontFamily: 'Space Grotesk, sans-serif', transition: 'all 0.2s ease' },
-  tabActive: { background: 'rgba(168,85,247,0.25)', border: '1px solid rgba(168,85,247,0.5)', color: '#c084fc', boxShadow: '0 4px 20px rgba(168,85,247,0.15)' },
+  tab: { padding: '0.6rem 1.25rem', background: 'var(--surface-color)', border: '1px solid var(--border-color)', borderRadius: 100, color: 'var(--text-secondary)', cursor: 'pointer', fontSize: 14, fontWeight: 700, fontFamily: 'Inter, sans-serif', transition: 'all 0.2s ease' },
+  tabActive: { background: 'var(--accent-mint)', border: '1px solid var(--border-color)', color: 'var(--text-primary)', boxShadow: '0 4px 20px rgba(0,0,0,0.05)' },
   statsGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1rem' },
-  statCard: { background: 'linear-gradient(135deg, rgba(255,255,255,0.04), rgba(168,85,247,0.03))', border: '1px solid rgba(168,85,247,0.1)', borderRadius: 20, padding: '1.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, boxShadow: '0 8px 32px rgba(0,0,0,0.1)' },
+  statCard: { background: 'var(--surface-color)', border: '1px solid var(--border-color)', borderRadius: 20, padding: '1.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, boxShadow: 'var(--shadow-bento)' },
   statIcon: { fontSize: 32 },
-  statVal: { fontSize: 28, fontWeight: 900, fontFamily: 'Syne, sans-serif', color: 'white' },
-  statLabel: { fontSize: 13, color: 'rgba(255,255,255,0.4)', fontWeight: 600 },
-  empty: { background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 24, padding: '4rem 2rem', textAlign: 'center' },
+  statVal: { fontSize: 28, fontWeight: 900, fontFamily: 'Outfit, sans-serif', color: 'var(--text-primary)' },
+  statLabel: { fontSize: 13, color: 'var(--text-secondary)', fontWeight: 600 },
+  empty: { background: 'var(--surface-color)', border: '1px solid var(--border-color)', borderRadius: 24, padding: '4rem 2rem', textAlign: 'center' },
   emptyIcon: { fontSize: 52, marginBottom: '1rem' },
-  emptyTitle: { fontSize: 20, fontWeight: 800, margin: '0 0 0.5rem' },
-  emptyText: { color: 'rgba(255,255,255,0.4)', fontSize: 14 },
+  emptyTitle: { fontSize: 20, fontWeight: 800, margin: '0 0 0.5rem', color: 'var(--text-primary)' },
+  emptyText: { color: 'var(--text-secondary)', fontSize: 14 },
   badgesGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1rem' },
-  badgeCard: { background: 'linear-gradient(135deg, rgba(255,255,255,0.04), rgba(168,85,247,0.03))', border: '1px solid rgba(168,85,247,0.1)', borderRadius: 20, padding: '1.5rem', textAlign: 'center', boxShadow: '0 8px 32px rgba(0,0,0,0.08)' },
+  badgeCard: { background: 'var(--surface-color)', border: '1px solid var(--border-color)', borderRadius: 20, padding: '1.5rem', textAlign: 'center', boxShadow: 'var(--shadow-bento)' },
   badgeEmoji: { fontSize: 40, display: 'block', marginBottom: '0.75rem' },
-  badgeName: { fontSize: 16, fontWeight: 800, margin: '0 0 0.4rem', color: 'white' },
-  badgeDesc: { fontSize: 13, color: 'rgba(255,255,255,0.5)', margin: '0 0 0.5rem' },
-  badgeDate: { fontSize: 11, color: 'rgba(255,255,255,0.3)', fontWeight: 600 },
+  badgeName: { fontSize: 16, fontWeight: 800, margin: '0 0 0.4rem', color: 'var(--text-primary)' },
+  badgeDesc: { fontSize: 13, color: 'var(--text-secondary)', margin: '0 0 0.5rem' },
+  badgeDate: { fontSize: 11, color: 'var(--text-secondary)', fontWeight: 600 },
   leaderboard: { display: 'flex', flexDirection: 'column', gap: 8 },
-  leaderRow: { display: 'flex', alignItems: 'center', gap: '1rem', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 16, padding: '1rem 1.5rem', cursor: 'default', boxShadow: '0 4px 16px rgba(0,0,0,0.06)' },
-  leaderRowMe: { background: 'rgba(168,85,247,0.1)', border: '1px solid rgba(168,85,247,0.3)' },
-  leaderRank: { fontSize: 20, minWidth: 36, textAlign: 'center', fontWeight: 800 },
-  leaderAvatar: { width: 36, height: 36, borderRadius: '50%', background: 'linear-gradient(135deg, #a855f7, #ec4899)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: 16, flexShrink: 0 },
+  leaderRow: { display: 'flex', alignItems: 'center', gap: '1rem', background: 'var(--surface-color)', border: '1px solid var(--border-color)', borderRadius: 16, padding: '1rem 1.5rem', cursor: 'default', boxShadow: 'var(--shadow-bento)' },
+  leaderRowMe: { background: 'var(--accent-mint)', border: '1px solid var(--border-color)' },
+  leaderRank: { fontSize: 20, minWidth: 36, textAlign: 'center', fontWeight: 800, color: 'var(--text-primary)' },
+  leaderAvatar: { width: 36, height: 36, borderRadius: '50%', background: 'var(--accent-pink)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: 16, flexShrink: 0, color: 'white' },
   leaderInfo: { flex: 1, display: 'flex', flexDirection: 'column', gap: 2 },
-  leaderName: { fontSize: 15, fontWeight: 700, color: 'white' },
-  leaderLevel: { fontSize: 12, color: 'rgba(255,255,255,0.4)', fontWeight: 600 },
-  youTag: { background: 'rgba(168,85,247,0.3)', color: '#c084fc', padding: '0.1rem 0.5rem', borderRadius: 100, fontSize: 11, fontWeight: 800, marginLeft: 6 },
+  leaderName: { fontSize: 15, fontWeight: 700, color: 'var(--text-primary)' },
+  leaderLevel: { fontSize: 12, color: 'var(--text-secondary)', fontWeight: 600 },
+  youTag: { background: 'var(--accent-teal)', color: 'white', padding: '0.1rem 0.5rem', borderRadius: 100, fontSize: 11, fontWeight: 800, marginLeft: 6 },
   leaderRight: { display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 2 },
-  leaderXP: { fontSize: 15, fontWeight: 800, color: '#a855f7' },
-  leaderStreak: { fontSize: 12, color: 'rgba(255,255,255,0.4)', fontWeight: 600 },
+  leaderXP: { fontSize: 15, fontWeight: 800, color: 'var(--text-primary)' },
+  leaderStreak: { fontSize: 12, color: 'var(--text-secondary)', fontWeight: 600 },
 };
