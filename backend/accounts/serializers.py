@@ -33,6 +33,11 @@ class UserSerializer(serializers.ModelSerializer):
     xp_for_current_level = serializers.SerializerMethodField()
     xp_progress_pct = serializers.SerializerMethodField()
     password = serializers.CharField(write_only=True, required=False, min_length=8)
+    dob = serializers.DateField(
+        required=False,
+        allow_null=True,
+        input_formats=['%Y-%m-%d', '%m/%d/%Y', '%d/%m/%Y', '%Y/%m/%d', '%m-%d-%Y', '%d-%m-%Y', '%Y-%m-%dT%H:%M:%S', '%Y-%m-%dT%H:%M:%S.%fZ', 'iso-8601']
+    )
 
     class Meta:
         model = User
@@ -45,6 +50,25 @@ class UserSerializer(serializers.ModelSerializer):
             'xp_for_next_level', 'xp_for_current_level', 'xp_progress_pct'
         ]
         read_only_fields = ['id', 'date_joined', 'xp', 'level', 'streak']
+
+    def to_internal_value(self, data):
+        data = dict(data)
+        if 'dob' in data:
+            val = data.get('dob')
+            if isinstance(val, list) and len(val) > 0:
+                val = val[0]
+            if val in ['', 'null', 'None', 'undefined', None, []]:
+                data['dob'] = None
+            elif isinstance(val, str):
+                val = val.strip()
+                if 'T' in val:
+                    val = val.split('T')[0]
+                elif ' ' in val:
+                    val = val.split(' ')[0]
+                data['dob'] = val
+        if 'password' in data and (not data.get('password') or data.get('password') in ['', ['']]):
+            data.pop('password', None)
+        return super().to_internal_value(data)
 
     def update(self, instance, validated_data):
         password = validated_data.pop('password', None)

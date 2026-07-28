@@ -11,6 +11,7 @@ export default function Settings() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
+  const [isError, setIsError] = useState(false);
   
   const [formData, setFormData] = useState({
     username: '',
@@ -22,6 +23,12 @@ export default function Settings() {
     gender: ''
   });
 
+  const formatDob = (val) => {
+    if (!val || val === 'null' || val === 'undefined') return '';
+    const str = String(val).trim();
+    return str.includes('T') ? str.split('T')[0] : str.split(' ')[0];
+  };
+
   useEffect(() => {
     getProfile().then(res => {
       setFormData({
@@ -30,7 +37,7 @@ export default function Settings() {
         password: '',
         skills: res.data.skills || '',
         career: res.data.career || '',
-        dob: res.data.dob || '',
+        dob: formatDob(res.data.dob),
         gender: res.data.gender || ''
       });
     }).finally(() => setLoading(false));
@@ -44,17 +51,52 @@ export default function Settings() {
     e.preventDefault();
     setSaving(true);
     setMessage('');
+    setIsError(false);
     
-    // Only send password if it's not empty
+    // Clean up payload before sending
     const payload = { ...formData };
     if (!payload.password) delete payload.password;
+    if (!payload.dob || payload.dob === '' || payload.dob === 'null') {
+      payload.dob = null;
+    } else {
+      payload.dob = formatDob(payload.dob);
+    }
 
     try {
-      await updateProfile(payload);
+      const res = await updateProfile(payload);
+      if (res && res.data) {
+        setFormData({
+          username: res.data.username || '',
+          email: res.data.email || '',
+          password: '',
+          skills: res.data.skills || '',
+          career: res.data.career || '',
+          dob: formatDob(res.data.dob),
+          gender: res.data.gender || ''
+        });
+      }
+      setIsError(false);
       setMessage('Profile updated successfully!');
-      setTimeout(() => setMessage(''), 3000);
+      setTimeout(() => setMessage(''), 4000);
     } catch (err) {
-      setMessage(err.response?.data?.error || 'Failed to update profile');
+      setIsError(true);
+      const errorData = err.response?.data;
+      let errorMsg = 'Failed to update profile';
+      if (errorData) {
+        if (typeof errorData === 'string') {
+          errorMsg = errorData;
+        } else if (errorData.error) {
+          errorMsg = errorData.error;
+        } else if (typeof errorData === 'object') {
+          const messages = Object.entries(errorData).map(([key, val]) => {
+            const field = key.charAt(0).toUpperCase() + key.slice(1);
+            const msg = Array.isArray(val) ? val.join(' ') : val;
+            return `${field}: ${msg}`;
+          });
+          if (messages.length > 0) errorMsg = messages.join(' | ');
+        }
+      }
+      setMessage(errorMsg);
     } finally {
       setSaving(false);
     }
@@ -122,8 +164,22 @@ export default function Settings() {
         </div>
 
         {message && (
-          <div className="bento-card card-teal" style={{ padding: '1rem 1.5rem', marginBottom: '2rem', fontWeight: 700, color: 'var(--bg-color)', display: 'flex', alignItems: 'center', gap: 12 }}>
-            <span style={{ fontSize: 20 }}>✓</span> {message}
+          <div 
+            className={`bento-card ${isError ? '' : 'card-teal'}`} 
+            style={{ 
+              padding: '1rem 1.5rem', 
+              marginBottom: '2rem', 
+              fontWeight: 700, 
+              backgroundColor: isError ? 'rgba(239, 68, 68, 0.15)' : undefined,
+              borderColor: isError ? '#ef4444' : 'var(--accent-teal)',
+              borderWidth: '2px',
+              color: isError ? '#ef4444' : 'var(--bg-color)', 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: 12 
+            }}
+          >
+            <span style={{ fontSize: 20 }}>{isError ? '⚠️' : '✓'}</span> {message}
           </div>
         )}
 
@@ -154,7 +210,15 @@ export default function Settings() {
             <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap' }}>
               <div style={{ flex: '1 1 200px' }}>
                 <label style={{ display: 'block', marginBottom: 8, fontSize: 14, color: 'var(--accent-teal)', fontWeight: 700 }}>Date of Birth</label>
-                <input type="date" name="dob" value={formData.dob} onChange={handleChange} className="input-field" style={{ borderRadius: 12, width: '100%', boxSizing: 'border-box', borderColor: 'var(--accent-teal)' }} />
+                <input 
+                  type="date" 
+                  name="dob" 
+                  value={formData.dob || ''} 
+                  onChange={handleChange} 
+                  onClick={(e) => e.target.showPicker && e.target.showPicker()}
+                  className="input-field" 
+                  style={{ borderRadius: 12, width: '100%', boxSizing: 'border-box', borderColor: 'var(--accent-teal)', cursor: 'pointer' }} 
+                />
               </div>
               <div style={{ flex: '1 1 200px' }}>
                 <label style={{ display: 'block', marginBottom: 8, fontSize: 14, color: 'var(--accent-teal)', fontWeight: 700 }}>Gender</label>

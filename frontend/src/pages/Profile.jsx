@@ -106,6 +106,30 @@ export default function Profile() {
             </div>
           </div>
 
+          <div className="bento-card" style={{ padding: '1.5rem', background: 'var(--bg-color)', border: '2px solid var(--accent-teal)' }}>
+            <h3 style={{ fontSize: 18, margin: '0 0 1rem', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span>👤</span> Personal Details
+            </h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', fontSize: 14 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem' }}>
+                <span style={{ color: 'var(--text-secondary)' }}>🎂 Date of Birth:</span>
+                <span style={{ fontWeight: 700, color: 'var(--text-primary)' }}>{profile?.dob || 'Not set'}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem' }}>
+                <span style={{ color: 'var(--text-secondary)' }}>⚧ Gender:</span>
+                <span style={{ fontWeight: 700, color: 'var(--text-primary)', textTransform: 'capitalize' }}>{profile?.gender ? profile.gender.replace('_', ' ') : 'Not set'}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem' }}>
+                <span style={{ color: 'var(--text-secondary)' }}>🎯 Career Goal:</span>
+                <span style={{ fontWeight: 700, color: 'var(--text-primary)' }}>{profile?.career || 'Not set'}</span>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', paddingTop: '0.25rem' }}>
+                <span style={{ color: 'var(--text-secondary)' }}>🛠️ Skills:</span>
+                <span style={{ fontWeight: 600, color: 'var(--accent-teal)' }}>{profile?.skills || 'Not set'}</span>
+              </div>
+            </div>
+          </div>
+
           <div className="bento-card card-orange" style={{ padding: '2rem' }}>
             <h3 style={{ fontSize: 20, margin: '0 0 1.5rem' }}>Badges</h3>
             {!profile?.badges?.length ? (
