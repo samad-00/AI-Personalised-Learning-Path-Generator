@@ -1,7 +1,13 @@
 import json
 import requests
+import urllib.parse
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from groq import Groq
 from django.conf import settings
+
+# Timeout per individual URL check (seconds)
+URL_CHECK_TIMEOUT = 4
+
 
 def generate_roadmap(goal, experience_level='beginner'):
     prompt = f"""
@@ -65,41 +71,60 @@ Rules:
     content = content.replace('```json', '').replace('```', '').strip()
     roadmap_data = json.loads(content)
 
-    # Verify and fix URLs
-    for week in roadmap_data['weeks']:
-        for resource in week['resources']:
-            url = resource.get('url', '')
-            is_valid = True
-            
-            if not url or not url.startswith('http'):
-                is_valid = False
-            elif resource.get('resource_type') == 'video' and 'youtube.com' not in url and 'youtu.be' not in url:
-                is_valid = False
-            elif not verify_url(url):
-                is_valid = False
-                
-            if not is_valid:
-                resource['url'] = get_fallback_url(resource['title'], resource['resource_type'])
+    # Collect all resources across all weeks for parallel verification
+    all_resources = [
+        resource
+        for week in roadmap_data['weeks']
+        for resource in week['resources']
+    ]
+
+    # Verify all URLs in parallel — dramatically faster than sequential
+    _fix_resources_parallel(all_resources)
 
     return roadmap_data
+
+
+def _fix_resources_parallel(resources):
+    """Check all resource URLs in parallel and replace invalid ones with fallbacks."""
+    def check_and_fix(resource):
+        url = resource.get('url', '')
+        is_valid = True
+
+        if not url or not url.startswith('http'):
+            is_valid = False
+        elif resource.get('resource_type') == 'video' and 'youtube.com' not in url and 'youtu.be' not in url:
+            is_valid = False
+        elif not verify_url(url):
+            is_valid = False
+
+        if not is_valid:
+            resource['url'] = get_fallback_url(resource['title'], resource['resource_type'])
+
+    with ThreadPoolExecutor(max_workers=10) as executor:
+        futures = {executor.submit(check_and_fix, r): r for r in resources}
+        for future in as_completed(futures):
+            try:
+                future.result()
+            except Exception:
+                # If a single check crashes, leave the resource as-is
+                pass
 
 
 def verify_url(url):
     try:
         if 'youtube.com/watch' in url or 'youtu.be/' in url:
-            import urllib.parse
             oembed_url = f"https://www.youtube.com/oembed?url={urllib.parse.quote(url)}"
-            response = requests.get(oembed_url, timeout=5)
+            response = requests.get(oembed_url, timeout=URL_CHECK_TIMEOUT)
             return response.status_code == 200
 
-        response = requests.head(url, timeout=5, allow_redirects=True)
-        
-        # Some sites block HEAD requests, fallback to GET
+        response = requests.head(url, timeout=URL_CHECK_TIMEOUT, allow_redirects=True)
+
+        # Some sites block HEAD requests — fallback to a lightweight GET
         if response.status_code in (403, 405):
-            response = requests.get(url, timeout=5, stream=True)
-            
+            response = requests.get(url, timeout=URL_CHECK_TIMEOUT, stream=True)
+
         return response.status_code < 400
-    except:
+    except Exception:
         return False
 
 
@@ -158,18 +183,7 @@ Return ONLY the JSON, no extra text.
     content = content.replace('```json', '').replace('```', '').strip()
     week_data = json.loads(content)
 
-    for resource in week_data['resources']:
-        url = resource.get('url', '')
-        is_valid = True
-        
-        if not url or not url.startswith('http'):
-            is_valid = False
-        elif resource.get('resource_type') == 'video' and 'youtube.com' not in url and 'youtu.be' not in url:
-            is_valid = False
-        elif not verify_url(url):
-            is_valid = False
-            
-        if not is_valid:
-            resource['url'] = get_fallback_url(resource['title'], resource['resource_type'])
+    # Verify week resources in parallel too
+    _fix_resources_parallel(week_data['resources'])
 
     return week_data

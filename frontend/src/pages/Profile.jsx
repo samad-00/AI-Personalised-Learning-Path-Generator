@@ -101,7 +101,7 @@ export default function Profile() {
                 <span>{profile?.xp} / {profile?.xp_for_next_level}</span>
               </div>
               <div style={{ height: 8, background: 'rgba(255,255,255,0.2)', borderRadius: 100, overflow: 'hidden' }}>
-                <div style={{ height: '100%', background: '#ffffff', width: `${profile?.xp_progress_pct || 0}%`, transition: 'width 1s ease' }} />
+                <div style={{ height: '100%', background: '#ffffff', width: `${profile?.xp_for_next_level ? Math.min(100, (profile.xp / profile.xp_for_next_level) * 100) : 0}%`, transition: 'width 1s ease' }} />
               </div>
             </div>
           </div>
@@ -148,7 +148,7 @@ export default function Profile() {
               <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)' }}>Weeks Passed</div>
             </div>
 
-            <div className="bento-card" style={{ background: 'var(--surface-color)', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '2rem 1rem' }}>
+            <div className="bento-card" style={{ background: 'var(--accent-red)', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '2rem 1rem' }}>
               <div style={{ fontSize: 24, opacity: 0.8, marginBottom: 12 }}>🔥</div>
               <div style={{ fontSize: 36, fontWeight: 800, fontFamily: 'Outfit', color: 'var(--text-primary)', lineHeight: 1, marginBottom: 8 }}>{profile?.streak || 0}</div>
               <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)' }}>Day Streak</div>

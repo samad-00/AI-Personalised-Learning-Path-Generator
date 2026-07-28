@@ -27,6 +27,7 @@
   --accent-mint: #e8f5e9; /* Light mint for positive stats */
   --accent-yellow: #f8f4e6;
   --accent-blue: #eaf2f0;
+  --accent-red: #fdeaea;
   
   --shadow-bento: 0 10px 30px rgba(0,0,0,0.03);
 }
@@ -47,6 +48,7 @@ body.dark-mode {
   --accent-mint: #253328; /* Dark mint background for positive stats */
   --accent-yellow: #383327;
   --accent-blue: #25302e;
+  --accent-red: #3b2a2a;
   
   --shadow-bento: 0 10px 30px rgba(0,0,0,0.3);
 }

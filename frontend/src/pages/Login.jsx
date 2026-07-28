@@ -20,11 +20,11 @@ export default function Login() {
       navigate('/dashboard');
     } catch (err) {
       if (!err.response) {
-        setError('Network error: Could not connect to the server.');
+        setError('Cannot reach server. In backend terminal run: .\\venv\\Scripts\\python.exe manage.py runserver 8011');
       } else if (err.response.status === 401) {
-        setError('Invalid credentials');
+        setError('Incorrect email or password. Please try again.');
       } else {
-        setError('An error occurred during login. Please try again.');
+        setError('Server error. Please try again.');
       }
     } finally {
       setLoading(false);
@@ -33,7 +33,7 @@ export default function Login() {
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden' }}>
-      
+
       <AnimatedBackground />
 
       {/* Navigation */}
@@ -48,8 +48,8 @@ export default function Login() {
       </nav>
 
       <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem', position: 'relative', zIndex: 10 }}>
-        <div className="bento-card" style={{ width: '100%', maxWidth: 450, padding: '3.5rem', background: 'var(--surface-color)', boxShadow: '0 20px 60px rgba(0,0,0,0.08)' }}>
-          
+        <div className="bento-card" style={{ width: '100%', maxWidth: 450, padding: '3.5rem', background: 'rgba(235, 99, 131, 0.015)', backdropFilter: 'blur(4px)', WebkitBackdropFilter: 'blur(4px)', border: '2px solid var(--accent-pink)', boxShadow: 'none' }}>
+
           <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
             <h1 style={{ fontSize: 36, fontWeight: 800, margin: '0 0 0.5rem', letterSpacing: '-1px' }}>Welcome Back</h1>
             <p style={{ color: 'var(--text-secondary)', fontSize: 16, margin: 0, fontWeight: 500 }}>Sign in to continue your learning journey</p>
@@ -64,7 +64,7 @@ export default function Login() {
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 required
-                style={{ padding: '16px 24px', fontSize: 15 }}
+                style={{ padding: '16px 24px', fontSize: 15, background: 'transparent' }}
               />
             </div>
 
@@ -76,12 +76,12 @@ export default function Login() {
                 value={password}
                 onChange={e => setPassword(e.target.value)}
                 required
-                style={{ padding: '16px 24px', fontSize: 15 }}
+                style={{ padding: '16px 24px', fontSize: 15, background: 'transparent' }}
               />
             </div>
-            
+
             {error && <div style={{ color: '#ef4444', fontSize: 14, fontWeight: 600, textAlign: 'center' }}>{error}</div>}
-            
+
             <button type="submit" className="btn-primary card-orange" disabled={loading} style={{ marginTop: '0.5rem', padding: '18px', fontSize: 18, border: 'none' }}>
               {loading ? 'Signing in...' : 'Sign In'}
             </button>
@@ -90,7 +90,7 @@ export default function Login() {
           <div style={{ textAlign: 'center', marginTop: '2.5rem', fontSize: 16, color: 'var(--text-secondary)', fontWeight: 500 }}>
             Don't have an account? <Link to="/register" style={{ color: 'var(--accent-teal)', fontWeight: 700 }}>Sign up</Link>
           </div>
-          
+
         </div>
       </div>
     </div>

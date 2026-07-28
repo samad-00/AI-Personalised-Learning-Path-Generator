@@ -113,6 +113,8 @@ export default function Dashboard() {
           
           <div style={{ display: 'flex', gap: 24, fontSize: 15, fontWeight: 600, color: 'var(--text-primary)' }}>
             <span style={{ color: 'var(--accent-pink)' }}>Home</span>
+            <span style={{ cursor: 'pointer' }} onClick={() => navigate('/interview-prep')}>Interview Prep</span>
+            <span style={{ cursor: 'pointer' }} onClick={() => navigate('/cv-analyzer')}>CV Analyzer</span>
             <span style={{ cursor: 'pointer' }} onClick={() => navigate('/profile')}>Profile</span>
           </div>
         </div>

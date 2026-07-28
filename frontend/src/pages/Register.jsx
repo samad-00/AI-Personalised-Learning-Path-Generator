@@ -21,7 +21,7 @@ export default function Register() {
     } catch (err) {
       const data = err.response?.data;
       let errorMessage = 'Registration failed';
-      
+
       if (data) {
         if (data.error) {
           errorMessage = data.error;
@@ -43,7 +43,7 @@ export default function Register() {
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden' }}>
-      
+
       <AnimatedBackground />
 
       {/* Navigation */}
@@ -58,8 +58,8 @@ export default function Register() {
       </nav>
 
       <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem', position: 'relative', zIndex: 10 }}>
-        <div className="bento-card" style={{ width: '100%', maxWidth: 450, padding: '3.5rem', background: 'var(--surface-color)', boxShadow: '0 20px 60px rgba(0,0,0,0.08)' }}>
-          
+        <div className="bento-card" style={{ width: '100%', maxWidth: 450, padding: '3.5rem', background: 'rgba(235, 99, 131, 0.015)', backdropFilter: 'blur(4px)', WebkitBackdropFilter: 'blur(4px)', border: '2px solid var(--accent-pink)', boxShadow: 'none' }}>
+
           <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
             <h1 style={{ fontSize: 36, fontWeight: 800, margin: '0 0 0.5rem', letterSpacing: '-1px' }}>Create an account</h1>
             <p style={{ color: 'var(--text-secondary)', fontSize: 16, margin: 0, fontWeight: 500 }}>Start your personalized learning journey</p>
@@ -74,7 +74,7 @@ export default function Register() {
                 value={username}
                 onChange={e => setUsername(e.target.value)}
                 required
-                style={{ padding: '16px 24px', fontSize: 15 }}
+                style={{ padding: '16px 24px', fontSize: 15, background: 'transparent' }}
               />
             </div>
 
@@ -86,10 +86,10 @@ export default function Register() {
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 required
-                style={{ padding: '16px 24px', fontSize: 15 }}
+                style={{ padding: '16px 24px', fontSize: 15, background: 'transparent' }}
               />
             </div>
-            
+
             <div>
               <input
                 type="password"
@@ -98,10 +98,10 @@ export default function Register() {
                 value={password}
                 onChange={e => setPassword(e.target.value)}
                 required
-                style={{ padding: '16px 24px', fontSize: 15 }}
+                style={{ padding: '16px 24px', fontSize: 15, background: 'transparent' }}
               />
             </div>
-            
+
             <button type="submit" className="btn-primary card-orange" disabled={loading} style={{ marginTop: '0.5rem', padding: '18px', fontSize: 18, border: 'none' }}>
               {loading ? 'Creating account...' : 'Sign Up'}
             </button>
@@ -110,7 +110,7 @@ export default function Register() {
           <div style={{ textAlign: 'center', marginTop: '2.5rem', fontSize: 16, color: 'var(--text-secondary)', fontWeight: 500 }}>
             Already have an account? <Link to="/login" style={{ color: 'var(--accent-teal)', fontWeight: 700 }}>Log in</Link>
           </div>
-          
+
         </div>
       </div>
     </div>

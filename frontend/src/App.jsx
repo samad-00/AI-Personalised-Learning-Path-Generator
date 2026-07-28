@@ -11,6 +11,8 @@ import SharedRoadmap from './pages/SharedRoadmap';
 import Profile from './pages/Profile';
 import Settings from './pages/Settings';
 import AllPlans from './pages/AllPlans';
+import InterviewPrep from './pages/InterviewPrep';
+import CVAnalyzer from './pages/CVAnalyzer';
 
 function PrivateRoute({ children }) {
   const { user, loading } = useAuth();
@@ -38,6 +40,8 @@ export default function App() {
             <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
             <Route path="/settings" element={<PrivateRoute><Settings /></PrivateRoute>} />
             <Route path="/plans" element={<PrivateRoute><AllPlans /></PrivateRoute>} />
+            <Route path="/interview-prep" element={<PrivateRoute><InterviewPrep /></PrivateRoute>} />
+            <Route path="/cv-analyzer" element={<PrivateRoute><CVAnalyzer /></PrivateRoute>} />
             <Route path="/share/:token" element={<SharedRoadmap />} />
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>

@@ -12,13 +12,32 @@ export function AuthProvider({ children }) {
     const token = localStorage.getItem('token');
     if (token) {
       getProfile()
-        .then(res => setUser(res.data))
-        .catch(() => localStorage.removeItem('token'))
+        .then(res => {
+          setUser(res.data);
+          localStorage.setItem('cached_user', JSON.stringify(res.data));
+        })
+        .catch((err) => {
+          // Only wipe token if server explicitly says it's invalid (401/403)
+          // If it's a network error (server down/restarting), keep the token
+          const status = err?.response?.status;
+          if (status === 401 || status === 403) {
+            localStorage.removeItem('token');
+            localStorage.removeItem('refresh_token');
+          } else {
+            // Network error — server might be restarting. Keep user logged in.
+            // Try to restore from a minimal cached user object if available
+            const cached = localStorage.getItem('cached_user');
+            if (cached) {
+              try { setUser(JSON.parse(cached)); } catch (_) {}
+            }
+          }
+        })
         .finally(() => setLoading(false));
     } else {
       setLoading(false);
     }
   }, []);
+
 
   const setToken = (token) => {
     localStorage.setItem('token', token);
@@ -28,8 +47,18 @@ export function AuthProvider({ children }) {
     const res = await loginAPI({ email, password });
     localStorage.setItem('token', res.data.access);
     localStorage.setItem('refresh_token', res.data.refresh);
-    const profile = await getProfile();
-    setUser(profile.data);
+    // Try to fetch profile but don't fail login if it errors
+    try {
+      const profile = await getProfile();
+      setUser(profile.data);
+      localStorage.setItem('cached_user', JSON.stringify(profile.data));
+    } catch (profileErr) {
+      // Token is valid, profile fetch just had a network hiccup
+      // Set a minimal user object so the app knows we're logged in
+      const minimal = { email, username: email.split('@')[0] };
+      setUser(minimal);
+      localStorage.setItem('cached_user', JSON.stringify(minimal));
+    }
   };
 
   const register = async (username, email, password) => {
@@ -49,6 +78,7 @@ export function AuthProvider({ children }) {
   const logout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('refresh_token');
+    localStorage.removeItem('cached_user');
     setUser(null);
   };
 

@@ -120,9 +120,9 @@ export default function Stats() {
             {[
               { icon: '⚡', val: profile.xp, label: 'Total XP', bg: 'var(--accent-yellow)' },
               { icon: '🎯', val: profile.level, label: 'Current Level', bg: 'var(--accent-blue)' },
-              { icon: '🔥', val: profile.streak, label: 'Day Streak', bg: 'var(--surface-muted)' },
+              { icon: '🔥', val: profile.streak, label: 'Day Streak', bg: 'var(--accent-red)' },
               { icon: '✅', val: profile.total_resources_completed, label: 'Resources Done', bg: 'var(--accent-mint)' },
-              { icon: '📅', val: profile.total_weeks_completed, label: 'Weeks Completed', bg: 'var(--surface-color)' },
+              { icon: '📅', val: profile.total_weeks_completed, label: 'Weeks Completed', bg: 'var(--accent-blue)' },
               { icon: '🗺️', val: profile.total_roadmaps_completed, label: 'Roadmaps Done', bg: 'var(--accent-yellow)' },
             ].map((stat, i) => (
               <div key={i} style={{ ...s.statCard, background: stat.bg }} className="stat-card">

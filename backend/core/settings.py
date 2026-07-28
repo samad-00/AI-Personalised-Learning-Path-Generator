@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     'roadmaps',
     'resources',
     'adaptation',
+    'careers',
 ]
 
 MIDDLEWARE = [
@@ -96,8 +97,19 @@ SIMPLE_JWT = {
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',
     'http://127.0.0.1:5173',
+    'http://localhost:3000',
 ]
 CORS_ALLOW_ALL_ORIGINS = True
+# Do NOT set CORS_ALLOW_CREDENTIALS=True with CORS_ALLOW_ALL_ORIGINS=True
+# (CORS spec forbids Access-Control-Allow-Credentials:true with origin:*)
+# We use JWT in Authorization headers, not cookies, so credentials mode is not needed.
+CORS_ALLOW_METHODS = [
+    'DELETE', 'GET', 'OPTIONS', 'PATCH', 'POST', 'PUT',
+]
+CORS_ALLOW_HEADERS = [
+    'accept', 'accept-encoding', 'authorization', 'content-type',
+    'dnt', 'origin', 'user-agent', 'x-csrftoken', 'x-requested-with',
+]
 
 OPENAI_API_KEY = env('OPENAI_API_KEY', default='')
 YOUTUBE_API_KEY = env('YOUTUBE_API_KEY', default='')
