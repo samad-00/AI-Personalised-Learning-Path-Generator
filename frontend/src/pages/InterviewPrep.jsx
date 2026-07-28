@@ -672,9 +672,23 @@ export default function InterviewPrep() {
 
     return (
       <div style={{ minHeight: '100vh', position: 'relative', overflow: 'hidden' }}>
+        <style>{`
+          @keyframes smoothRiseUp {
+            0% { opacity: 0; transform: translateY(60px) scale(0.95); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+          }
+          @keyframes floatEmoji {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-6px) rotate(4deg); }
+          }
+          .rise-item-1 { animation: smoothRiseUp 1.35s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both; }
+          .rise-item-2 { animation: smoothRiseUp 1.35s cubic-bezier(0.16, 1, 0.3, 1) 0.35s both; }
+          .hover-card-effects { transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important; }
+          .hover-card-effects:hover { transform: translateY(-6px) scale(1.01) !important; box-shadow: 0 18px 38px rgba(0,0,0,0.14) !important; }
+        `}</style>
         <AnimatedBackground />
         <div style={{ position: 'relative', zIndex: 1, padding: '2.5rem 2rem', maxWidth: 960, margin: '0 auto' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem', flexWrap: 'wrap' }}>
+          <div className="rise-item-1" style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem', flexWrap: 'wrap' }}>
             <button onClick={() => setTestData(null)} style={{ padding: '8px 18px', borderRadius: 100, border: '1px solid var(--border-color)', background: 'transparent', color: 'var(--text-secondary)', cursor: 'pointer', fontWeight: 600, fontSize: 14 }}>← New Test</button>
             <div>
               <h1 style={{ margin: 0, fontSize: 'clamp(1.5rem,3vw,2rem)', fontWeight: 800, color: 'var(--text-primary)' }}>
@@ -771,24 +785,41 @@ export default function InterviewPrep() {
   /* ── Setup Form ── */
   return (
     <div style={{ minHeight: '100vh', position: 'relative', overflow: 'hidden' }}>
+      <style>{`
+        @keyframes smoothRiseUp {
+          0% { opacity: 0; transform: translateY(60px) scale(0.95); }
+          100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes floatEmoji {
+          0%, 100% { transform: translateY(0px) rotate(0deg); }
+          50% { transform: translateY(-6px) rotate(4deg); }
+        }
+        .rise-item-1 { animation: smoothRiseUp 1.35s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both; }
+        .rise-item-2 { animation: smoothRiseUp 1.35s cubic-bezier(0.16, 1, 0.3, 1) 0.35s both; }
+        .rise-item-3 { animation: smoothRiseUp 1.35s cubic-bezier(0.16, 1, 0.3, 1) 0.55s both; }
+        .hover-card-effects { transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important; }
+        .hover-card-effects:hover { transform: translateY(-6px) scale(1.01) !important; box-shadow: 0 18px 38px rgba(0,0,0,0.14) !important; }
+      `}</style>
       <AnimatedBackground />
       <div style={{ position: 'relative', zIndex: 1, padding: '3rem 2rem', maxWidth: 780, margin: '0 auto' }}>
-        <button onClick={() => navigate('/dashboard')} style={{ padding: '8px 18px', borderRadius: 100, border: '1px solid var(--border-color)', background: 'transparent', color: 'var(--text-secondary)', cursor: 'pointer', fontWeight: 600, marginBottom: '2rem', fontSize: 14 }}>
-          ← Dashboard
-        </button>
+        <div className="rise-item-1">
+          <button onClick={() => navigate('/dashboard')} style={{ padding: '8px 18px', borderRadius: 100, border: '1px solid var(--border-color)', background: 'transparent', color: 'var(--text-secondary)', cursor: 'pointer', fontWeight: 600, marginBottom: '2rem', fontSize: 14 }}>
+            ← Dashboard
+          </button>
 
-        <h1 style={{ fontSize: 'clamp(2rem, 4vw, 2.8rem)', fontWeight: 800, margin: '0 0 0.4rem', color: 'var(--text-primary)' }}>🎯 AI Interview Prep</h1>
-        <p style={{ color: 'var(--text-secondary)', marginBottom: '2.5rem', fontSize: '1.05rem', lineHeight: 1.6 }}>
-          Personalized mock interviews with MCQs, live coding challenges, rapid fire rounds, and soft skills tests.
-        </p>
+          <h1 style={{ fontSize: 'clamp(2rem, 4vw, 2.8rem)', fontWeight: 800, margin: '0 0 0.4rem', color: 'var(--text-primary)' }}>🎯 AI Interview Prep</h1>
+          <p style={{ color: 'var(--text-secondary)', marginBottom: '2.5rem', fontSize: '1.05rem', lineHeight: 1.6 }}>
+            Personalized mock interviews with MCQs, live coding challenges, rapid fire rounds, and soft skills tests.
+          </p>
+        </div>
 
         {/* Test Mode Selector */}
-        <div style={{ marginBottom: '2rem' }}>
+        <div className="rise-item-2" style={{ marginBottom: '2rem' }}>
           <p style={{ fontWeight: 700, color: 'var(--text-primary)', marginBottom: '1rem', fontSize: '0.95rem' }}>Select Test Mode</p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
             {TEST_MODES.map(mode => (
-              <div key={mode.id} onClick={() => setTestMode(mode.id)}
-                style={{ padding: '1rem 1.25rem', borderRadius: 12, border: `2px solid ${testMode === mode.id ? 'var(--accent-pink)' : 'var(--border-color)'}`, background: testMode === mode.id ? 'rgba(235, 99, 131, 0.08)' : 'var(--surface-color)', cursor: 'pointer', transition: 'all 0.2s', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+              <div key={mode.id} onClick={() => setTestMode(mode.id)} className="hover-card-effects"
+                style={{ padding: '1rem 1.25rem', borderRadius: 12, border: `2px solid ${testMode === mode.id ? 'var(--accent-pink)' : 'var(--border-color)'}`, background: testMode === mode.id ? 'rgba(235, 99, 131, 0.08)' : 'var(--surface-color)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '1rem' }}>
                 <div style={{ flex: 1 }}>
                   <p style={{ margin: 0, fontWeight: 700, color: 'var(--text-primary)', fontSize: '0.95rem' }}>{mode.label}</p>
                   <p style={{ margin: '0.2rem 0 0', fontSize: 13, color: 'var(--text-secondary)' }}>{mode.desc}</p>
@@ -800,7 +831,7 @@ export default function InterviewPrep() {
         </div>
 
         {/* Form */}
-        <form onSubmit={handleGenerate} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', background: 'var(--surface-color)', borderRadius: 16, padding: '2rem', border: '1px solid var(--border-color)' }}>
+        <form onSubmit={handleGenerate} className="rise-item-3 hover-card-effects" style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', background: 'var(--surface-color)', borderRadius: 16, padding: '2rem', border: '1px solid var(--border-color)' }}>
           <div>
             <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600, color: 'var(--text-primary)', fontSize: '0.9rem' }}>Target Job Role *</label>
             <input type="text" value={jobRole} onChange={e => setJobRole(e.target.value)} required placeholder="e.g. Frontend Developer, Data Scientist, Product Manager"

@@ -31,14 +31,14 @@ function Typewriter({ texts, speed = 45, deleteSpeed = 20, pauseTime = 2500 }) {
   return (
     <span style={{ display: 'inline-flex', alignItems: 'center' }}>
       <span style={{ color: 'var(--accent-teal)', fontWeight: 700 }}>{displayedText}</span>
-      <span style={{ 
-        display: 'inline-block', 
-        width: 3, 
-        height: '1.2em', 
-        backgroundColor: 'var(--accent-pink)', 
+      <span style={{
+        display: 'inline-block',
+        width: 3,
+        height: '1.2em',
+        backgroundColor: 'var(--accent-pink)',
         marginLeft: 4,
         animation: 'cursorBlink 1s infinite'
-      }}/>
+      }} />
       <style>{`
         @keyframes cursorBlink {
           0%, 100% { opacity: 1; }
@@ -70,15 +70,15 @@ function ParagraphTypewriter({ text, speed = 50 }) {
     <span>
       {displayedText}
       {displayedText.length < text.length && (
-        <span style={{ 
-          display: 'inline-block', 
-          width: 3, 
-          height: '1.1em', 
-          backgroundColor: 'var(--accent-teal)', 
-          marginLeft: 4, 
+        <span style={{
+          display: 'inline-block',
+          width: 3,
+          height: '1.1em',
+          backgroundColor: 'var(--accent-teal)',
+          marginLeft: 4,
           verticalAlign: 'middle',
           animation: 'cursorBlink 0.8s infinite'
-        }}/>
+        }} />
       )}
     </span>
   );
@@ -87,184 +87,193 @@ function ParagraphTypewriter({ text, speed = 50 }) {
 function ScrollPathCard({ cardClass, pathData, steps, travelerIcon = "🚀" }) {
   const cardRef = useRef(null);
   const pathRef = useRef(null);
+  const progressRef = useRef(0);     // mutable — avoids stale closure
+  const doneRef = useRef(false); // true once step 3 reached
+
   const [scrollProgress, setScrollProgress] = useState(0);
   const [pathLength, setPathLength] = useState(0);
   const [travelerPos, setTravelerPos] = useState({ x: 0, y: 0 });
 
+  // Measure SVG path length once mounted
   useEffect(() => {
     if (pathRef.current) {
       const len = pathRef.current.getTotalLength();
-      if (len > 0) setPathLength(len);
-      const startPoint = pathRef.current.getPointAtLength(0);
-      setTravelerPos({ x: startPoint.x, y: startPoint.y });
+      if (len > 0) {
+        setPathLength(len);
+        const p = pathRef.current.getPointAtLength(0);
+        setTravelerPos({ x: p.x, y: p.y });
+      }
     }
   }, [pathData]);
 
+  // Sync traveller position whenever progress or length changes
   useEffect(() => {
-    const handleScroll = () => {
+    if (pathRef.current && pathLength > 0) {
+      const p = pathRef.current.getPointAtLength(scrollProgress * pathLength);
+      setTravelerPos({ x: p.x, y: p.y });
+    }
+  }, [scrollProgress, pathLength]);
+
+  // Wheel / touch intercept — bidirectional
+  useEffect(() => {
+    const SPEED = 0.0010; // wheel delta → progress units
+
+    const onWheel = (e) => {
+      if (!cardRef.current) return;
+
+      const rect = cardRef.current.getBoundingClientRect();
+      const centred = rect.top < window.innerHeight * 0.6 && rect.bottom > window.innerHeight * 0.4;
+      if (!centred) return;
+
+      const scrollingDown = e.deltaY > 0;
+      const scrollingUp = e.deltaY < 0;
+
+      // Scrolling down: lock until animation reaches 1
+      if (scrollingDown && !doneRef.current) {
+        e.preventDefault();
+        const next = Math.min(1, progressRef.current + e.deltaY * SPEED);
+        progressRef.current = next;
+        setScrollProgress(next);
+        if (next >= 1) doneRef.current = true;
+        return;
+      }
+
+      // Scrolling up: if animation is in progress (> 0), re-lock and reverse
+      if (scrollingUp && progressRef.current > 0) {
+        e.preventDefault();
+        doneRef.current = false; // re-engage forward lock for next downward scroll
+        const next = Math.max(0, progressRef.current + e.deltaY * SPEED);
+        progressRef.current = next;
+        setScrollProgress(next);
+        return;
+      }
+
+      // Otherwise let normal scroll happen (up from 0, or down after done)
+    };
+
+    // Touch support — bidirectional
+    let lastY = 0;
+    const onTouchStart = (e) => { lastY = e.touches[0].clientY; };
+    const onTouchMove = (e) => {
       if (!cardRef.current) return;
       const rect = cardRef.current.getBoundingClientRect();
-      const winHeight = window.innerHeight || document.documentElement.clientHeight;
-      
-      // Start progressing when top of card reaches 85% of window height
-      const start = winHeight * 0.85;
-      // Reaches 100% well above viewport (-85% of window height), making path curve progression much slower and calmer as you scroll
-      const end = -winHeight * 0.85;
-      
-      let progress = (start - rect.top) / (start - end);
-      
-      // Ensure path completes if scrolled to the absolute bottom of the page
-      const isAtBottom = (window.innerHeight + window.scrollY) >= (document.documentElement.scrollHeight - 40);
-      if (isAtBottom && rect.top < winHeight) {
-        progress = 1;
-      }
-      
-      progress = Math.max(0, Math.min(1, progress));
-      
-      setScrollProgress(progress);
+      const centred = rect.top < window.innerHeight * 0.6 && rect.bottom > window.innerHeight * 0.4;
+      if (!centred) return;
 
-      let len = pathLength;
-      if (pathRef.current && len === 0) {
-        len = pathRef.current.getTotalLength();
-        if (len > 0) setPathLength(len);
-      }
-      if (pathRef.current && len > 0) {
-        const point = pathRef.current.getPointAtLength(progress * len);
-        setTravelerPos({ x: point.x, y: point.y });
+      const dy = lastY - e.touches[0].clientY; // positive = swipe up = scroll down
+      lastY = e.touches[0].clientY;
+
+      if (dy > 0 && !doneRef.current) {
+        e.preventDefault();
+        const next = Math.min(1, progressRef.current + dy * SPEED * 5);
+        progressRef.current = next;
+        setScrollProgress(next);
+        if (next >= 1) doneRef.current = true;
+      } else if (dy < 0 && progressRef.current > 0) {
+        e.preventDefault();
+        doneRef.current = false;
+        const next = Math.max(0, progressRef.current + dy * SPEED * 5);
+        progressRef.current = next;
+        setScrollProgress(next);
       }
     };
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll();
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [pathLength]);
+    document.addEventListener('wheel', onWheel, { passive: false });
+    document.addEventListener('touchstart', onTouchStart, { passive: true });
+    document.addEventListener('touchmove', onTouchMove, { passive: false });
+    return () => {
+      document.removeEventListener('wheel', onWheel);
+      document.removeEventListener('touchstart', onTouchStart);
+      document.removeEventListener('touchmove', onTouchMove);
+    };
+  }, []);
 
   return (
-    <div ref={cardRef} className={`bento-card ${cardClass}`} style={{ position: 'relative', height: 440, padding: 0, overflow: 'hidden', display: 'flex', alignItems: 'center', borderColor: 'rgba(255,255,255,0.25)', borderWidth: '2px', transition: 'all 0.3s ease' }}>
-      
-      {/* Background & Animated Paths */}
-      <svg width="100%" height="100%" preserveAspectRatio="none" viewBox="0 0 100 100" style={{ position: 'absolute', top: 0, left: 0 }}>
-        {/* Faint base path */}
+    <div ref={cardRef} className={`bento-card ${cardClass}`}
+      style={{
+        position: 'relative', height: 460, overflow: 'hidden',
+        borderColor: 'rgba(255,255,255,0.25)', borderWidth: '2px'
+      }}>
+
+      {/* SVG Path */}
+      <svg width="100%" height="100%" preserveAspectRatio="none" viewBox="0 0 100 100"
+        style={{ position: 'absolute', top: 0, left: 0 }}>
         <path d={pathData} fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="3" strokeDasharray="4 4" />
-        {/* Filled gradient polygon below path */}
         <path d={`${pathData} L100,100 L0,100 Z`} fill="rgba(255,255,255,0.05)" />
-        {/* Bright glowing progress path that draws per scroll without lagging delay */}
-        <path 
-          ref={pathRef} 
-          d={pathData} 
-          fill="none" 
-          stroke="#ffffff" 
-          strokeWidth="4" 
-          strokeDasharray={pathLength || 1000} 
+        <path
+          ref={pathRef}
+          d={pathData} fill="none" stroke="#ffffff" strokeWidth="4"
+          strokeDasharray={pathLength || 1000}
           strokeDashoffset={(pathLength || 1000) * (1 - scrollProgress)}
-          style={{ transition: 'stroke-dashoffset 0.08s ease-out' }} 
+          style={{ transition: 'stroke-dashoffset 0.06s ease-out' }}
         />
       </svg>
 
-      {/* Moving Traveler Icon riding the curve instantly with scroll position */}
+      {/* Traveller */}
       <div style={{
         position: 'absolute',
-        left: `${travelerPos.x}%`,
-        top: `${travelerPos.y}%`,
+        left: `${travelerPos.x}%`, top: `${travelerPos.y}%`,
         transform: 'translate(-50%, -50%) scale(1.15)',
-        width: 50,
-        height: 50,
-        borderRadius: '50%',
+        width: 50, height: 50, borderRadius: '50%',
         backgroundColor: '#ffffff',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        fontSize: 26,
-        boxShadow: '0 4px 15px rgba(0,0,0,0.35)',
-        zIndex: 5,
-        transition: 'left 0.08s ease-out, top 0.08s ease-out, transform 0.2s ease',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        fontSize: 26, boxShadow: '0 4px 15px rgba(0,0,0,0.35)', zIndex: 5,
+        transition: 'left 0.06s ease-out, top 0.06s ease-out',
       }}>
         {travelerIcon}
       </div>
 
+      {/* "Scroll to continue" hint */}
+      {scrollProgress < 1 && (
+        <div style={{
+          position: 'absolute', bottom: 16, left: '50%', transform: 'translateX(-50%)',
+          color: 'rgba(255,255,255,0.75)', fontSize: 13, fontWeight: 700,
+          display: 'flex', alignItems: 'center', gap: 5, zIndex: 6,
+          animation: 'hintBounce 1.8s infinite ease-in-out',
+          pointerEvents: 'none',
+        }}>
+          <style>{`@keyframes hintBounce { 0%,100%{transform:translateX(-50%) translateY(0);opacity:.7} 50%{transform:translateX(-50%) translateY(5px);opacity:1} }`}</style>
+          ↓ Scroll to reveal steps
+        </div>
+      )}
+
       {/* Step Checkpoints */}
       {steps.map((s, idx) => {
-        // Activate precisely when the moving traveler icon crosses the step's exact horizontal coordinate!
         const isReached = travelerPos.x >= (s.x - 1.5);
         return (
-          <div key={idx} style={{ 
-            position: 'absolute', 
-            left: `${s.x}%`, 
-            top: `${s.y}%`, 
-            transform: isReached ? 'translate(-50%, -50%) scale(1.05)' : 'translate(-50%, -40%) scale(0.85)', 
-            width: 230, 
-            textAlign: 'center',
-            zIndex: 4,
-            transition: 'all 0.2s cubic-bezier(0.2, 0.9, 0.3, 1)',
-            pointerEvents: isReached ? 'auto' : 'none'
+          <div key={idx} style={{
+            position: 'absolute', left: `${s.x}%`, top: `${s.y}%`,
+            transform: isReached ? 'translate(-50%,-50%) scale(1.05)' : 'translate(-50%,-40%) scale(0.85)',
+            width: 220, textAlign: 'center', zIndex: 4,
+            transition: 'all 0.25s cubic-bezier(0.2,0.9,0.3,1)',
           }}>
-            {/* Waypoint circle dot */}
-            <div style={{ 
-              width: isReached ? 26 : 14, 
-              height: isReached ? 26 : 14, 
-              borderRadius: '50%', 
-              background: isReached ? '#ffffff' : 'rgba(255,255,255,0.25)', 
-              margin: '0 auto 1rem', 
-              boxShadow: isReached ? '0 0 0 6px rgba(255,255,255,0.25)' : 'none',
-              transition: 'all 0.2s cubic-bezier(0.34, 1.5, 0.6, 1)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: '#000000',
-              fontSize: 13,
-              fontWeight: 900
-            }}>
-              {isReached ? '✓' : ''}
-            </div>
-
-            {/* Content box that shows cleanly when reached without delayed reveal */}
             <div style={{
-              opacity: isReached ? 1 : 0,
-              visibility: isReached ? 'visible' : 'hidden',
-              filter: isReached ? 'blur(0px)' : 'blur(8px)',
-              transform: isReached ? 'translateY(0px)' : 'translateY(15px)',
-              transition: 'all 0.2s cubic-bezier(0.2, 0.9, 0.3, 1)'
+              width: isReached ? 26 : 14, height: isReached ? 26 : 14,
+              borderRadius: '50%',
+              background: isReached ? '#ffffff' : 'rgba(255,255,255,0.25)',
+              margin: '0 auto 0.75rem',
+              boxShadow: isReached ? '0 0 0 6px rgba(255,255,255,0.25)' : 'none',
+              transition: 'all 0.25s cubic-bezier(0.34,1.5,0.6,1)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              color: '#000', fontSize: 13, fontWeight: 900,
+            }}>{isReached ? '✓' : ''}</div>
+            <div style={{
+              opacity: isReached ? 1 : 0, visibility: isReached ? 'visible' : 'hidden',
+              filter: isReached ? 'blur(0)' : 'blur(8px)',
+              transform: isReached ? 'translateY(0)' : 'translateY(15px)',
+              transition: 'all 0.25s cubic-bezier(0.2,0.9,0.3,1)',
             }}>
-              <div style={{ 
-                background: '#ffffff', 
-                color: '#111111', 
-                padding: '5px 16px', 
-                borderRadius: 100, 
-                fontSize: 13, 
-                fontWeight: 800, 
-                display: 'inline-block', 
-                marginBottom: '0.6rem',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                transition: 'all 0.2s ease'
-              }}>
-                {s.step}
-              </div>
-              <h3 style={{ 
-                fontSize: 22, 
-                fontWeight: 900, 
-                margin: '0 0 0.5rem', 
-                color: '#ffffff',
-                transition: 'all 0.2s ease'
-              }}>
-                {s.title}
-              </h3>
-              <p style={{ 
-                color: '#ffffff', 
-                fontSize: '0.95rem', 
-                lineHeight: 1.45, 
-                margin: 0,
-                fontWeight: 500
-              }}>
-                {s.desc}
-              </p>
+              <div style={{ background: '#fff', color: '#111', padding: '4px 14px', borderRadius: 100, fontSize: 12, fontWeight: 800, display: 'inline-block', marginBottom: '0.5rem', boxShadow: '0 4px 12px rgba(0,0,0,0.15)' }}>{s.step}</div>
+              <h3 style={{ fontSize: 20, fontWeight: 900, margin: '0 0 0.35rem', color: '#fff' }}>{s.title}</h3>
+              <p style={{ color: '#fff', fontSize: '0.9rem', lineHeight: 1.45, margin: 0, fontWeight: 500 }}>{s.desc}</p>
             </div>
           </div>
         );
       })}
-
     </div>
   );
 }
+
 
 function ScrollRiseUp({ children, distance = 80, scaleShape = false, delay = 0 }) {
   const ref = useRef(null);
@@ -275,20 +284,20 @@ function ScrollRiseUp({ children, distance = 80, scaleShape = false, delay = 0 }
       if (!ref.current) return;
       const rect = ref.current.getBoundingClientRect();
       const winHeight = window.innerHeight || document.documentElement.clientHeight;
-      
+
       // Complete the rising animation when element reaches 68% of window height (lower mid-screen)
       // This ensures elements at the very bottom of the page comfortably reach 100% completion!
       const start = winHeight * 1.05;
       const end = winHeight * 0.68;
-      
+
       let p = (start - rect.top) / (start - end);
-      
+
       // If user is scrolled to the absolute bottom of the webpage, ensure all visible elements reach 100% completion
       const isAtBottom = (window.innerHeight + window.scrollY) >= (document.documentElement.scrollHeight - 40);
       if (isAtBottom && rect.top < winHeight) {
         p = 1;
       }
-      
+
       p = Math.max(0, Math.min(1, p));
       setProgress(p);
     };
@@ -306,8 +315,8 @@ function ScrollRiseUp({ children, distance = 80, scaleShape = false, delay = 0 }
   const opacity = Math.min(1, Math.max(0, progress * 3.5));
 
   return (
-    <div 
-      ref={ref} 
+    <div
+      ref={ref}
       style={{
         opacity: opacity,
         transform: `translateY(${translateY}px) scale(${scale})`,
@@ -332,13 +341,26 @@ export default function Landing() {
 
       <AnimatedBackground />
 
+      <style>{`
+        @keyframes smoothRiseUp {
+          0% { opacity: 0; transform: translateY(60px) scale(0.97); }
+          100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .land-rise-1 { animation: smoothRiseUp 1.35s cubic-bezier(0.16, 1, 0.3, 1) 0.05s both; }
+        .land-rise-2 { animation: smoothRiseUp 1.35s cubic-bezier(0.16, 1, 0.3, 1) 0.22s both; }
+        .land-rise-3 { animation: smoothRiseUp 1.35s cubic-bezier(0.16, 1, 0.3, 1) 0.40s both; }
+        .land-rise-4 { animation: smoothRiseUp 1.35s cubic-bezier(0.16, 1, 0.3, 1) 0.58s both; }
+        .land-rise-5 { animation: smoothRiseUp 1.35s cubic-bezier(0.16, 1, 0.3, 1) 0.76s both; }
+        .land-rise-6 { animation: smoothRiseUp 1.35s cubic-bezier(0.16, 1, 0.3, 1) 0.94s both; }
+      `}</style>
+
       {/* Navigation */}
-      <nav style={{ padding: '1.5rem 2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative', zIndex: 10 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <div style={{ width: 44, height: 44, borderRadius: '50%', background: 'var(--accent-pink)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>
+      <nav className="land-rise-1" style={{ padding: '2rem 3.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative', zIndex: 10 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+          <div style={{ width: 52, height: 52, borderRadius: '50%', background: 'var(--accent-pink)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 26, boxShadow: '0 4px 15px rgba(226, 85, 131, 0.25)' }}>
             📖
           </div>
-          <span style={{ fontSize: 28, fontWeight: 800, fontFamily: 'Outfit, sans-serif', color: 'var(--text-primary)' }}>LearnPath</span>
+          <span style={{ fontSize: 32, fontWeight: 900, fontFamily: 'Outfit, sans-serif', color: 'var(--text-primary)', letterSpacing: '-0.5px' }}>LearnPath</span>
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
@@ -350,34 +372,34 @@ export default function Landing() {
       <main style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '6rem 4rem', position: 'relative', zIndex: 10, maxWidth: 1400, margin: '0 auto', width: '100%' }}>
 
         <div style={{ maxWidth: 750 }}>
-          <h1 style={{ fontSize: 'clamp(3rem, 6vw, 5.5rem)', fontWeight: 800, margin: '0 0 1rem', lineHeight: 1.05, letterSpacing: '-2px' }}>
+          <h1 className="land-rise-2" style={{ fontSize: 'clamp(3rem, 6vw, 5.5rem)', fontWeight: 800, margin: '0 0 1rem', lineHeight: 1.05, letterSpacing: '-2px' }}>
             Your Platform <span style={{ opacity: 0.5, fontWeight: 500 }}>for</span><br />
             Unlimited Learning
           </h1>
 
-          <div style={{ fontSize: 'clamp(1.2rem, 2.3vw, 1.45rem)', marginBottom: '1.5rem', fontWeight: 600, color: 'var(--text-primary)', minHeight: '42px', display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+          <div className="land-rise-3" style={{ fontSize: 'clamp(1.2rem, 2.3vw, 1.45rem)', marginBottom: '1.5rem', fontWeight: 600, color: 'var(--text-primary)', minHeight: '42px', display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
             <span>✨ Featuring:</span>
-            <Typewriter 
+            <Typewriter
               texts={[
                 "AI-Powered Personalized Learning Roadmaps",
                 "Live Interactive AI Mock Interviews & Feedback",
                 "Smart Resume ATS Audit & CV Optimizer",
                 "Gamified Career Tracking & Weekly Mastery"
-              ]} 
-              speed={45} 
-              deleteSpeed={20} 
-              pauseTime={2500} 
+              ]}
+              speed={45}
+              deleteSpeed={20}
+              pauseTime={2500}
             />
           </div>
 
-          <p style={{ fontSize: '1.25rem', color: 'var(--text-secondary)', marginBottom: '2.5rem', lineHeight: 1.65, minHeight: '7em' }}>
-            <ParagraphTypewriter 
-              text="Create personalized learning roadmaps powered by AI. Track your progress, earn badges, and master new skills with interactive weekly plans. Practice realistic technical and behavioral job interviews with instant expert evaluation, and optimize your resume line-by-line to beat ATS scanners and secure your dream career." 
+          <p className="land-rise-4" style={{ fontSize: '1.25rem', color: 'var(--text-secondary)', marginBottom: '2.5rem', lineHeight: 1.65, minHeight: '7em' }}>
+            <ParagraphTypewriter
+              text="Create personalized learning roadmaps powered by AI. Track your progress, earn badges, and master new skills with interactive weekly plans. Practice realistic technical and behavioral job interviews with instant expert evaluation, and optimize your resume line-by-line to beat ATS scanners and secure your dream career."
               speed={50}
             />
           </p>
 
-          <div className="bento-card" style={{ display: 'inline-flex', alignItems: 'center', gap: 16, padding: '12px 24px', borderRadius: 100, marginBottom: '3rem', border: '1px solid var(--border-color)', background: 'var(--surface-color)' }}>
+          <div className="bento-card land-rise-5" style={{ display: 'inline-flex', alignItems: 'center', gap: 16, padding: '12px 24px', borderRadius: 100, marginBottom: '3rem', border: '1px solid var(--border-color)', background: 'var(--surface-color)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <span style={{ width: 12, height: 12, borderRadius: '50%', background: 'var(--accent-teal)' }}></span>
               <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>Current activity</span>
@@ -388,7 +410,7 @@ export default function Landing() {
             </div>
           </div>
 
-          <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+          <div className="land-rise-6" style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
             {user ? (
               <Link to="/dashboard" className="btn-primary" style={{ background: 'var(--text-primary)', color: 'var(--bg-color)', textDecoration: 'none', padding: '18px 40px', fontSize: 18, borderRadius: 100 }}>
                 Go to Dashboard
@@ -536,7 +558,7 @@ export default function Landing() {
         overflow: 'hidden'
       }}>
         <div style={{ maxWidth: 1380, margin: '0 auto', padding: '0 1.5rem' }}>
-          
+
           {/* Widened Column-wise Grid: 3 Separated Parts without Unnecessary Spaces */}
           <div style={{
             display: 'grid',
@@ -545,7 +567,7 @@ export default function Landing() {
             marginBottom: '4rem',
             alignItems: 'stretch'
           }}>
-            
+
             {/* Part 1: Brand & Star on GitHub (Wide Horizontal Rectangle Shape) */}
             <ScrollRiseUp distance={50} scaleShape={true}>
               <div className="bento-card card-pink" style={{
@@ -571,29 +593,29 @@ export default function Landing() {
                     AI-crafted skill curricula, interactive roleplay interview simulation, and instant ATS CV optimization.
                   </p>
                 </div>
-                
+
                 <div style={{ marginTop: '1.2rem', background: 'rgba(255, 255, 255, 0.16)', padding: '0.9rem 1.2rem', borderRadius: 20, backdropFilter: 'blur(10px)' }}>
                   <div style={{ fontSize: '0.84rem', color: 'white', fontWeight: 700, marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <span style={{ color: '#FFE169', fontSize: '1.1rem' }}>★</span>
                     <span>Found this useful? Support us:</span>
                   </div>
-                  <a 
-                    href="https://github.com/samad-00/AI-Personalised-Learning-Path-Generator" 
-                    target="_blank" 
-                    rel="noopener noreferrer" 
-                    style={{ 
-                      display: 'flex', 
-                      alignItems: 'center', 
+                  <a
+                    href="https://github.com/samad-00/AI-Personalised-Learning-Path-Generator"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
                       justifyContent: 'center',
                       width: '100%',
-                      gap: '8px', 
-                      padding: '10px', 
-                      borderRadius: '100px', 
-                      background: 'white', 
-                      color: 'var(--accent-pink)', 
-                      textDecoration: 'none', 
-                      fontSize: '0.92rem', 
-                      fontWeight: 800, 
+                      gap: '8px',
+                      padding: '10px',
+                      borderRadius: '100px',
+                      background: 'white',
+                      color: 'var(--accent-pink)',
+                      textDecoration: 'none',
+                      fontSize: '0.92rem',
+                      fontWeight: 800,
                       boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
                       transition: 'transform 0.2s ease',
                       boxSizing: 'border-box'
@@ -632,19 +654,19 @@ export default function Landing() {
                   <div style={{ fontSize: '0.84rem', color: 'white', opacity: 0.95, marginBottom: '8px', fontWeight: 600, fontStyle: 'italic', display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <span>⚡ Response time: within 24–48 hours</span>
                   </div>
-                  <a 
-                    href="https://mail.google.com/mail/?view=cm&fs=1&to=edsam324@gmail.com&su=Project%20Collaboration%20Inquiry" 
-                    target="_blank" 
+                  <a
+                    href="https://mail.google.com/mail/?view=cm&fs=1&to=edsam324@gmail.com&su=Project%20Collaboration%20Inquiry"
+                    target="_blank"
                     rel="noopener noreferrer"
-                    style={{ 
-                      display: 'flex', 
+                    style={{
+                      display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      width: '100%', 
-                      gap: '8px', 
-                      color: 'var(--accent-teal)', 
-                      textDecoration: 'none', 
-                      fontSize: '0.92rem', 
+                      width: '100%',
+                      gap: '8px',
+                      color: 'var(--accent-teal)',
+                      textDecoration: 'none',
+                      fontSize: '0.92rem',
                       fontWeight: 800,
                       padding: '10px',
                       borderRadius: 100,

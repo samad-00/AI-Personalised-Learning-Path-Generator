@@ -113,6 +113,21 @@ export default function Settings() {
       
       <AnimatedBackground />
 
+      <style>{`
+        @keyframes smoothRiseUp {
+          0% { opacity: 0; transform: translateY(60px) scale(0.95); }
+          100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .rise-item-1 { animation: smoothRiseUp 1.35s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both; }
+        .rise-item-2 { animation: smoothRiseUp 1.35s cubic-bezier(0.16, 1, 0.3, 1) 0.35s both; }
+        .rise-item-3 { animation: smoothRiseUp 1.35s cubic-bezier(0.16, 1, 0.3, 1) 0.55s both; }
+        .rise-item-4 { animation: smoothRiseUp 1.35s cubic-bezier(0.16, 1, 0.3, 1) 0.75s both; }
+        .hover-card-effects { transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important; }
+        .hover-card-effects:hover { transform: translateY(-8px) scale(1.015) !important; box-shadow: 0 22px 45px rgba(0, 0, 0, 0.16) !important; }
+        .hover-pill { transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important; }
+        .hover-pill:hover { transform: translateY(-3px) !important; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15) !important; }
+      `}</style>
+
       {/* Top Navbar */}
       <nav style={{ padding: '1.5rem 2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative', zIndex: 10 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 32 }}>
@@ -158,7 +173,7 @@ export default function Settings() {
 
       <main style={{ flex: 1, maxWidth: 800, margin: '0 auto', width: '100%', padding: '2rem', position: 'relative', zIndex: 10 }}>
         
-        <div style={{ marginBottom: '2rem' }}>
+        <div className="rise-item-1" style={{ marginBottom: '2rem' }}>
           <h1 style={{ fontSize: 'clamp(2rem, 3vw, 2.5rem)', fontWeight: 800, margin: '0 0 0.5rem', color: 'var(--text-primary)' }}>Account Settings</h1>
           <p style={{ color: 'var(--text-secondary)', fontSize: 15, margin: 0 }}>Update your profile information and career goals.</p>
         </div>
@@ -186,8 +201,8 @@ export default function Settings() {
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           
           {/* Account Info */}
-          <div className="bento-card" style={{ padding: '2rem', backgroundColor: 'var(--bg-color)', borderColor: 'var(--accent-teal)', borderWidth: '2px' }}>
-            <h2 style={{ fontSize: 20, margin: '0 0 1.5rem', color: 'var(--text-primary)' }}>Basic Information</h2>
+          <div className="bento-card rise-item-2 hover-card-effects" style={{ padding: '2rem', backgroundColor: 'var(--bg-color)', borderColor: 'var(--accent-teal)', borderWidth: '2px', borderRadius: 24 }}>
+            <h2 style={{ fontSize: 20, margin: '0 0 1.5rem', color: 'var(--text-primary)', fontFamily: 'Outfit, sans-serif', fontWeight: 800 }}>Basic Information</h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <div>
                 <label style={{ display: 'block', marginBottom: 8, fontSize: 14, color: 'var(--accent-teal)', fontWeight: 700 }}>Username</label>
@@ -205,8 +220,8 @@ export default function Settings() {
           </div>
 
           {/* Personal Details */}
-          <div className="bento-card" style={{ padding: '2rem', backgroundColor: 'var(--bg-color)', borderColor: 'var(--accent-teal)', borderWidth: '2px' }}>
-            <h2 style={{ fontSize: 20, margin: '0 0 1.5rem', color: 'var(--text-primary)' }}>Personal Details</h2>
+          <div className="bento-card rise-item-3 hover-card-effects" style={{ padding: '2rem', backgroundColor: 'var(--bg-color)', borderColor: 'var(--accent-teal)', borderWidth: '2px', borderRadius: 24 }}>
+            <h2 style={{ fontSize: 20, margin: '0 0 1.5rem', color: 'var(--text-primary)', fontFamily: 'Outfit, sans-serif', fontWeight: 800 }}>Personal Details</h2>
             <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap' }}>
               <div style={{ flex: '1 1 200px' }}>
                 <label style={{ display: 'block', marginBottom: 8, fontSize: 14, color: 'var(--accent-teal)', fontWeight: 700 }}>Date of Birth</label>
@@ -234,8 +249,8 @@ export default function Settings() {
           </div>
 
           {/* Professional Details */}
-          <div className="bento-card" style={{ padding: '2rem', backgroundColor: 'var(--bg-color)', borderColor: 'var(--accent-teal)', borderWidth: '2px' }}>
-            <h2 style={{ fontSize: 20, margin: '0 0 1.5rem', color: 'var(--text-primary)' }}>Professional Details</h2>
+          <div className="bento-card rise-item-4 hover-card-effects" style={{ padding: '2rem', backgroundColor: 'var(--bg-color)', borderColor: 'var(--accent-teal)', borderWidth: '2px', borderRadius: 24 }}>
+            <h2 style={{ fontSize: 20, margin: '0 0 1.5rem', color: 'var(--text-primary)', fontFamily: 'Outfit, sans-serif', fontWeight: 800 }}>Professional Details</h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <div>
                 <label style={{ display: 'block', marginBottom: 8, fontSize: 14, color: 'var(--accent-teal)', fontWeight: 700 }}>Career Goal</label>
@@ -249,7 +264,7 @@ export default function Settings() {
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '1rem' }}>
-            <button type="submit" disabled={saving} className="btn-primary" style={{ padding: '16px 32px', fontSize: 16, backgroundColor: 'var(--accent-teal)', color: 'white', border: 'none' }}>
+            <button type="submit" disabled={saving} className="btn-primary rise-item-4 hover-pill" style={{ padding: '16px 34px', fontSize: 16, fontWeight: 800, backgroundColor: 'var(--accent-teal)', color: 'white', border: 'none', borderRadius: 100, cursor: 'pointer', fontFamily: 'Outfit, sans-serif', boxShadow: '0 4px 15px rgba(20,184,166,0.25)' }}>
               {saving ? 'Saving Changes...' : 'Save Changes'}
             </button>
           </div>
