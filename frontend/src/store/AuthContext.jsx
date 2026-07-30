@@ -69,7 +69,8 @@ export function AuthProvider({ children }) {
   };
 
   const loginWithGoogle = async (googleToken) => {
-    const res = await axios.post('http://127.0.0.1:8010/api/accounts/google/', {
+    const BASE_URL = import.meta.env.VITE_API_URL || '';
+    const res = await axios.post(`${BASE_URL}/api/accounts/google/`, {
       token: googleToken
     });
     localStorage.setItem('token', res.data.access);
