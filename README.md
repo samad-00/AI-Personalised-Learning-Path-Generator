@@ -4,6 +4,7 @@ An AI-powered web application that creates **personalized learning roadmaps**, c
 
 Users can enter a learning objective (for example, **"Learn Quantum Physics"** or **"Master Data Structures & Algorithms"**) and receive a structured AI-generated roadmap with weekly plans, recommended resources, and progress tracking.
 
+url- https://ai-learnpath.vercel.app/
 ---
 
 ## ✨ Features
