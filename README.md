@@ -9,13 +9,21 @@ Users can enter a learning objective (for example, **"Learn Quantum Physics"** o
 ## ✨ Features
 
 ✅ **Personalized Goal-Based Learning Paths** (Beginner, Intermediate, Advanced)
+
 ✅ **Live Interactive AI Mock Interviews** (Technical, Analytical, Rapid Fire, Soft Skills)
+
 ✅ **Smart Resume ATS Audit & CV Optimizer** (Line-by-line feedback)
+
 ✅ **AI-Generated Learning Roadmaps** (with resource recommendations & dynamic duration)
+
 ✅ **Gamified Progress Tracking** (XP, Daily Streaks, Mastery Badges)
+
 ✅ **Robust API Fallback System** (Groq Primary → Groq Fallback → OpenRouter) to prevent rate limit crashes
+
 ✅ **Shareable Learning Roadmaps**
+
 ✅ **Interactive Modern UI** with Light & Dark Modes
+
 ✅ User Authentication (Login / Signup)
 
 ---
