@@ -13,7 +13,7 @@ url- https://ai-learnpath.vercel.app/
 
 ✅ **Live Interactive AI Mock Interviews** (Technical, Analytical, Rapid Fire, Soft Skills)
 
-✅ **Smart Resume ATS Audit & CV Optimizer** (Line-by-line feedback)
+✅ **Smart Resume ATS Audit**
 
 ✅ **AI-Generated Learning Roadmaps** (with resource recommendations & dynamic duration)
 
