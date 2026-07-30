@@ -1,6 +1,6 @@
-# 🚀 AI Personalized Learning Path Generator
+# Learning Path
 
-An AI-powered web application that creates **personalized learning roadmaps**, conducts **mock interviews**, and **optimizes your CV** based on your specific career goals and skill level. 
+An AI-powered web application that creates **personalized learning roadmaps**, conducts **mock interviews**, and **analyzes your CV** based on your specific career goals and skill level. 
 
 Users can enter a learning objective (for example, **"Learn Quantum Physics"** or **"Master Data Structures & Algorithms"**) and receive a structured AI-generated roadmap with weekly plans, recommended resources, and progress tracking.
 
