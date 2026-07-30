@@ -89,3 +89,23 @@ class Badge(models.Model):
 
     def __str__(self):
         return f"{self.user.email} - {self.name}"
+
+class OTPCode(models.Model):
+    PURPOSE_CHOICES = [
+        ('login', 'Login'),
+        ('reset', 'Password Reset'),
+        ('register', 'Registration'),
+    ]
+    email = models.EmailField()
+    code = models.CharField(max_length=6)
+    purpose = models.CharField(max_length=10, choices=PURPOSE_CHOICES)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_used = models.BooleanField(default=False)
+
+    def is_expired(self):
+        # Expires in 15 minutes
+        expiration_time = self.created_at + timezone.timedelta(minutes=15)
+        return timezone.now() > expiration_time
+
+    def __str__(self):
+        return f"{self.email} - {self.code} ({self.purpose})"

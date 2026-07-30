@@ -44,6 +44,7 @@ export function AuthProvider({ children }) {
   };
 
   const login = async (email, password) => {
+    localStorage.removeItem('is_new_user');
     const res = await loginAPI({ email, password });
     localStorage.setItem('token', res.data.access);
     localStorage.setItem('refresh_token', res.data.refresh);
@@ -61,9 +62,10 @@ export function AuthProvider({ children }) {
     }
   };
 
-  const register = async (username, email, password) => {
-    await registerAPI({ username, email, password });
+  const register = async (username, email, password, otp_code) => {
+    await registerAPI({ username, email, password, otp_code });
     await login(email, password);
+    localStorage.setItem('is_new_user', 'true');
   };
 
   const loginWithGoogle = async (googleToken) => {
@@ -79,6 +81,7 @@ export function AuthProvider({ children }) {
     localStorage.removeItem('token');
     localStorage.removeItem('refresh_token');
     localStorage.removeItem('cached_user');
+    localStorage.removeItem('is_new_user');
     setUser(null);
   };
 

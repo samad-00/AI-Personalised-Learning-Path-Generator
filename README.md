@@ -20,11 +20,15 @@ Users can enter a learning objective (for example, **"Learn Quantum Physics"** o
 
 ✅ **Robust API Fallback System** (Groq Primary → Groq Fallback → OpenRouter) to prevent rate limit crashes
 
+✅ **Real Email OTP Authentication System** (Secure Registration & Login with 30-sec resend timers)
+
+✅ **Premium HTML Animated Emails** (Stunning light/dark theme embedded GIF emails)
+
 ✅ **Shareable Learning Roadmaps**
 
 ✅ **Interactive Modern UI** with Light & Dark Modes
 
-✅ User Authentication (Login / Signup)
+✅ **Throttled & Secured API Endpoints**
 
 ---
 
@@ -33,11 +37,13 @@ Users can enter a learning objective (for example, **"Learn Quantum Physics"** o
 ### Frontend
 * React.js
 * Vite
-* Tailwind CSS
+* Vanilla CSS / Premium Glassmorphism UI
 
 ### Backend
 * Django
 * Django REST Framework (DRF)
+* Python `Pillow` (for dynamic GIF generation)
+* SMTP Email Integration
 
 ### AI Integration
 * Groq API (Primary: `llama-3.3-70b-versatile`, Backup: `llama-3.1-8b-instant`)
@@ -71,10 +77,21 @@ pip install -r requirements.txt
 Create a `.env` file inside `backend/`:
 
 ```env
+# AI Keys
 GROQ_API_KEY=your_groq_api_key
 OPENROUTER_API_KEY=your_openrouter_api_key
-DATABASE_URL=your_postgresql_url
+
+# Django Keys
 SECRET_KEY=your_django_secret_key
+DATABASE_URL=your_postgresql_url
+
+# Email SMTP Setup (For OTP Authentication)
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_USE_TLS=True
+EMAIL_HOST_USER=your_email@gmail.com
+EMAIL_HOST_PASSWORD=your_app_password
+DEFAULT_FROM_EMAIL=your_email@gmail.com
 ```
 
 Run migrations and start the server:
@@ -106,7 +123,6 @@ npm run dev
 * AWS Cloud Deployment
 
 ---
-
 ## 🤝 Contributing
 
 Contributions, feature requests, and suggestions are welcome.

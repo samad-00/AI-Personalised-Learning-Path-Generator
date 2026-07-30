@@ -216,7 +216,7 @@ export default function Dashboard() {
 
           <div className="rise-item-1">
             <div style={{ fontSize: '1.25rem', fontWeight: 600, color: 'var(--accent-teal)', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              Welcome back, {user?.username || 'Learner'} <span style={{ display: 'inline-block', animation: 'floatEmoji 3s infinite ease-in-out' }}>👋</span>
+              {localStorage.getItem('is_new_user') === 'true' ? 'Welcome,' : 'Welcome back,'} {user?.username || 'Learner'} <span style={{ display: 'inline-block', animation: 'floatEmoji 3s infinite ease-in-out' }}>👋</span>
             </div>
             <h1 style={{ fontSize: 'clamp(2.5rem, 4vw, 3.5rem)', fontWeight: 800, margin: '0 0 1rem', lineHeight: 1.1, letterSpacing: '-1px' }}>
               Your Platform <span style={{ opacity: 0.5, fontWeight: 500 }}>for</span><br />Unlimited Learning
