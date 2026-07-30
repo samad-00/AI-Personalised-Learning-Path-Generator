@@ -11,7 +11,7 @@ XP_REWARDS = {
     'rate_resource': 5,
     'complete_week': 50,
     'complete_roadmap': 200,
-    'generate_roadmap': 20,
+    'generate_roadmap': 15,
 }
 
 class GenerateRoadmapView(APIView):
@@ -184,7 +184,7 @@ class LeaderboardView(APIView):
     def get(self, request):
         from django.contrib.auth import get_user_model
         User = get_user_model()
-        top_users = User.objects.order_by('-xp')[:10]
+        top_users = User.objects.order_by('-xp')
         data = [
             {
                 'rank': i + 1,

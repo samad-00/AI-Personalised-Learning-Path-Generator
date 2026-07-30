@@ -20,6 +20,7 @@ class User(AbstractUser):
     gender = models.CharField(max_length=50, blank=True, default='')
     # Gamification fields
     xp = models.IntegerField(default=0)
+    daily_xp = models.IntegerField(default=0)
     level = models.IntegerField(default=1)
     streak = models.IntegerField(default=0)
     last_activity = models.DateField(null=True, blank=True)
@@ -34,22 +35,17 @@ class User(AbstractUser):
         return self.email
 
     def add_xp(self, amount):
-        self.xp += amount
-        self.level = self.calculate_level()
         self.update_streak()
+        self.xp += amount
+        self.daily_xp = amount
+        self.level = self.calculate_level()
         self.save()
 
     def calculate_level(self):
         if self.xp < 100: return 1
-        elif self.xp < 300: return 2
-        elif self.xp < 600: return 3
-        elif self.xp < 1000: return 4
-        elif self.xp < 1500: return 5
-        elif self.xp < 2500: return 6
-        elif self.xp < 4000: return 7
-        elif self.xp < 6000: return 8
-        elif self.xp < 9000: return 9
-        else: return 10
+        elif self.xp < 500: return 2
+        elif self.xp >= 10000: return 22
+        return (self.xp // 500) + 2
 
     def update_streak(self):
         today = timezone.now().date()
@@ -64,20 +60,28 @@ class User(AbstractUser):
         self.last_activity = today
 
     def get_level_title(self):
-        titles = {
-            1: 'Novice', 2: 'Apprentice', 3: 'Student',
-            4: 'Scholar', 5: 'Adept', 6: 'Expert',
-            7: 'Master', 8: 'Grandmaster', 9: 'Legend', 10: 'GOD'
-        }
-        return titles.get(self.level, 'Novice')
+        if self.level == 1: return 'Beginner'
+        elif self.level == 2: return 'Learner'
+        elif self.level <= 5: return 'Student'
+        elif self.level <= 8: return 'Intermediate'
+        elif self.level <= 11: return 'Advanced'
+        elif self.level <= 14: return 'Practitioner'
+        elif self.level <= 17: return 'Specialist'
+        elif self.level <= 19: return 'Expert'
+        elif self.level <= 21: return 'Master'
+        else: return 'Pro'
 
     def xp_for_next_level(self):
-        thresholds = [0, 100, 300, 600, 1000, 1500, 2500, 4000, 6000, 9000, 99999]
-        return thresholds[min(self.level, 10)]
+        if self.level == 1: return 100
+        elif self.level == 2: return 500
+        elif self.level >= 21: return 10000
+        return (self.level - 1) * 500
 
     def xp_for_current_level(self):
-        thresholds = [0, 0, 100, 300, 600, 1000, 1500, 2500, 4000, 6000, 9000]
-        return thresholds[min(self.level, 10)]
+        if self.level == 1: return 0
+        elif self.level == 2: return 100
+        elif self.level >= 22: return 10000
+        return (self.level - 2) * 500
 
 
 class Badge(models.Model):

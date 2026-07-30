@@ -49,6 +49,8 @@ class ProfileView(APIView):
         serializer = UserSerializer(request.user, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
+            request.user.add_xp(15)
+            serializer = UserSerializer(request.user)
             return Response(serializer.data)
         return Response(serializer.errors, status=400)
 

@@ -44,7 +44,7 @@ class UserSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'username', 'email', 'password', 'learning_goal', 'experience_level',
             'skills', 'career', 'dob', 'gender',
-            'date_joined', 'xp', 'level', 'streak', 'last_activity',
+            'date_joined', 'xp', 'daily_xp', 'level', 'streak', 'last_activity',
             'total_resources_completed', 'total_weeks_completed',
             'total_roadmaps_completed', 'badges', 'level_title',
             'xp_for_next_level', 'xp_for_current_level', 'xp_progress_pct'

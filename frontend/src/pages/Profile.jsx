@@ -117,10 +117,10 @@ export default function Profile() {
             <div style={{ width: '100%', background: 'rgba(0,0,0,0.15)', padding: '1rem', borderRadius: 20 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, fontSize: 13, fontWeight: 700, color: '#ffffff' }}>
                 <span>XP Progress</span>
-                <span>{profile?.xp} / {profile?.xp_for_next_level}</span>
+                <span>{profile?.xp} XP → {profile?.xp_for_next_level} XP</span>
               </div>
               <div style={{ height: 8, background: 'rgba(255,255,255,0.2)', borderRadius: 100, overflow: 'hidden' }}>
-                <div style={{ height: '100%', background: '#ffffff', width: `${profile?.xp_for_next_level ? Math.min(100, (profile.xp / profile.xp_for_next_level) * 100) : 0}%`, transition: 'width 1.5s cubic-bezier(0.16, 1, 0.3, 1)' }} />
+                <div style={{ height: '100%', background: '#ffffff', width: `${profile?.xp_progress_pct || 0}%`, transition: 'width 1.5s cubic-bezier(0.16, 1, 0.3, 1)' }} />
               </div>
             </div>
           </div>
@@ -156,28 +156,28 @@ export default function Profile() {
           
           {/* Top Stats Grid matching the image */}
           <div className="rise-item-1" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem' }}>
-            <div className="bento-card hover-card-effects" style={{ background: 'var(--accent-mint)', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '1.5rem 1rem', borderRadius: 24 }}>
-              <div style={{ fontSize: 26, opacity: 0.9, marginBottom: 10, animation: 'floatEmoji 3s infinite ease-in-out 0.1s' }}>🎓</div>
-              <div style={{ fontSize: 34, fontWeight: 800, fontFamily: 'Outfit', color: 'var(--text-primary)', lineHeight: 1, marginBottom: 6 }}>{roadmaps.length}</div>
-              <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-secondary)' }}>Total Plans</div>
+            <div className="bento-card hover-card-effects" style={{ background: 'var(--accent-pink)', border: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '1.5rem 1rem', borderRadius: 24 }}>
+              <div style={{ fontSize: 26, opacity: 1, marginBottom: 10, animation: 'floatEmoji 3s infinite ease-in-out 0.1s' }}>🎓</div>
+              <div style={{ fontSize: 34, fontWeight: 800, fontFamily: 'Outfit', color: '#ffffff', lineHeight: 1, marginBottom: 6 }}>{roadmaps.length}</div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: '#ffffff', opacity: 0.9 }}>Total Plans</div>
             </div>
             
-            <div className="bento-card hover-card-effects" style={{ background: 'var(--accent-yellow)', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '1.5rem 1rem', borderRadius: 24 }}>
-              <div style={{ fontSize: 26, opacity: 0.9, marginBottom: 10, animation: 'floatEmoji 3s infinite ease-in-out 0.3s' }}>✅</div>
-              <div style={{ fontSize: 34, fontWeight: 800, fontFamily: 'Outfit', color: 'var(--text-primary)', lineHeight: 1, marginBottom: 6 }}>{profile?.total_resources_completed || 0}</div>
-              <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-secondary)' }}>Lessons Done</div>
+            <div className="bento-card hover-card-effects" style={{ background: 'var(--accent-teal)', border: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '1.5rem 1rem', borderRadius: 24 }}>
+              <div style={{ fontSize: 26, opacity: 1, marginBottom: 10, animation: 'floatEmoji 3s infinite ease-in-out 0.3s' }}>✅</div>
+              <div style={{ fontSize: 34, fontWeight: 800, fontFamily: 'Outfit', color: '#ffffff', lineHeight: 1, marginBottom: 6 }}>{profile?.total_resources_completed || 0}</div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: '#ffffff', opacity: 0.9 }}>Lessons Done</div>
             </div>
 
-            <div className="bento-card hover-card-effects" style={{ background: 'var(--accent-blue)', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '1.5rem 1rem', borderRadius: 24 }}>
-              <div style={{ fontSize: 26, opacity: 0.9, marginBottom: 10, animation: 'floatEmoji 3s infinite ease-in-out 0.5s' }}>⏱️</div>
-              <div style={{ fontSize: 34, fontWeight: 800, fontFamily: 'Outfit', color: 'var(--text-primary)', lineHeight: 1, marginBottom: 6 }}>{profile?.total_weeks_completed || 0}</div>
-              <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-secondary)' }}>Weeks Passed</div>
+            <div className="bento-card hover-card-effects" style={{ background: 'var(--accent-orange)', border: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '1.5rem 1rem', borderRadius: 24 }}>
+              <div style={{ fontSize: 26, opacity: 1, marginBottom: 10, animation: 'floatEmoji 3s infinite ease-in-out 0.5s' }}>⏱️</div>
+              <div style={{ fontSize: 34, fontWeight: 800, fontFamily: 'Outfit', color: '#ffffff', lineHeight: 1, marginBottom: 6 }}>{profile?.total_weeks_completed || 0}</div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: '#ffffff', opacity: 0.9 }}>Weeks Passed</div>
             </div>
 
-            <div className="bento-card hover-card-effects" style={{ background: 'var(--accent-red)', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '1.5rem 1rem', borderRadius: 24 }}>
-              <div style={{ fontSize: 26, opacity: 0.9, marginBottom: 10, animation: 'floatEmoji 3s infinite ease-in-out 0.7s' }}>🔥</div>
-              <div style={{ fontSize: 34, fontWeight: 800, fontFamily: 'Outfit', color: 'var(--text-primary)', lineHeight: 1, marginBottom: 6 }}>{profile?.streak || 0}</div>
-              <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-secondary)' }}>Day Streak</div>
+            <div className="bento-card hover-card-effects" style={{ background: 'var(--accent-pink)', border: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '1.5rem 1rem', borderRadius: 24 }}>
+              <div style={{ fontSize: 26, opacity: 1, marginBottom: 10, animation: 'floatEmoji 3s infinite ease-in-out 0.7s' }}>🔥</div>
+              <div style={{ fontSize: 34, fontWeight: 800, fontFamily: 'Outfit', color: '#ffffff', lineHeight: 1, marginBottom: 6 }}>{profile?.streak || 0}</div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: '#ffffff', opacity: 0.9 }}>Day Streak</div>
             </div>
           </div>
 
@@ -202,7 +202,7 @@ export default function Profile() {
                </svg>
                
                <div style={{ position: 'absolute', left: '38%', top: '35%', background: '#1e293b', color: 'white', padding: '6px 14px', borderRadius: 100, fontSize: 13, fontWeight: 800, boxShadow: '0 4px 12px rgba(0,0,0,0.2)', animation: 'floatEmoji 3s infinite ease-in-out' }}>
-                 +12 XP
+                 +{profile?.daily_xp || 0} XP
                </div>
             </div>
           </div>

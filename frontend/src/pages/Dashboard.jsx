@@ -118,7 +118,7 @@ export default function Dashboard() {
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden' }}>
-      
+
       <AnimatedBackground />
 
       <style>{`
@@ -266,11 +266,11 @@ export default function Dashboard() {
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
-            <div className="bento-card rise-item-3 hover-card-effects" style={{ padding: '2rem', borderRadius: 24, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', backgroundColor: 'var(--accent-mint)' }}>
+            <div className="bento-card card-pink rise-item-3 hover-card-effects" style={{ padding: '2rem', borderRadius: 24, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
               <div style={{ fontSize: 28, marginBottom: '1rem', animation: 'floatEmoji 4s infinite ease-in-out 0.2s' }}>⏱️</div>
               <div>
-                <div style={{ fontSize: 'clamp(2rem, 3vw, 3rem)', fontWeight: 800, fontFamily: 'Outfit', color: 'var(--text-primary)', lineHeight: 1 }}>{roadmaps.length}</div>
-                <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-secondary)', marginTop: 8 }}>Total learning plans <br />created</div>
+                <div style={{ fontSize: 'clamp(2rem, 3vw, 3rem)', fontWeight: 800, fontFamily: 'Outfit', color: '#ffffff', lineHeight: 1 }}>{roadmaps.length}</div>
+                <div style={{ fontSize: 15, fontWeight: 700, color: 'rgba(255,255,255,0.9)', marginTop: 8 }}>Total learning plans <br />created</div>
               </div>
             </div>
 
