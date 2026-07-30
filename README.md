@@ -43,7 +43,6 @@ url- https://ai-learnpath.vercel.app/
 ### Backend
 * Django
 * Django REST Framework (DRF)
-* Python `Pillow` (for dynamic GIF generation)
 * SMTP Email Integration
 
 ### AI Integration
