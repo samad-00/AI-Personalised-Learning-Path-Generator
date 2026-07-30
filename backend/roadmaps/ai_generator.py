@@ -12,7 +12,7 @@ URL_CHECK_TIMEOUT = 4
 def generate_roadmap(goal, experience_level='beginner'):
     prompt = f"""
 You are an expert learning coach. Create a structured learning roadmap.
-Analyze the user's Goal to determine the requested duration (e.g., if they ask for "6 weeks", create a 6-week roadmap). If no duration is specified, default to 4 weeks.
+Analyze the user's Goal to determine the requested duration. You can create a roadmap of up to 12 weeks (3 months). If no duration is specified, default to 12 weeks.
 
 Goal: {goal}
 Experience Level: {experience_level}
@@ -20,6 +20,12 @@ Experience Level: {experience_level}
 Return ONLY a valid JSON object in this exact format:
 {{
   "goal": "{goal}",
+  "topics_overview": [
+    {{
+      "topic": "Core Topic Name",
+      "subtopics": ["Subtopic 1", "Subtopic 2"]
+    }}
+  ],
   "weeks": [
     {{
       "week_number": 1,
@@ -39,10 +45,15 @@ Return ONLY a valid JSON object in this exact format:
 }}
 
 Rules:
-- Create the appropriate number of weeks based on the duration specified in the Goal. Default to 4 weeks if none is specified.
+- STRICTLY adapt the content, pacing, and resource difficulty to the user's Experience Level ({experience_level}). 
+  * If beginner: Assume zero prior knowledge, focus on fundamentals, basics, and easy introductions.
+  * If intermediate: Skip absolute basics, focus on practical applications, building, and intermediate concepts.
+  * If advanced: Focus on complex architectures, deep dives, best practices, optimization, and advanced engineering topics.
+- For `topics_overview`: Generate a highly EXHAUSTIVE and COMPREHENSIVE chart map. It MUST include EVERY single topic and subtopic needed to master the skill from absolute zero to 100%. Do not skip any foundational or advanced concepts. Break down the subject into deep, detailed subtopics.
+- Create the appropriate number of weeks based on the duration specified in the Goal, up to a maximum of 12 weeks. Default to 12 weeks if none is specified.
 - Each week has 3-4 resources
 - resource_type must be one of: video, article, book, exercise
-- Start simple, progressively increase difficulty
+- Start at the appropriate difficulty for {experience_level} and progressively increase difficulty
 - For videos: use ONLY these well-known YouTube videos with real IDs:
   * Python basics: https://www.youtube.com/watch?v=rfscVS0vtbw
   * Use real, famous YouTube tutorial video URLs you are confident exist
@@ -64,7 +75,7 @@ Rules:
         model="llama-3.3-70b-versatile",
         messages=[{"role": "user", "content": prompt}],
         temperature=0.3,
-        max_tokens=2000,
+        max_tokens=4000,
     )
 
     content = response.choices[0].message.content.strip()

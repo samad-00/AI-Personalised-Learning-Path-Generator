@@ -112,8 +112,8 @@ export default function CVAnalyzer() {
       {/* Prominent Scaled-Up Top Navbar */}
       <nav style={{ padding: '2rem 3.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative', zIndex: 10 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 50 }}>
-          <div 
-            onClick={() => navigate('/')} 
+          <div
+            onClick={() => navigate('/')}
             style={{ display: 'flex', alignItems: 'center', gap: 16, cursor: 'pointer' }}
           >
             <div style={{ width: 52, height: 52, borderRadius: '50%', background: 'var(--accent-pink)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 26, boxShadow: '0 4px 15px rgba(226, 85, 131, 0.25)' }}>
@@ -121,34 +121,34 @@ export default function CVAnalyzer() {
             </div>
             <span style={{ fontSize: 32, fontWeight: 900, fontFamily: 'Outfit, sans-serif', color: 'var(--text-primary)', letterSpacing: '-0.5px' }}>LearnPath</span>
           </div>
-          
+
           <div style={{ display: 'flex', gap: 36, fontSize: 19, fontWeight: 700, color: 'var(--text-primary)' }}>
             <span style={{ cursor: 'pointer', transition: 'opacity 0.2s', opacity: 0.85 }} onMouseEnter={e => e.currentTarget.style.opacity = 1} onMouseLeave={e => e.currentTarget.style.opacity = 0.85} onClick={() => navigate('/dashboard')}>Home</span>
-            <span style={{ cursor: 'pointer', transition: 'opacity 0.2s', opacity: 0.85 }} onMouseEnter={e => e.currentTarget.style.opacity = 1} onMouseLeave={e => e.currentTarget.style.opacity = 0.85} onClick={() => navigate('/interview-prep')}>Interview Prep</span>
+            <span style={{ cursor: 'pointer', transition: 'opacity 0.2s', opacity: 0.85 }} onMouseEnter={e => e.currentTarget.style.opacity = 1} onMouseLeave={e => e.currentTarget.style.opacity = 0.85} onClick={() => navigate('/interview-prep')}>Interview Preparation</span>
             <span style={{ color: 'var(--accent-pink)', cursor: 'pointer' }}>CV Analyzer</span>
             <span style={{ cursor: 'pointer', transition: 'opacity 0.2s', opacity: 0.85 }} onMouseEnter={e => e.currentTarget.style.opacity = 1} onMouseLeave={e => e.currentTarget.style.opacity = 0.85} onClick={() => navigate('/profile')}>Profile</span>
           </div>
         </div>
-        
+
         <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
           <ThemeToggle />
           {logout && (
-            <button 
-              title="Logout" 
-              style={{ 
-                background: 'transparent', 
-                border: '2px solid var(--border-color)', 
+            <button
+              title="Logout"
+              style={{
+                background: 'transparent',
+                border: '2px solid var(--border-color)',
                 color: 'var(--text-primary)',
-                width: 46, 
-                height: 46, 
-                borderRadius: 12, 
-                cursor: 'pointer', 
-                display: 'flex', 
-                alignItems: 'center', 
-                justifyContent: 'center', 
+                width: 46,
+                height: 46,
+                borderRadius: 12,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
                 fontSize: 22,
                 transition: 'all 0.2s ease'
-              }} 
+              }}
               onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--border-color)'}
               onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
               onClick={logout}
@@ -161,7 +161,7 @@ export default function CVAnalyzer() {
 
       {/* Main Container */}
       <main style={{ flex: 1, position: 'relative', zIndex: 1, padding: '1rem 3.5rem 4rem', maxWidth: 1440, margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
-        
+
         {/* Hero Banner Section */}
         <div style={{ marginBottom: '1.75rem', animation: 'smoothRiseUp 1.35s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both' }}>
           <h1 style={{ fontSize: '2rem', fontWeight: 800, margin: '0 0 0.4rem', color: 'var(--text-primary)', fontFamily: 'Outfit, sans-serif', letterSpacing: '-0.5px' }}>
@@ -176,7 +176,7 @@ export default function CVAnalyzer() {
 
           {/* ---- LEFT: Upload + Form ---- */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-            
+
             {/* Upload Zone Bento Card */}
             <div className="bento-card card-teal anim-card-1 hover-lift" style={{ padding: '2rem', position: 'relative', overflow: 'hidden', borderRadius: 28 }}>
               <div style={{ position: 'absolute', right: -20, top: -20, fontSize: 130, opacity: 0.15, transform: 'rotate(-10deg)', pointerEvents: 'none' }}>📎</div>
@@ -207,13 +207,13 @@ export default function CVAnalyzer() {
                 <span style={{ fontSize: '1.6rem' }}>🎯</span>
                 <h3 style={{ margin: 0, fontSize: '1.35rem', fontWeight: 800, fontFamily: 'Outfit, sans-serif', color: '#ffffff' }}>Target Job Details</h3>
               </div>
-              
+
               <div style={{ position: 'relative', zIndex: 1 }}>
                 <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.95rem', fontWeight: 700, color: '#ffffff' }}>Target Job Role *</label>
                 <input type="text" value={jobRole} onChange={e => setJobRole(e.target.value)} required placeholder="e.g. Senior Full Stack Engineer, AI Researcher"
                   style={{ width: '100%', boxSizing: 'border-box', padding: '14px 18px', borderRadius: 14, border: 'none', background: '#ffffff', color: '#1e293b', fontSize: '1.05rem', fontWeight: 600, outline: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }} />
               </div>
-              
+
               <div style={{ position: 'relative', zIndex: 1 }}>
                 <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.95rem', fontWeight: 700, color: '#ffffff' }}>Job Description <span style={{ opacity: 0.8, fontWeight: 500 }}>(Optional for deep ATS match)</span></label>
                 <textarea value={jd} onChange={e => setJd(e.target.value)} placeholder="Paste target Job Description (JD) here to match keywords and qualifications exactly..."
@@ -242,45 +242,27 @@ export default function CVAnalyzer() {
                     <span style={{ fontSize: '1.6rem' }}>✍️</span>
                     <h3 style={{ margin: 0, fontSize: '1.35rem', fontWeight: 800, fontFamily: 'Outfit, sans-serif', color: '#ffffff' }}>Live CV Editor</h3>
                   </div>
-                  <div style={{ display: 'flex', gap: '0.6rem', alignItems: 'center', flexWrap: 'wrap', background: 'rgba(255, 255, 255, 0.2)', backdropFilter: 'blur(10px)', padding: '6px 12px', borderRadius: 100, border: '1px solid rgba(255, 255, 255, 0.35)' }}>
-                    {/* Font family */}
-                    <select value={fontFamily} onChange={e => setFontFamily(e.target.value)} style={{ padding: '4px 8px', borderRadius: 8, border: 'none', background: 'transparent', color: '#ffffff', fontSize: 13, fontWeight: 700, cursor: 'pointer', outline: 'none' }}>
-                      {FONTS.map(f => <option key={f.value} value={f.value} style={{ color: '#1e293b', background: '#ffffff' }}>{f.label}</option>)}
-                    </select>
-                    <div style={{ width: 1, height: 18, background: 'rgba(255, 255, 255, 0.35)' }} />
-                    {/* Font size */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                      <button type="button" onClick={() => setFontSize(f => Math.max(11, f - 1))} style={{ width: 26, height: 26, borderRadius: 100, border: '1px solid rgba(255, 255, 255, 0.4)', background: 'rgba(255, 255, 255, 0.2)', color: '#ffffff', cursor: 'pointer', fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>-</button>
-                      <span style={{ fontSize: 13, fontWeight: 800, color: '#ffffff', minWidth: 26, textAlign: 'center' }}>{fontSize}</span>
-                      <button type="button" onClick={() => setFontSize(f => Math.min(24, f + 1))} style={{ width: 26, height: 26, borderRadius: 100, border: '1px solid rgba(255, 255, 255, 0.4)', background: 'rgba(255, 255, 255, 0.2)', color: '#ffffff', cursor: 'pointer', fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>+</button>
-                    </div>
-                    <div style={{ width: 1, height: 18, background: 'rgba(255, 255, 255, 0.35)' }} />
-                    {/* Text color */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <span style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255, 255, 255, 0.9)' }}>Color</span>
-                      <input type="color" value={textColor} onChange={e => setTextColor(e.target.value)} style={{ width: 26, height: 26, borderRadius: 100, border: 'none', cursor: 'pointer', background: 'transparent' }} />
-                    </div>
+                  <div style={{ padding: '4px 12px', background: 'rgba(0, 0, 0, 0.2)', borderRadius: 100, border: '1px solid rgba(255,255,255,0.2)' }}>
+                    <span style={{ fontSize: 13, fontWeight: 800, color: '#ffffff' }}>🚧 Feature coming soon...</span>
                   </div>
                 </div>
-                <textarea
-                  value={resumeText}
-                  onChange={e => setResumeText(e.target.value)}
-                  placeholder="Paste your resume text here, or upload a PDF on the left. You can freely customize words, add accomplishments, and refine skills before running AI analysis!"
-                  style={{ flex: 1, width: '100%', boxSizing: 'border-box', padding: '1.5rem', borderRadius: 20, border: '2px solid rgba(255, 255, 255, 0.4)', background: 'rgba(255, 255, 255, 0.96)', color: textColor, fontSize: fontSize + 'px', fontFamily, minHeight: 560, outline: 'none', resize: 'vertical', lineHeight: 1.7, transition: 'all 0.2s', boxShadow: '0 8px 25px rgba(0,0,0,0.1)', position: 'relative', zIndex: 1 }}
-                  onFocus={e => { e.target.style.borderColor = '#ffffff'; e.target.style.boxShadow = '0 12px 30px rgba(0,0,0,0.18)'; }}
-                  onBlur={e => { e.target.style.borderColor = 'rgba(255, 255, 255, 0.4)'; e.target.style.boxShadow = '0 8px 25px rgba(0,0,0,0.1)'; }}
-                />
+                
+                <div style={{ flex: 1, width: '100%', boxSizing: 'border-box', padding: '1.5rem', borderRadius: 20, border: '2px dashed rgba(255, 255, 255, 0.4)', background: 'rgba(255, 255, 255, 0.1)', color: '#ffffff', minHeight: 400, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', position: 'relative', zIndex: 1 }}>
+                  <div style={{ fontSize: 60, marginBottom: '1rem', animation: 'floatEmoji 3s infinite ease-in-out' }}>🛠️</div>
+                  <h4 style={{ margin: '0 0 0.5rem', fontSize: '1.2rem', fontWeight: 800 }}>We're building something amazing!</h4>
+                  <p style={{ margin: 0, fontSize: '0.95rem', opacity: 0.8, maxWidth: 300, lineHeight: 1.5 }}>Our True In-Place PDF Editor is currently undergoing maintenance to provide a flawless WYSIWYG experience. Please check back soon!</p>
+                </div>
               </div>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-                
+
                 {/* Score Match Card */}
                 <div className="bento-card card-teal anim-card-1 hover-lift" style={{ padding: '2.2rem', borderRadius: 28, position: 'relative', overflow: 'hidden' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '2rem', position: 'relative', zIndex: 1 }}>
                     <span style={{ fontSize: '1.7rem' }}>📊</span>
                     <h3 style={{ margin: 0, fontWeight: 900, fontSize: '1.5rem', fontFamily: 'Outfit, sans-serif', color: '#ffffff' }}>AI Match Intelligence</h3>
                   </div>
-                  
+
                   <div style={{ display: 'flex', justifyContent: 'space-around', flexWrap: 'wrap', gap: '2rem', background: 'rgba(0, 0, 0, 0.15)', backdropFilter: 'blur(10px)', padding: '2rem 1.5rem', borderRadius: 20, border: '1px solid rgba(255, 255, 255, 0.15)', position: 'relative', zIndex: 1 }}>
                     <Ring score={analysis.ats_score || 0} label="ATS COMPATIBILITY" color={ScoreColor(analysis.ats_score || 0)} />
                     <div style={{ width: 1, background: 'rgba(255, 255, 255, 0.2)', minHeight: '100px' }} />
@@ -302,7 +284,7 @@ export default function CVAnalyzer() {
                       <span style={{ fontSize: '1.6rem' }}>💡</span>
                       <h3 style={{ margin: 0, fontWeight: 900, fontSize: '1.4rem', fontFamily: 'Outfit, sans-serif', color: '#ffffff' }}>Actionable ATS Improvements</h3>
                     </div>
-                    
+
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', position: 'relative', zIndex: 1 }}>
                       {analysis.suggestions.map((s, i) => (
                         <div key={i} style={{ display: 'flex', gap: '1rem', alignItems: 'center', padding: '14px 16px', background: 'rgba(0, 0, 0, 0.15)', backdropFilter: 'blur(8px)', borderRadius: 14, border: '1px solid rgba(255, 255, 255, 0.15)', transition: 'transform 0.2s' }} onMouseEnter={e => e.currentTarget.style.transform = 'translateX(6px)'} onMouseLeave={e => e.currentTarget.style.transform = 'translateX(0)'}>

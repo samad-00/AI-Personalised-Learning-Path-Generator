@@ -5,13 +5,60 @@ from django.conf import settings
 
 def _groq_call(prompt, max_tokens=4000):
     client = Groq(api_key=settings.GROQ_API_KEY)
-    response = client.chat.completions.create(
-        model="llama-3.3-70b-versatile",
-        messages=[{"role": "user", "content": prompt}],
-        temperature=0.4,
-        max_tokens=max_tokens,
-    )
-    content = response.choices[0].message.content.strip()
+    try:
+        response = client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.4,
+            max_tokens=max_tokens,
+        )
+        content = response.choices[0].message.content.strip()
+    except Exception as e:
+        if '429' in str(e) or 'rate limit' in str(e).lower() or 'tokens per day' in str(e).lower():
+            print("Rate limit hit on primary model. Falling back to llama-3.1-8b-instant...")
+            
+            import time
+            fallback_success = False
+            for attempt in range(5):
+                try:
+                    response = client.chat.completions.create(
+                        model="llama-3.1-8b-instant",
+                        messages=[{"role": "user", "content": prompt}],
+                        temperature=0.4,
+                        max_tokens=min(max_tokens, 2500),
+                    )
+                    content = response.choices[0].message.content.strip()
+                    fallback_success = True
+                    break
+                except Exception as fallback_e:
+                    if '429' in str(fallback_e) or 'rate limit' in str(fallback_e).lower():
+                        print(f"Fallback rate limit hit (attempt {attempt+1}/5). Retrying in 3s...")
+                        time.sleep(3)
+                    else:
+                        raise fallback_e
+            
+            if not fallback_success:
+                print("Groq backup model also failed. Falling back to OpenRouter API...")
+                import requests
+                import os
+                or_key = getattr(settings, 'OPENROUTER_API_KEY', os.environ.get('OPENROUTER_API_KEY', ''))
+                headers = {
+                    "Authorization": f"Bearer {or_key}",
+                    "Content-Type": "application/json"
+                }
+                data = {
+                    "model": "meta-llama/llama-3.1-8b-instruct:free",
+                    "messages": [{"role": "user", "content": prompt}],
+                    "temperature": 0.4,
+                    "max_tokens": min(max_tokens, 2500)
+                }
+                or_response = requests.post("https://openrouter.ai/api/v1/chat/completions", headers=headers, json=data)
+                if or_response.status_code == 200:
+                    content = or_response.json()['choices'][0]['message']['content'].strip()
+                else:
+                    raise Exception(f"All backups failed. OpenRouter error: {or_response.text}")
+        else:
+            raise e
     # Strip markdown code blocks if present
     if content.startswith("```"):
         content = content.split("```")[1]
@@ -31,9 +78,11 @@ def generate_mock_interview(
 
     n = question_count  # shorthand
 
-    base_ctx = f"""Job Role: {job_role}
-Skills: {skills or 'General'}
-Job Description: {job_description or 'General role requirements'}"""
+    base_ctx = f"""Target Role: {job_role}
+Skills: {skills}
+Job Description: {job_description or 'None provided'}
+
+CRITICAL INSTRUCTION: Be extremely concise! Keep all explanations, tips, and hints to a MAXIMUM of 1 brief sentence. This is necessary to save tokens."""
 
     # ── MCQ Only ─────────────────────────────────────────────────────────
     if test_type == 'mcq_only':
@@ -66,8 +115,8 @@ Return ONLY the JSON. Do not truncate — include all {n} MCQs."""
 
     # ── Coding ───────────────────────────────────────────────────────────
     elif test_type == 'coding':
-        # For coding, max 10 but respect the count if under 10
-        coding_count = min(n, 10)
+        # For coding, max 5 but respect the count if under 5
+        coding_count = min(n, 5)
         prompt = f"""You are a senior software engineer conducting a coding interview.
 
 {base_ctx}
@@ -150,71 +199,86 @@ IMPORTANT: Generate EXACTLY {n} behavioral and soft skills questions for {job_ro
 - Each question should target a distinct competency.
 Return ONLY the JSON. Include all {n} soft skills questions."""
 
-    # ── Full Mock Interview ───────────────────────────────────────────────
-    else:
-        # Distribute counts proportionally across sections
-        mcq_n       = max(5, round(n * 0.40))   # ~40%
-        rapid_n     = max(5, round(n * 0.30))   # ~30%
-        soft_n      = max(3, round(n * 0.20))   # ~20%
-        analytical_n = max(2, round(n * 0.10))  # ~10%
-        coding_n    = min(4, max(2, round(n * 0.10)))  # 2-4 problems
-
-        prompt = f"""You are an expert technical recruiter. Generate a full mock interview.
+    # ── Analytical ───────────────────────────────────────────────────────
+    elif test_type == 'analytical':
+        prompt = f"""You are an expert interviewer focusing on logical reasoning and analytical thinking.
 
 {base_ctx}
 
 Return ONLY valid JSON (no markdown):
 {{
-  "mcqs": [
-    {{
-      "question": "Question text?",
-      "options": ["Option A", "Option B", "Option C", "Option D"],
-      "correct_answer_index": 0,
-      "explanation": "Why this answer is correct"
-    }}
-  ],
+  "mcqs": [],
+  "coding": [],
+  "rapid_fire": [],
   "analytical": [
     {{
-      "question": "Situational question?",
-      "tips_to_answer": "Use STAR method: Situation, Task, Action, Result"
+      "question": "Situational or analytical problem?",
+      "tips_to_answer": "Use STAR method: Situation, Task, Action, Result",
+      "ideal_answer": "A structured, concise example of a good answer"
     }}
   ],
-  "coding": [
-    {{
-      "question": "Write a function that...",
-      "language": "Python",
-      "starter_code": "# Provide valid python starter function template",
-      "hints": "Approach hint",
-      "sample_input": "example input",
-      "sample_output": "expected output",
-      "difficulty": "Medium",
-      "time_limit": "30 minutes"
-    }}
-  ],
-  "rapid_fire": [
-    {{
-      "question": "Short quick question?",
-      "ideal_answer": "Concise answer"
-    }}
-  ],
-  "soft_skills": [
-    {{
-      "question": "How do you handle conflict?",
-      "what_to_demonstrate": "Empathy, communication, problem-solving"
-    }}
-  ]
+  "soft_skills": []
 }}
 
-IMPORTANT — Generate EXACTLY the following counts:
-- mcqs: {mcq_n} MCQs on core technical knowledge (each with 4 options + explanation)
-- analytical: {analytical_n} situational/behavioral questions (with tips_to_answer)
-- coding: {coding_n} coding challenges (with starter_code, sample_input, sample_output, difficulty, time_limit)
-- rapid_fire: {rapid_n} quick-fire questions (answerable in 30 seconds)
-- soft_skills: {soft_n} behavioral/interpersonal questions (with what_to_demonstrate)
+IMPORTANT: Generate EXACTLY {n} analytical and situational questions for {job_role}.
+- Focus on logical reasoning, systemic design thinking, or structured problem solving.
+- Provide practical tips on how to answer each question.
+Return ONLY the JSON. Include all {n} analytical questions."""
 
-Total questions across all sections: {mcq_n + analytical_n + coding_n + rapid_n + soft_n}
-Do NOT omit or truncate any section. Return ONLY the JSON."""
+    # ── Full Mock Interview ───────────────────────────────────────────────
+    else:
+        # Distribute counts so that the total sum equals EXACTLY n
+        coding_n     = min(5, max(1, round(n * 0.10)))
+        analytical_n = max(1, round(n * 0.15))
+        soft_n       = max(1, round(n * 0.20))
+        rapid_n      = max(1, round(n * 0.25))
+        mcq_n        = n - (coding_n + analytical_n + soft_n + rapid_n)
 
+        import concurrent.futures
+
+        def fetch_section(t_type, count):
+            if count == 0: return {}
+            # Recursively call generate_mock_interview for the specific section.
+            # Distribute max_tokens evenly across the 5 workers.
+            sub_tokens = max(1000, max_tokens // 5 + 100)
+            try:
+                return generate_mock_interview(job_role, skills, job_description, t_type, count, max_tokens=sub_tokens)
+            except Exception as e:
+                err_str = str(e).lower()
+                print(f"Exception in fetch_section ({t_type}): {type(e)} - {err_str}")
+                if "on cooldown" in err_str or "429" in err_str or "rate limit" in err_str or "tokens per day" in err_str or "too many requests" in err_str or "exhausted" in err_str or "token limit" in err_str:
+                    raise e
+                return {}
+
+        merged_result = {
+            "mcqs": [], "analytical": [], "coding": [], "rapid_fire": [], "soft_skills": []
+        }
+
+        with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+            future_to_type = {
+                executor.submit(fetch_section, 'mcq_only', mcq_n): 'mcqs',
+                executor.submit(fetch_section, 'analytical', analytical_n): 'analytical',
+                executor.submit(fetch_section, 'coding', coding_n): 'coding',
+                executor.submit(fetch_section, 'rapid', rapid_n): 'rapid_fire',
+                executor.submit(fetch_section, 'soft_skills', soft_n): 'soft_skills',
+            }
+            for future in concurrent.futures.as_completed(future_to_type):
+                section_key = future_to_type[future]
+                try:
+                    res_dict = future.result()
+                    # Each sub-mode returns its questions under its own key (e.g. res_dict['mcqs'])
+                    if section_key in res_dict and isinstance(res_dict[section_key], list):
+                        merged_result[section_key] = res_dict[section_key]
+                except Exception as e:
+                    err_str = str(e).lower()
+                    print(f"Exception in fetch_section loop: {type(e)} - {err_str}")
+                    if "on cooldown" in err_str or "429" in err_str or "rate limit" in err_str or "tokens per day" in err_str or "too many requests" in err_str or "exhausted" in err_str or "token limit" in err_str:
+                        raise e
+                    pass
+
+        return merged_result
+
+    # For all other modes (mcq, coding, analytical, etc), execute the prompt
     return _groq_call(prompt, max_tokens=max_tokens)
 
 

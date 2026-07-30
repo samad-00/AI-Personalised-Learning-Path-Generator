@@ -192,6 +192,53 @@ export default function RoadmapDetail() {
           </div>
         </div>
 
+        {roadmap.topics_overview && roadmap.topics_overview.length > 0 && (
+          <div className="bento-card rise-item-2" style={{ padding: '2.5rem', marginBottom: '2rem', background: 'var(--surface-color)', position: 'relative', overflow: 'hidden' }}>
+            <div style={{ position: 'absolute', right: -20, top: -20, fontSize: 100, opacity: 0.05, transform: 'rotate(-10deg)', pointerEvents: 'none' }}>🗺️</div>
+            <h3 style={{ fontSize: 24, fontWeight: 800, margin: '0 0 2rem', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <span style={{ fontSize: 28 }}>🗺️</span> Course Overview Map
+            </h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem', position: 'relative' }}>
+              {/* Vertical connecting line */}
+              <div style={{ position: 'absolute', left: 100, top: 20, bottom: 20, width: 2, background: 'var(--border-color)', zIndex: 0 }} />
+              
+              {roadmap.topics_overview.map((topicItem, index) => (
+                <div key={index} style={{ display: 'flex', alignItems: 'center', gap: '2rem', position: 'relative', zIndex: 1 }}>
+                  
+                  {/* Topic Node */}
+                  <div style={{ 
+                    background: index % 2 === 0 ? 'var(--accent-pink)' : 'var(--accent-teal)', 
+                    color: 'white', 
+                    padding: '1.25rem 1.5rem', 
+                    borderRadius: '16px', 
+                    fontWeight: 800, 
+                    width: '200px',
+                    flexShrink: 0,
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center',
+                    textAlign: 'center',
+                    boxShadow: '0 8px 25px rgba(0, 0, 0, 0.15)',
+                    position: 'relative'
+                  }}>
+                    {topicItem.topic}
+                  </div>
+                  
+                  {/* Horizontal line to subtopics */}
+                  <div style={{ flex: 1, display: 'flex', flexWrap: 'wrap', gap: '0.75rem', alignItems: 'center', background: 'var(--bg-color)', padding: '1.5rem', borderRadius: '16px', border: '1px solid var(--border-color)' }}>
+                    {topicItem.subtopics && topicItem.subtopics.map((sub, i) => (
+                      <span key={i} className="pill-tag hover-pill" style={{ background: 'var(--surface-color)', border: '1px solid var(--border-color)', color: 'var(--text-primary)', fontWeight: 700, padding: '8px 16px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
+                        {sub}
+                      </span>
+                    ))}
+                  </div>
+                  
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         <div style={{ display: 'grid', gridTemplateColumns: '300px 1fr', gap: '2rem', alignItems: 'start' }}>
           
           {/* Sidebar / Week Navigation */}

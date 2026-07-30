@@ -33,8 +33,8 @@ class GenerateMockInterviewView(APIView):
             return Response({'error': 'Job role is required'}, status=400)
 
         try:
-            # Scale max_tokens with question count (each question ~150 tokens)
-            max_tokens = min(8000, 3000 + question_count * 120)
+            # Scale max_tokens with question count
+            max_tokens = min(8000, 3000 + question_count * 100)
             questions_json = generate_mock_interview(
                 job_role, skills, job_description, test_type, question_count, max_tokens
             )

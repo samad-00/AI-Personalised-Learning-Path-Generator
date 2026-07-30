@@ -25,7 +25,10 @@ class GenerateRoadmapView(APIView):
         try:
             roadmap_data = generate_roadmap(goal, experience_level)
             roadmap = Roadmap.objects.create(
-                user=request.user, goal=goal, experience_level=experience_level
+                user=request.user, 
+                goal=goal, 
+                experience_level=experience_level,
+                topics_overview=roadmap_data.get('topics_overview', [])
             )
             for week_data in roadmap_data['weeks']:
                 week = Week.objects.create(

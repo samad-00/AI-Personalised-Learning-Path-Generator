@@ -175,7 +175,7 @@ export default function Dashboard() {
 
           <div style={{ display: 'flex', gap: 36, fontSize: 19, fontWeight: 700, color: 'var(--text-primary)' }}>
             <span style={{ color: 'var(--accent-pink)', cursor: 'pointer' }}>Home</span>
-            <span style={{ cursor: 'pointer', transition: 'opacity 0.2s', opacity: 0.85 }} onMouseEnter={e => e.currentTarget.style.opacity = 1} onMouseLeave={e => e.currentTarget.style.opacity = 0.85} onClick={() => navigate('/interview-prep')}>Interview Prep</span>
+            <span style={{ cursor: 'pointer', transition: 'opacity 0.2s', opacity: 0.85 }} onMouseEnter={e => e.currentTarget.style.opacity = 1} onMouseLeave={e => e.currentTarget.style.opacity = 0.85} onClick={() => navigate('/interview-prep')}>Interview Preparation</span>
             <span style={{ cursor: 'pointer', transition: 'opacity 0.2s', opacity: 0.85 }} onMouseEnter={e => e.currentTarget.style.opacity = 1} onMouseLeave={e => e.currentTarget.style.opacity = 0.85} onClick={() => navigate('/cv-analyzer')}>CV Analyzer</span>
             <span style={{ cursor: 'pointer', transition: 'opacity 0.2s', opacity: 0.85 }} onMouseEnter={e => e.currentTarget.style.opacity = 1} onMouseLeave={e => e.currentTarget.style.opacity = 0.85} onClick={() => navigate('/profile')}>Profile</span>
           </div>
@@ -230,7 +230,7 @@ export default function Dashboard() {
             <form onSubmit={handleGenerate} style={{ display: 'flex', flexDirection: 'column', gap: 16, position: 'relative', zIndex: 1 }}>
               <input
                 type="text"
-                placeholder="e.g. Learn React Native in 4 weeks"
+                placeholder="e.g. Learn React Native in 12 weeks (3 months)"
                 value={goal}
                 onChange={e => setGoal(e.target.value)}
                 style={{ width: '100%', boxSizing: 'border-box', padding: '16px 24px', borderRadius: 100, border: 'none', fontSize: 15, fontFamily: 'Inter', outline: 'none', background: '#ffffff', color: 'var(--text-primary)', boxShadow: '0 6px 20px rgba(0,0,0,0.1)' }}
@@ -453,7 +453,7 @@ export default function Dashboard() {
             </div>
 
             <button className="hover-pill" style={{ width: '100%', background: '#ffffff', color: 'var(--accent-pink)', border: 'none', padding: '15px', borderRadius: 100, fontSize: 15, fontWeight: 900, fontFamily: 'Outfit', cursor: 'pointer', boxShadow: '0 6px 20px rgba(0,0,0,0.12)' }}>
-              Keep Learning →
+              Keep Learning
             </button>
           </div>
 

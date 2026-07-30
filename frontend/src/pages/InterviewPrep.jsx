@@ -1,14 +1,13 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { generateMockInterview, executeCode as apiExecuteCode } from '../services/api';
+import { useAuth } from '../store/AuthContext';
 import AnimatedBackground from '../components/AnimatedBackground';
+import ThemeToggle from '../components/ThemeToggle';
 
 /* ─────────────────────────────────────────
    Piston API — free, no-key, supports 30+ languages
-   https://github.com/engineer-man/piston
 ───────────────────────────────────────── */
-
-// Map display language → Piston API lang/version + file extension
 const LANG_CONFIG = {
   Python: { language: 'python', version: '3.10.0', ext: 'py' },
   JavaScript: { language: 'javascript', version: '18.15.0', ext: 'js' },
@@ -173,25 +172,14 @@ fun main() {
 `,
 };
 
-/* ─────────────────────────────────────────
-   Get starter code for a language, using the
-   AI-provided starter_code as a base if available
-───────────────────────────────────────── */
 function getStarterCode(language, aiStarterCode) {
-  // If AI provided starter code for this language, use it
   if (aiStarterCode && aiStarterCode.trim()) {
     return aiStarterCode;
   }
-  // Otherwise use our default template
   const tmpl = STARTER_TEMPLATES[language];
   return tmpl ? tmpl() : `// Write your ${language} solution here\n`;
 }
 
-/* ─────────────────────────────────────────
-   Auto-evaluator: wraps a bare function with
-   code that calls it with STDIN input and prints the result
-   (Only for Python and JS without explicit print/console.log)
-───────────────────────────────────────── */
 function prepareCode(code, language, stdin) {
   const c = (code || '').trim();
   if (!c) return '';
@@ -247,10 +235,7 @@ try {
   return c;
 }
 
-/* ─────────────────────────────────────────
-   Code Execution via Piston API
-───────────────────────────────────────── */
-async function executeCode(sourceCode, language, stdin = '') {
+async function executeCodeClient(sourceCode, language, stdin = '') {
   if (!sourceCode?.trim()) {
     return { output: '', error: '⚠️ Editor is empty. Write your code then click Run.', status: 'Error' };
   }
@@ -259,7 +244,6 @@ async function executeCode(sourceCode, language, stdin = '') {
   const code = prepareCode(sourceCode, language, stdin);
   const fileName = cfg.language === 'java' ? 'Main.java' : `main.${cfg.ext}`;
 
-  // Try primary Piston instance
   for (const pistonUrl of [
     'https://emkc.org/api/v2/piston/execute',
     'https://piston.kirillzhosul.ru/api/v2/piston/execute',
@@ -277,7 +261,7 @@ async function executeCode(sourceCode, language, stdin = '') {
         }),
       });
 
-      if (!res.ok) continue; // try next
+      if (!res.ok) continue;
 
       const data = await res.json();
       const run = data.run || {};
@@ -301,7 +285,7 @@ async function executeCode(sourceCode, language, stdin = '') {
       }
       return { output: stdout, error: '', status: 'Success' };
     } catch (err) {
-      continue; // try next Piston instance
+      continue;
     }
   }
 
@@ -313,7 +297,6 @@ async function executeCode(sourceCode, language, stdin = '') {
 }
 
 /* ─────────────────────────────────────────
-
    Code Editor Component
 ───────────────────────────────────────── */
 function CodeEditor({ q, i }) {
@@ -326,7 +309,6 @@ function CodeEditor({ q, i }) {
   const [showHints, setShowHints] = useState(false);
   const textareaRef = useRef(null);
 
-  // Switch language → load that language's template
   const handleLangChange = (newLang) => {
     const tmpl = STARTER_TEMPLATES[newLang];
     const defaultCode = tmpl ? tmpl() : `// Write your ${newLang} solution here\n`;
@@ -335,7 +317,6 @@ function CodeEditor({ q, i }) {
     setOutput(null);
   };
 
-  // Reset to the current language's default template
   const handleReset = () => {
     const tmpl = STARTER_TEMPLATES[lang];
     setCode(tmpl ? tmpl() : `// Write your ${lang} solution here\n`);
@@ -350,7 +331,9 @@ function CodeEditor({ q, i }) {
       const newCode = code.substring(0, start) + '    ' + code.substring(end);
       setCode(newCode);
       setTimeout(() => {
-        textareaRef.current.selectionStart = textareaRef.current.selectionEnd = start + 4;
+        if (textareaRef.current) {
+          textareaRef.current.selectionStart = textareaRef.current.selectionEnd = start + 4;
+        }
       }, 0);
     }
   };
@@ -359,9 +342,14 @@ function CodeEditor({ q, i }) {
     setRunning(true);
     setOutput(null);
     try {
-      // prepareCode wraps bare Python/JS functions with an auto-evaluator
       const executableCode = prepareCode(code, lang, stdin);
-      const result = await apiExecuteCode({ code: executableCode, language: lang, stdin });
+      let result;
+      try {
+        result = await apiExecuteCode({ code: executableCode, language: lang, stdin });
+      } catch (backendErr) {
+        console.warn('Backend execution failed, using fallback Piston client runner:', backendErr);
+        result = await executeCodeClient(code, lang, stdin);
+      }
       setOutput(result);
     } catch (e) {
       setOutput({ output: '', error: e.message, status: 'Error' });
@@ -393,10 +381,10 @@ function CodeEditor({ q, i }) {
   };
 
   return (
-    <div style={{ background: 'var(--surface-color)', borderRadius: 16, border: '1px solid var(--border-color)', overflow: 'hidden' }}>
+    <div className="bento-card" style={{ padding: 0, overflow: 'hidden', border: '1px solid var(--border-color)' }}>
       {/* Header */}
-      <div style={{ padding: '1.25rem 1.5rem', borderBottom: '1px solid var(--border-color)', display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
-        <span style={{ ...badgeBase, background: '#4f46e5', border: '1px solid #4338ca', boxShadow: '0 2px 6px rgba(79,70,229,0.25)' }}>
+      <div style={{ padding: '1.25rem 1.5rem', borderBottom: '1px solid var(--border-color)', display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center', background: 'var(--surface-color)' }}>
+        <span style={{ ...badgeBase, background: '#4f46e5', border: '1px solid #4338ca', boxShadow: '0 2px 8px rgba(79,70,229,0.25)' }}>
           TASK {i + 1}
         </span>
         {q.difficulty && (
@@ -405,7 +393,7 @@ function CodeEditor({ q, i }) {
           </span>
         )}
         {q.time_limit && (
-          <span style={{ ...badgeBase, background: '#64748b', border: '1px solid #475569' }}>
+          <span style={{ ...badgeBase, background: 'var(--surface-muted)', border: '1px solid var(--border-color)', color: 'var(--text-primary)' }}>
             ⏱ {q.time_limit}
           </span>
         )}
@@ -413,22 +401,22 @@ function CodeEditor({ q, i }) {
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
         {/* Problem Statement */}
-        <div style={{ padding: '1.5rem' }}>
-          <p style={{ margin: '0 0 1rem', fontWeight: 700, fontSize: '1rem', color: 'var(--text-primary)', lineHeight: 1.7 }}>{q.question}</p>
+        <div style={{ padding: '1.5rem', background: 'var(--surface-color)' }}>
+          <p style={{ margin: '0 0 1.25rem', fontWeight: 700, fontSize: '1.05rem', color: 'var(--text-primary)', lineHeight: 1.7, fontFamily: 'Outfit, sans-serif' }}>{q.question}</p>
 
           {q.sample_input && (
-            <div style={{ display: 'flex', gap: '0.85rem', flexWrap: 'wrap', marginBottom: '1.25rem' }}>
-              <div style={{ flex: 1, minWidth: 160, padding: '0.85rem 1.1rem', background: '#12121f', borderRadius: 10, border: '1px solid #2a2a40', boxShadow: '0 4px 12px rgba(0,0,0,0.15)' }}>
+            <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', marginBottom: '1.25rem' }}>
+              <div style={{ flex: 1, minWidth: 200, padding: '1rem 1.2rem', background: '#12121f', borderRadius: 14, border: '1px solid #2a2a40', boxShadow: '0 4px 14px rgba(0,0,0,0.15)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '7px', marginBottom: '8px' }}>
                   <span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: '50%', background: '#38e54d' }}></span>
-                  <p style={{ margin: 0, fontSize: 11, fontWeight: 700, color: '#a0a6b8', letterSpacing: '1px' }}>SAMPLE INPUT</p>
+                  <p style={{ margin: 0, fontSize: 11, fontWeight: 800, color: '#a0a6b8', letterSpacing: '1px' }}>SAMPLE INPUT</p>
                 </div>
                 <pre style={{ margin: 0, color: '#ffffff', fontFamily: "'Fira Code', 'Consolas', monospace", fontSize: '14px', fontWeight: 600, lineHeight: 1.5, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{q.sample_input}</pre>
               </div>
-              <div style={{ flex: 1, minWidth: 160, padding: '0.85rem 1.1rem', background: '#12121f', borderRadius: 10, border: '1px solid #2a2a40', boxShadow: '0 4px 12px rgba(0,0,0,0.15)' }}>
+              <div style={{ flex: 1, minWidth: 200, padding: '1rem 1.2rem', background: '#12121f', borderRadius: 14, border: '1px solid #2a2a40', boxShadow: '0 4px 14px rgba(0,0,0,0.15)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '7px', marginBottom: '8px' }}>
                   <span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: '50%', background: '#ffb86c' }}></span>
-                  <p style={{ margin: 0, fontSize: 11, fontWeight: 700, color: '#a0a6b8', letterSpacing: '1px' }}>EXPECTED OUTPUT</p>
+                  <p style={{ margin: 0, fontSize: 11, fontWeight: 800, color: '#a0a6b8', letterSpacing: '1px' }}>EXPECTED OUTPUT</p>
                 </div>
                 <pre style={{ margin: 0, color: '#ffbe6b', fontFamily: "'Fira Code', 'Consolas', monospace", fontSize: '14px', fontWeight: 700, lineHeight: 1.5, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{q.sample_output}</pre>
               </div>
@@ -437,12 +425,12 @@ function CodeEditor({ q, i }) {
 
           {q.hints && (
             <div>
-              <button onClick={() => setShowHints(v => !v)}
-                style={{ padding: '6px 14px', borderRadius: 100, border: '1px solid var(--border-color)', background: 'transparent', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: 12, fontWeight: 600 }}>
+              <button onClick={() => setShowHints(v => !v)} className="hover-pill"
+                style={{ padding: '8px 18px', borderRadius: 100, border: '1px solid var(--border-color)', background: 'var(--surface-muted)', color: 'var(--text-primary)', cursor: 'pointer', fontSize: 13, fontWeight: 700 }}>
                 {showHints ? '🙈 Hide Hints' : '💡 Show Hints'}
               </button>
               {showHints && (
-                <div style={{ marginTop: '0.75rem', padding: '0.75rem 1rem', background: 'rgba(20,184,166,0.08)', borderRadius: 8, borderLeft: '3px solid var(--accent-mint)' }}>
+                <div style={{ marginTop: '0.85rem', padding: '1rem 1.25rem', background: 'rgba(20,184,166,0.08)', borderRadius: 12, borderLeft: '4px solid var(--accent-teal)' }}>
                   <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: 14, lineHeight: 1.6 }}>{q.hints}</p>
                 </div>
               )}
@@ -453,20 +441,20 @@ function CodeEditor({ q, i }) {
         {/* Code Editor */}
         <div style={{ borderTop: '1px solid var(--border-color)' }}>
           {/* Editor Toolbar */}
-          <div style={{ padding: '0.6rem 1rem', background: '#1a1a2e', display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
-            <span style={{ fontSize: 12, color: '#888', fontWeight: 600 }}>Language:</span>
+          <div style={{ padding: '0.75rem 1.25rem', background: '#1a1a2e', display: 'flex', alignItems: 'center', gap: '0.85rem', flexWrap: 'wrap' }}>
+            <span style={{ fontSize: 13, color: '#a0a6b8', fontWeight: 700 }}>Language:</span>
             <select value={lang} onChange={e => handleLangChange(e.target.value)}
-              style={{ padding: '4px 10px', borderRadius: 6, border: '1px solid #333', background: '#252540', color: '#e0e0e0', fontSize: 12, cursor: 'pointer', fontWeight: 600 }}>
+              style={{ padding: '6px 14px', borderRadius: 8, border: '1px solid #3b3b5c', background: '#252540', color: '#ffffff', fontSize: 13, cursor: 'pointer', fontWeight: 700, outline: 'none' }}>
               {Object.keys(LANG_CONFIG).map(l => <option key={l} value={l}>{l}</option>)}
             </select>
-            <div style={{ marginLeft: 'auto', display: 'flex', gap: '0.5rem' }}>
+            <div style={{ marginLeft: 'auto', display: 'flex', gap: '0.6rem' }}>
               <button onClick={handleReset}
-                style={{ padding: '5px 12px', borderRadius: 6, border: '1px solid #444', background: 'transparent', color: '#aaa', cursor: 'pointer', fontSize: 12, fontWeight: 600 }}>
+                style={{ padding: '6px 14px', borderRadius: 8, border: '1px solid #444466', background: 'transparent', color: '#cccccc', cursor: 'pointer', fontSize: 13, fontWeight: 700, transition: 'all 0.2s' }}>
                 Reset
               </button>
               <button onClick={handleRun} disabled={running}
-                style={{ padding: '5px 18px', borderRadius: 6, border: 'none', background: running ? '#444' : '#38e54d', color: '#0a0a1a', cursor: running ? 'not-allowed' : 'pointer', fontSize: 12, fontWeight: 800 }}>
-                {running ? '⏳ Running...' : '▶ Run'}
+                style={{ padding: '6px 20px', borderRadius: 8, border: 'none', background: running ? '#444' : '#10b981', color: '#ffffff', cursor: running ? 'not-allowed' : 'pointer', fontSize: 13, fontWeight: 800, transition: 'all 0.2s', boxShadow: running ? 'none' : '0 2px 10px rgba(16,185,129,0.3)' }}>
+                {running ? '⏳ Running...' : '▶ Run Code'}
               </button>
             </div>
           </div>
@@ -480,7 +468,7 @@ function CodeEditor({ q, i }) {
               onKeyDown={handleTabKey}
               spellCheck={false}
               style={{
-                width: '100%', minHeight: 240, padding: '1rem 1rem 1rem 3.5rem',
+                width: '100%', minHeight: 260, padding: '1rem 1rem 1rem 3.5rem',
                 background: 'transparent', color: '#e8e8f0', fontFamily: "'Fira Code', 'Cascadia Code', 'Consolas', monospace",
                 fontSize: 14, lineHeight: 1.7, border: 'none', outline: 'none', resize: 'vertical',
                 boxSizing: 'border-box', caretColor: '#38e54d', letterSpacing: '0.3px',
@@ -497,12 +485,12 @@ function CodeEditor({ q, i }) {
           </div>
 
           {/* Stdin */}
-          <div style={{ padding: '0.6rem 1rem', background: '#12121f', borderTop: '1px solid #222' }}>
-            <p style={{ margin: '0 0 4px', fontSize: 11, fontWeight: 700, color: '#666', letterSpacing: 1 }}>STDIN (optional input)</p>
+          <div style={{ padding: '0.85rem 1.25rem', background: '#12121f', borderTop: '1px solid #222' }}>
+            <p style={{ margin: '0 0 6px', fontSize: 11, fontWeight: 800, color: '#777', letterSpacing: 1 }}>STDIN (OPTIONAL INPUT)</p>
             <textarea value={stdin} onChange={e => setStdin(e.target.value)}
               placeholder="Custom input to pass to your program..."
               rows={2}
-              style={{ width: '100%', boxSizing: 'border-box', padding: '6px 10px', background: '#0d0d1a', border: '1px solid #2a2a40', borderRadius: 6, color: '#aaa', fontFamily: 'monospace', fontSize: 13, resize: 'vertical', outline: 'none' }} />
+              style={{ width: '100%', boxSizing: 'border-box', padding: '8px 12px', background: '#0d0d1a', border: '1px solid #2a2a40', borderRadius: 8, color: '#dddddd', fontFamily: 'monospace', fontSize: 13, resize: 'vertical', outline: 'none' }} />
           </div>
 
           {/* Output */}
@@ -553,39 +541,39 @@ function MCQCard({ q, i }) {
   const [revealed, setRevealed] = useState(false);
 
   return (
-    <div style={{ background: 'var(--surface-color)', borderRadius: 16, padding: '1.75rem', border: '1px solid var(--border-color)' }}>
-      <p style={{ fontWeight: 700, fontSize: '1.05rem', color: 'var(--text-primary)', marginBottom: '1.25rem', lineHeight: 1.6 }}>
-        <span style={{ color: 'var(--accent-pink)', marginRight: 8 }}>Q{i + 1}.</span>{q.question}
+    <div className="bento-card hover-lift" style={{ padding: '1.75rem' }}>
+      <p style={{ fontWeight: 700, fontSize: '1.1rem', color: 'var(--text-primary)', marginBottom: '1.25rem', lineHeight: 1.6, fontFamily: 'Outfit, sans-serif' }}>
+        <span style={{ color: 'var(--accent-pink)', marginRight: 10, fontWeight: 800 }}>Q{i + 1}.</span>{q.question}
       </p>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
         {q.options.map((opt, j) => {
           let bg = 'var(--bg-color)', border = '1px solid var(--border-color)', color = 'var(--text-primary)';
           if (revealed) {
-            if (j === q.correct_answer_index) { bg = 'rgba(56,229,77,0.12)'; border = '2px solid #38e54d'; }
-            else if (j === selected) { bg = 'rgba(255,80,80,0.12)'; border = '2px solid #ff5050'; }
-          } else if (j === selected) { border = '2px solid var(--accent-pink)'; }
+            if (j === q.correct_answer_index) { bg = 'rgba(56,229,77,0.14)'; border = '2px solid #38e54d'; }
+            else if (j === selected) { bg = 'rgba(255,80,80,0.14)'; border = '2px solid #ff5050'; }
+          } else if (j === selected) { border = '2px solid var(--accent-pink)'; bg = 'rgba(235,99,131,0.08)'; }
           return (
-            <div key={j} onClick={() => !revealed && setSelected(j)}
-              style={{ padding: '12px 16px', background: bg, borderRadius: 10, border, cursor: revealed ? 'default' : 'pointer', display: 'flex', alignItems: 'center', gap: 12, color, transition: 'all 0.15s' }}>
-              <span style={{ width: 28, height: 28, borderRadius: '50%', background: 'var(--surface-color)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: 13, flexShrink: 0 }}>
+            <div key={j} onClick={() => !revealed && setSelected(j)} className="hover-pill"
+              style={{ padding: '14px 18px', background: bg, borderRadius: 14, border, cursor: revealed ? 'default' : 'pointer', display: 'flex', alignItems: 'center', gap: 14, color, fontWeight: 600, transition: 'all 0.2s ease' }}>
+              <span style={{ width: 32, height: 32, borderRadius: '50%', background: 'var(--surface-color)', border: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: 13, flexShrink: 0 }}>
                 {String.fromCharCode(65 + j)}
               </span>
-              <span style={{ lineHeight: 1.5 }}>{opt}</span>
-              {revealed && j === q.correct_answer_index && <span style={{ marginLeft: 'auto' }}>✅</span>}
-              {revealed && j === selected && j !== q.correct_answer_index && <span style={{ marginLeft: 'auto' }}>❌</span>}
+              <span style={{ lineHeight: 1.5, flex: 1 }}>{opt}</span>
+              {revealed && j === q.correct_answer_index && <span style={{ fontSize: 18 }}>✅</span>}
+              {revealed && j === selected && j !== q.correct_answer_index && <span style={{ fontSize: 18 }}>❌</span>}
             </div>
           );
         })}
       </div>
       {!revealed ? (
-        <button onClick={() => setRevealed(true)}
-          style={{ marginTop: '1rem', padding: '8px 18px', borderRadius: 100, border: '1px solid var(--border-color)', background: 'transparent', color: 'var(--text-secondary)', cursor: 'pointer', fontWeight: 600, fontSize: 13 }}>
+        <button onClick={() => setRevealed(true)} className="btn-primary"
+          style={{ marginTop: '1.25rem', padding: '10px 24px', fontSize: 13 }}>
           Show Answer
         </button>
       ) : (
-        <div style={{ marginTop: '1rem', padding: '1rem 1.25rem', background: 'rgba(168,85,247,0.08)', borderRadius: 10, borderLeft: '4px solid var(--accent-pink)' }}>
-          <strong style={{ color: 'var(--text-primary)' }}>✅ {q.options[q.correct_answer_index]}</strong>
-          {q.explanation && <p style={{ margin: '0.4rem 0 0', color: 'var(--text-secondary)', fontSize: 14, lineHeight: 1.5 }}>{q.explanation}</p>}
+        <div style={{ marginTop: '1.25rem', padding: '1.25rem', background: 'rgba(235, 99, 131, 0.08)', borderRadius: 16, borderLeft: '4px solid var(--accent-pink)' }}>
+          <strong style={{ color: 'var(--text-primary)', fontSize: '0.95rem', fontFamily: 'Outfit, sans-serif' }}>✅ Correct Answer: {q.options[q.correct_answer_index]}</strong>
+          {q.explanation && <p style={{ margin: '0.5rem 0 0', color: 'var(--text-secondary)', fontSize: 14, lineHeight: 1.6 }}>{q.explanation}</p>}
         </div>
       )}
     </div>
@@ -597,13 +585,14 @@ function MCQCard({ q, i }) {
 ───────────────────────────────────────── */
 function TabBtn({ label, active, onClick, count }) {
   return (
-    <button onClick={onClick} style={{
-      padding: '10px 18px', borderRadius: 100, border: '1px solid var(--border-color)', cursor: 'pointer',
-      fontWeight: 700, fontSize: 13, transition: 'all 0.2s', whiteSpace: 'nowrap',
+    <button onClick={onClick} className="hover-pill" style={{
+      padding: '10px 22px', borderRadius: 100, border: '1px solid var(--border-color)', cursor: 'pointer',
+      fontWeight: 700, fontSize: 14, fontFamily: 'Outfit, sans-serif', transition: 'all 0.2s', whiteSpace: 'nowrap',
       background: active ? 'var(--text-primary)' : 'var(--surface-color)',
       color: active ? 'var(--bg-color)' : 'var(--text-secondary)',
+      boxShadow: active ? '0 4px 14px rgba(0,0,0,0.12)' : 'none',
     }}>
-      {label} {count !== undefined && <span style={{ opacity: 0.7 }}>({count})</span>}
+      {label} {count !== undefined && <span style={{ opacity: 0.75, marginLeft: 4 }}>({count})</span>}
     </button>
   );
 }
@@ -612,17 +601,19 @@ function TabBtn({ label, active, onClick, count }) {
    Test Modes Config
 ───────────────────────────────────────── */
 const TEST_MODES = [
-  { id: 'full', label: '🎯 Full Mock Interview', desc: 'MCQs + Analytical + Coding + Rapid Fire + Soft Skills' },
-  { id: 'mcq_only', label: '📝 MCQ Only', desc: 'Multiple choice questions to test knowledge' },
-  { id: 'coding', label: '💻 Coding Round', desc: 'Technical coding & problem solving with live code editor' },
-  { id: 'rapid', label: '⚡ Rapid Fire', desc: 'Quick 30-second answer questions' },
-  { id: 'soft_skills', label: '🤝 Soft Skills', desc: 'Behavioral and interpersonal questions' },
+  { id: 'full', label: '🎯 Full Mock Interview', desc: 'MCQs + Analytical + Coding + Rapid Fire + Soft Skills', badgeColor: 'var(--accent-pink)' },
+  { id: 'mcq_only', label: '📝 MCQ Only', desc: 'Multiple choice questions to test core domain knowledge', badgeColor: 'var(--accent-teal)' },
+  { id: 'analytical', label: '🧠 Analytical', desc: 'Logical reasoning and analytical thinking problems', badgeColor: 'var(--accent-orange)' },
+  { id: 'coding', label: '💻 Coding Round', desc: 'Technical coding & problem solving with live code editor', badgeColor: '#38bdf8' },
+  { id: 'rapid', label: '⚡ Rapid Fire', desc: 'Quick 30-second rapid answer questions', badgeColor: '#eab308' },
+  { id: 'soft_skills', label: '🤝 Soft Skills', desc: 'Behavioral and interpersonal scenario questions', badgeColor: '#a855f7' },
 ];
 
 /* ─────────────────────────────────────────
    Main Page
 ───────────────────────────────────────── */
 export default function InterviewPrep() {
+  const { logout } = useAuth();
   const navigate = useNavigate();
   const [jobRole, setJobRole] = useState('');
   const [skills, setSkills] = useState('');
@@ -630,9 +621,33 @@ export default function InterviewPrep() {
   const [testMode, setTestMode] = useState('full');
   const [questionCount, setQuestionCount] = useState(20);
   const [loading, setLoading] = useState(false);
+  const [loadingText, setLoadingText] = useState('');
   const [error, setError] = useState('');
   const [testData, setTestData] = useState(null);
   const [activeTab, setActiveTab] = useState('mcqs');
+
+  // Dynamic loading text effect
+  useEffect(() => {
+    let interval;
+    if (loading) {
+      const messages = [
+        `⏳ Preparing ${questionCount} Questions...`,
+        "🧠 Analyzing your skills...",
+        "📝 Designing custom scenarios...",
+        "💻 Generating coding challenges...",
+        "⚡ Crafting rapid-fire questions...",
+        "🤝 Adding soft skills tests...",
+        "✨ Almost there, putting it all together..."
+      ];
+      let msgIndex = 0;
+      setLoadingText(messages[0]);
+      interval = setInterval(() => {
+        msgIndex = (msgIndex + 1) % messages.length;
+        setLoadingText(messages[msgIndex]);
+      }, 3500); // Change every 3.5s
+    }
+    return () => clearInterval(interval);
+  }, [loading, questionCount]);
 
   const handleGenerate = async (e) => {
     e.preventDefault();
@@ -649,8 +664,7 @@ export default function InterviewPrep() {
       const questions = res.data.questions;
       setTestData({ ...questions, job_role: res.data.job_role || jobRole, test_type: testMode });
 
-      // Set the default active tab based on mode
-      const modeTabMap = { mcq_only: 'mcqs', coding: 'coding', rapid: 'rapid_fire', soft_skills: 'soft_skills', full: 'mcqs' };
+      const modeTabMap = { mcq_only: 'mcqs', coding: 'coding', rapid: 'rapid_fire', soft_skills: 'soft_skills', analytical: 'analytical', full: 'mcqs' };
       setActiveTab(modeTabMap[testMode] || 'mcqs');
     } catch (err) {
       console.error('Interview error:', err);
@@ -671,30 +685,55 @@ export default function InterviewPrep() {
     ].filter(t => t.data && t.data.length > 0);
 
     return (
-      <div style={{ minHeight: '100vh', position: 'relative', overflow: 'hidden' }}>
+      <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden' }}>
         <style>{`
           @keyframes smoothRiseUp {
             0% { opacity: 0; transform: translateY(60px) scale(0.95); }
             100% { opacity: 1; transform: translateY(0) scale(1); }
           }
-          @keyframes floatEmoji {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-6px) rotate(4deg); }
-          }
-          .rise-item-1 { animation: smoothRiseUp 1.35s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both; }
-          .rise-item-2 { animation: smoothRiseUp 1.35s cubic-bezier(0.16, 1, 0.3, 1) 0.35s both; }
-          .hover-card-effects { transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important; }
-          .hover-card-effects:hover { transform: translateY(-6px) scale(1.01) !important; box-shadow: 0 18px 38px rgba(0,0,0,0.14) !important; }
+          .rise-item-1 { animation: smoothRiseUp 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both; }
+          .rise-item-2 { animation: smoothRiseUp 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.35s both; }
+          .hover-lift { transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important; }
+          .hover-lift:hover { transform: translateY(-6px) scale(1.01) !important; box-shadow: 0 18px 38px rgba(0,0,0,0.14) !important; }
         `}</style>
         <AnimatedBackground />
-        <div style={{ position: 'relative', zIndex: 1, padding: '2.5rem 2rem', maxWidth: 960, margin: '0 auto' }}>
-          <div className="rise-item-1" style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem', flexWrap: 'wrap' }}>
-            <button onClick={() => setTestData(null)} style={{ padding: '8px 18px', borderRadius: 100, border: '1px solid var(--border-color)', background: 'transparent', color: 'var(--text-secondary)', cursor: 'pointer', fontWeight: 600, fontSize: 14 }}>← New Test</button>
+
+        {/* Top Navbar Header */}
+        <nav style={{ padding: '2rem 3.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative', zIndex: 10 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 50 }}>
+            <div onClick={() => navigate('/')} style={{ display: 'flex', alignItems: 'center', gap: 16, cursor: 'pointer' }}>
+              <div style={{ width: 52, height: 52, borderRadius: '50%', background: 'var(--accent-pink)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 26, boxShadow: '0 4px 15px rgba(226, 85, 131, 0.25)' }}>
+                📖
+              </div>
+              <span style={{ fontSize: 32, fontWeight: 900, fontFamily: 'Outfit, sans-serif', color: 'var(--text-primary)', letterSpacing: '-0.5px' }}>LearnPath</span>
+            </div>
+
+            <div style={{ display: 'flex', gap: 36, fontSize: 19, fontWeight: 700, color: 'var(--text-primary)' }}>
+              <span style={{ cursor: 'pointer', transition: 'opacity 0.2s', opacity: 0.85 }} onClick={() => navigate('/dashboard')}>Home</span>
+              <span style={{ color: 'var(--accent-pink)', cursor: 'pointer' }}>Interview Preparation</span>
+              <span style={{ cursor: 'pointer', transition: 'opacity 0.2s', opacity: 0.85 }} onClick={() => navigate('/cv-analyzer')}>CV Analyzer</span>
+              <span style={{ cursor: 'pointer', transition: 'opacity 0.2s', opacity: 0.85 }} onClick={() => navigate('/profile')}>Profile</span>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
+            <ThemeToggle />
+            <button title="Logout" onClick={logout} style={{ background: 'transparent', border: '2px solid var(--border-color)', color: 'var(--text-primary)', width: 46, height: 46, borderRadius: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, transition: 'all 0.2s ease' }}>
+              🚪
+            </button>
+          </div>
+        </nav>
+
+        <div style={{ position: 'relative', zIndex: 1, padding: '1rem 2rem 4rem', maxWidth: 1040, margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
+          <div className="rise-item-1" style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', marginBottom: '2.5rem', flexWrap: 'wrap' }}>
+            <button onClick={() => setTestData(null)} className="hover-pill" style={{ padding: '10px 22px', borderRadius: 100, border: '1px solid var(--border-color)', background: 'var(--surface-color)', color: 'var(--text-primary)', cursor: 'pointer', fontWeight: 700, fontSize: 14, fontFamily: 'Outfit, sans-serif' }}>
+              ← New Test
+            </button>
             <div>
-              <h1 style={{ margin: 0, fontSize: 'clamp(1.5rem,3vw,2rem)', fontWeight: 800, color: 'var(--text-primary)' }}>
-                Mock Interview — <span style={{ color: '#10b981' }}>{testData.job_role}</span>
+              <h1 style={{ margin: 0, fontSize: 'clamp(1.75rem,3.5vw,2.4rem)', fontWeight: 800, color: 'var(--text-primary)', fontFamily: 'Outfit, sans-serif' }}>
+                Mock Interview — <span style={{ color: 'var(--accent-teal)' }}>{testData.job_role}</span>
               </h1>
-              <p style={{ margin: '0.25rem 0 0', color: 'var(--text-secondary)', fontSize: 13 }}>
+              <p style={{ margin: '0.35rem 0 0', color: 'var(--text-secondary)', fontSize: 14, fontWeight: 500 }}>
                 {TEST_MODES.find(m => m.id === testData.test_type)?.label || 'Full Mock Interview'}
               </p>
             </div>
@@ -702,30 +741,36 @@ export default function InterviewPrep() {
 
           {/* Tabs */}
           {tabs.length > 1 && (
-            <div style={{ display: 'flex', gap: '0.6rem', marginBottom: '2rem', overflowX: 'auto', paddingBottom: '0.5rem' }}>
+            <div className="rise-item-2" style={{ display: 'flex', gap: '0.75rem', marginBottom: '2rem', overflowX: 'auto', paddingBottom: '0.5rem' }}>
               {tabs.map(t => <TabBtn key={t.id} label={t.label} count={t.data?.length} active={activeTab === t.id} onClick={() => setActiveTab(t.id)} />)}
             </div>
           )}
 
           {/* MCQs */}
           {activeTab === 'mcqs' && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
               {(testData.mcqs || []).map((q, i) => <MCQCard key={i} q={q} i={i} />)}
             </div>
           )}
 
           {/* Analytical */}
           {activeTab === 'analytical' && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
               {(testData.analytical || []).map((q, i) => (
-                <div key={i} style={{ background: 'var(--surface-color)', borderRadius: 16, padding: '1.75rem', border: '1px solid var(--border-color)' }}>
+                <div key={i} className="bento-card hover-lift" style={{ padding: '1.75rem' }}>
                   <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.25rem' }}>
-                    <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'var(--accent-pink)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, flexShrink: 0 }}>{i + 1}</div>
-                    <p style={{ margin: 0, fontSize: '1.05rem', fontWeight: 600, color: 'var(--text-primary)', lineHeight: 1.6 }}>{q.question}</p>
+                    <div style={{ width: 40, height: 40, borderRadius: '50%', background: 'var(--accent-orange)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: 16, flexShrink: 0 }}>{i + 1}</div>
+                    <p style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1.6, fontFamily: 'Outfit, sans-serif' }}>{q.question}</p>
                   </div>
-                  <div style={{ padding: '1rem 1.25rem', background: 'rgba(168,85,247,0.07)', borderRadius: 10, borderLeft: '4px solid var(--accent-pink)' }}>
-                    <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.35rem' }}>💡 What interviewers look for:</p>
+                  <div style={{ padding: '1.1rem 1.35rem', background: 'rgba(244, 162, 89, 0.08)', borderRadius: 14, borderLeft: '4px solid var(--accent-orange)' }}>
+                    <p style={{ margin: 0, fontSize: 14, fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.35rem', fontFamily: 'Outfit, sans-serif' }}>💡 What interviewers look for:</p>
                     <p style={{ margin: 0, color: 'var(--text-secondary)', lineHeight: 1.6 }}>{q.tips_to_answer}</p>
+                    {q.ideal_answer && (
+                      <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+                        <p style={{ margin: 0, fontSize: 14, fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.35rem', fontFamily: 'Outfit, sans-serif' }}>✅ Ideal Answer Strategy:</p>
+                        <p style={{ margin: 0, color: 'var(--text-secondary)', lineHeight: 1.6 }}>{q.ideal_answer}</p>
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}
@@ -734,9 +779,12 @@ export default function InterviewPrep() {
 
           {/* Coding — Live Editor */}
           {activeTab === 'coding' && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-              <div style={{ padding: '0.75rem 1rem', background: 'rgba(56,229,77,0.08)', borderRadius: 10, border: '1px solid rgba(56,229,77,0.2)', fontSize: 13, color: 'var(--text-secondary)' }}>
-                💡 <strong style={{ color: 'var(--text-primary)' }}>Live Code Editor</strong> — Write your solution and click <strong>▶ Run</strong> to execute it. Tab key inserts 4 spaces.
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.75rem' }}>
+              <div style={{ padding: '1rem 1.25rem', background: 'rgba(56,229,77,0.08)', borderRadius: 16, border: '1px solid rgba(56,229,77,0.25)', fontSize: 14, color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: 10 }}>
+                <span style={{ fontSize: 20 }}>💡</span>
+                <div>
+                  <strong style={{ color: 'var(--text-primary)', fontFamily: 'Outfit, sans-serif' }}>Live Code Editor</strong> — Write your code solution and click <strong>▶ Run Code</strong> to evaluate output. Tab key inserts 4 spaces.
+                </div>
               </div>
               {(testData.coding || []).map((q, i) => <CodeEditor key={i} q={q} i={i} />)}
             </div>
@@ -744,16 +792,16 @@ export default function InterviewPrep() {
 
           {/* Rapid Fire */}
           {activeTab === 'rapid_fire' && (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))', gap: '1.25rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))', gap: '1.5rem' }}>
               {(testData.rapid_fire || []).map((q, i) => (
-                <div key={i} style={{ background: 'var(--surface-color)', borderRadius: 16, padding: '1.5rem', border: '1px solid var(--border-color)' }}>
-                  <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '1rem' }}>
-                    <span style={{ padding: '4px 14px', background: '#f59e0b', border: '1px solid #d97706', borderRadius: 100, fontSize: 12, fontWeight: 800, color: '#ffffff', flexShrink: 0, alignSelf: 'flex-start', marginTop: 2, boxShadow: '0 2px 6px rgba(245,158,11,0.25)' }}>⚡ {i + 1}</span>
-                    <p style={{ margin: 0, fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1.5 }}>{q.question}</p>
+                <div key={i} className="bento-card hover-lift" style={{ padding: '1.5rem' }}>
+                  <div style={{ display: 'flex', gap: '0.85rem', marginBottom: '1rem', alignItems: 'flex-start' }}>
+                    <span style={{ padding: '5px 14px', background: '#f59e0b', border: '1px solid #d97706', borderRadius: 100, fontSize: 12, fontWeight: 800, color: '#ffffff', flexShrink: 0, boxShadow: '0 2px 6px rgba(245,158,11,0.25)' }}>⚡ {i + 1}</span>
+                    <p style={{ margin: 0, fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1.5, fontFamily: 'Outfit, sans-serif' }}>{q.question}</p>
                   </div>
-                  <details>
-                    <summary style={{ cursor: 'pointer', fontSize: 13, color: 'var(--text-secondary)', fontWeight: 600 }}>Reveal Answer</summary>
-                    <p style={{ margin: '0.75rem 0 0', color: 'var(--text-secondary)', fontSize: 14, lineHeight: 1.6, paddingLeft: '0.5rem', borderLeft: '3px solid var(--accent-yellow)' }}>{q.ideal_answer}</p>
+                  <details style={{ cursor: 'pointer' }}>
+                    <summary style={{ fontSize: 13, color: 'var(--text-secondary)', fontWeight: 700, userSelect: 'none' }}>Reveal Ideal Answer</summary>
+                    <p style={{ margin: '0.85rem 0 0', color: 'var(--text-secondary)', fontSize: 14, lineHeight: 1.6, paddingLeft: '0.75rem', borderLeft: '3px solid #f59e0b' }}>{q.ideal_answer}</p>
                   </details>
                 </div>
               ))}
@@ -762,15 +810,15 @@ export default function InterviewPrep() {
 
           {/* Soft Skills */}
           {activeTab === 'soft_skills' && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
               {(testData.soft_skills || []).map((q, i) => (
-                <div key={i} style={{ background: 'var(--surface-color)', borderRadius: 16, padding: '1.75rem', border: '1px solid var(--border-color)' }}>
+                <div key={i} className="bento-card hover-lift" style={{ padding: '1.75rem' }}>
                   <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.25rem' }}>
-                    <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'var(--accent-teal)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, flexShrink: 0 }}>🤝</div>
-                    <p style={{ margin: 0, fontSize: '1.05rem', fontWeight: 600, color: 'var(--text-primary)', lineHeight: 1.6 }}>{q.question}</p>
+                    <div style={{ width: 40, height: 40, borderRadius: '50%', background: 'var(--accent-teal)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: 18, flexShrink: 0 }}>🤝</div>
+                    <p style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1.6, fontFamily: 'Outfit, sans-serif' }}>{q.question}</p>
                   </div>
-                  <div style={{ padding: '1rem 1.25rem', background: 'rgba(20,184,166,0.07)', borderRadius: 10, borderLeft: '4px solid var(--accent-teal)' }}>
-                    <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.35rem' }}>🎯 What to demonstrate:</p>
+                  <div style={{ padding: '1.1rem 1.35rem', background: 'rgba(42, 118, 106, 0.08)', borderRadius: 14, borderLeft: '4px solid var(--accent-teal)' }}>
+                    <p style={{ margin: 0, fontSize: 14, fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.35rem', fontFamily: 'Outfit, sans-serif' }}>🎯 What to demonstrate:</p>
                     <p style={{ margin: 0, color: 'var(--text-secondary)', lineHeight: 1.6 }}>{q.what_to_demonstrate}</p>
                   </div>
                 </div>
@@ -784,116 +832,203 @@ export default function InterviewPrep() {
 
   /* ── Setup Form ── */
   return (
-    <div style={{ minHeight: '100vh', position: 'relative', overflow: 'hidden' }}>
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden' }}>
       <style>{`
         @keyframes smoothRiseUp {
           0% { opacity: 0; transform: translateY(60px) scale(0.95); }
           100% { opacity: 1; transform: translateY(0) scale(1); }
         }
-        @keyframes floatEmoji {
-          0%, 100% { transform: translateY(0px) rotate(0deg); }
-          50% { transform: translateY(-6px) rotate(4deg); }
+        .rise-item-1 { animation: smoothRiseUp 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both; }
+        .rise-item-2 { animation: smoothRiseUp 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.35s both; }
+        .rise-item-3 { animation: smoothRiseUp 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.55s both; }
+        .hover-lift { transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important; }
+        .hover-lift:hover { transform: translateY(-6px) scale(1.01) !important; box-shadow: 0 18px 38px rgba(0,0,0,0.14) !important; }
+        .hover-pill { transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important; }
+        .hover-pill:hover { transform: translateY(-2px) !important; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1) !important; }
+        
+        @keyframes buttonFillBar {
+          0% { width: 0%; opacity: 1; }
+          90% { width: 95%; opacity: 1; }
+          100% { width: 100%; opacity: 0; }
         }
-        .rise-item-1 { animation: smoothRiseUp 1.35s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both; }
-        .rise-item-2 { animation: smoothRiseUp 1.35s cubic-bezier(0.16, 1, 0.3, 1) 0.35s both; }
-        .rise-item-3 { animation: smoothRiseUp 1.35s cubic-bezier(0.16, 1, 0.3, 1) 0.55s both; }
-        .hover-card-effects { transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important; }
-        .hover-card-effects:hover { transform: translateY(-6px) scale(1.01) !important; box-shadow: 0 18px 38px rgba(0,0,0,0.14) !important; }
+        .btn-loading-fill {
+          position: relative;
+          overflow: hidden;
+        }
+        .btn-loading-fill::after {
+          content: '';
+          position: absolute;
+          top: 0; left: 0; bottom: 0;
+          background: rgba(214, 51, 90, 0.85);
+          animation: buttonFillBar 4.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+          z-index: 1;
+        }
+        .btn-loading-text {
+          position: relative;
+          z-index: 2;
+        }
       `}</style>
       <AnimatedBackground />
-      <div style={{ position: 'relative', zIndex: 1, padding: '3rem 2rem', maxWidth: 780, margin: '0 auto' }}>
-        <div className="rise-item-1">
-          <button onClick={() => navigate('/dashboard')} style={{ padding: '8px 18px', borderRadius: 100, border: '1px solid var(--border-color)', background: 'transparent', color: 'var(--text-secondary)', cursor: 'pointer', fontWeight: 600, marginBottom: '2rem', fontSize: 14 }}>
-            ← Dashboard
-          </button>
 
-          <h1 style={{ fontSize: 'clamp(2rem, 4vw, 2.8rem)', fontWeight: 800, margin: '0 0 0.4rem', color: 'var(--text-primary)' }}>🎯 AI Interview Prep</h1>
-          <p style={{ color: 'var(--text-secondary)', marginBottom: '2.5rem', fontSize: '1.05rem', lineHeight: 1.6 }}>
-            Personalized mock interviews with MCQs, live coding challenges, rapid fire rounds, and soft skills tests.
+      {/* Top Navbar Header */}
+      <nav style={{ padding: '2rem 3.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative', zIndex: 10 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 50 }}>
+          <div onClick={() => navigate('/')} style={{ display: 'flex', alignItems: 'center', gap: 16, cursor: 'pointer' }}>
+            <div style={{ width: 52, height: 52, borderRadius: '50%', background: 'var(--accent-pink)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 26, boxShadow: '0 4px 15px rgba(226, 85, 131, 0.25)' }}>
+              📖
+            </div>
+            <span style={{ fontSize: 32, fontWeight: 900, fontFamily: 'Outfit, sans-serif', color: 'var(--text-primary)', letterSpacing: '-0.5px' }}>LearnPath</span>
+          </div>
+
+          <div style={{ display: 'flex', gap: 36, fontSize: 19, fontWeight: 700, color: 'var(--text-primary)' }}>
+            <span style={{ cursor: 'pointer', transition: 'opacity 0.2s', opacity: 0.85 }} onClick={() => navigate('/dashboard')}>Home</span>
+            <span style={{ color: 'var(--accent-pink)', cursor: 'pointer' }}>Interview Preparation</span>
+            <span style={{ cursor: 'pointer', transition: 'opacity 0.2s', opacity: 0.85 }} onClick={() => navigate('/cv-analyzer')}>CV Analyzer</span>
+            <span style={{ cursor: 'pointer', transition: 'opacity 0.2s', opacity: 0.85 }} onClick={() => navigate('/profile')}>Profile</span>
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
+          <ThemeToggle />
+          <button title="Logout" onClick={logout} style={{ background: 'transparent', border: '2px solid var(--border-color)', color: 'var(--text-primary)', width: 46, height: 46, borderRadius: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, transition: 'all 0.2s ease' }}>
+            🚪
+          </button>
+        </div>
+      </nav>
+
+      <div style={{ position: 'relative', zIndex: 1, padding: '1rem 2rem 4rem', maxWidth: 880, margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
+        {/* Title Header */}
+        <div className="rise-item-1" style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
+
+          <h1 style={{ fontSize: 'clamp(2.2rem, 4.5vw, 3.2rem)', fontWeight: 900, margin: '0 0 0.75rem', color: 'var(--text-primary)', fontFamily: 'Outfit, sans-serif', letterSpacing: '-1px' }}>
+            Interview Preparation
+          </h1>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem', lineHeight: 1.6, maxWidth: 640, margin: '0 auto', fontWeight: 500 }}>
+            Generate realistic mock interview questions with interactive MCQs, live code evaluation, rapid fire rounds, and behavioral soft skills feedback.
           </p>
         </div>
 
-        {/* Test Mode Selector */}
-        <div className="rise-item-2" style={{ marginBottom: '2rem' }}>
-          <p style={{ fontWeight: 700, color: 'var(--text-primary)', marginBottom: '1rem', fontSize: '0.95rem' }}>Select Test Mode</p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-            {TEST_MODES.map(mode => (
-              <div key={mode.id} onClick={() => setTestMode(mode.id)} className="hover-card-effects"
-                style={{ padding: '1rem 1.25rem', borderRadius: 12, border: `2px solid ${testMode === mode.id ? 'var(--accent-pink)' : 'var(--border-color)'}`, background: testMode === mode.id ? 'rgba(235, 99, 131, 0.08)' : 'var(--surface-color)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                <div style={{ flex: 1 }}>
-                  <p style={{ margin: 0, fontWeight: 700, color: 'var(--text-primary)', fontSize: '0.95rem' }}>{mode.label}</p>
-                  <p style={{ margin: '0.2rem 0 0', fontSize: 13, color: 'var(--text-secondary)' }}>{mode.desc}</p>
+        {/* Test Mode Selector — Orange Theme */}
+        <div className="rise-item-2" style={{ marginBottom: '2.5rem' }}>
+          <p style={{ fontWeight: 800, color: 'var(--text-primary)', marginBottom: '1rem', fontSize: '1.05rem', fontFamily: 'Outfit, sans-serif' }}>Select Test Mode</p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '1rem' }}>
+            {TEST_MODES.map(mode => {
+              const isSelected = testMode === mode.id;
+              return (
+                <div key={mode.id} onClick={() => setTestMode(mode.id)} className="hover-lift"
+                  style={{
+                    padding: '1.35rem 1.25rem', borderRadius: 22,
+                    border: '2px solid var(--accent-orange)',
+                    background: isSelected ? 'rgba(244, 162, 89, 0.12)' : 'var(--accent-orange)',
+                    boxShadow: 'none',
+                    cursor: 'pointer', display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
+                    gap: '0.75rem', transition: 'all 0.25s ease', position: 'relative'
+                  }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <p style={{ margin: 0, fontWeight: 900, color: isSelected ? 'var(--accent-orange)' : '#ffffff', fontSize: '1.05rem', fontFamily: 'Outfit, sans-serif' }}>{mode.label}</p>
+                  </div>
+                  <p style={{ margin: 0, fontSize: 13, color: isSelected ? 'var(--text-primary)' : 'rgba(255,255,255,0.92)', lineHeight: 1.5, fontWeight: 500 }}>{mode.desc}</p>
                 </div>
-                <div style={{ width: 20, height: 20, borderRadius: '50%', border: `2px solid ${testMode === mode.id ? 'var(--accent-pink)' : 'var(--border-color)'}`, background: testMode === mode.id ? 'var(--accent-pink)' : 'transparent', flexShrink: 0 }} />
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
 
-        {/* Form */}
-        <form onSubmit={handleGenerate} className="rise-item-3 hover-card-effects" style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', background: 'var(--surface-color)', borderRadius: 16, padding: '2rem', border: '1px solid var(--border-color)' }}>
-          <div>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600, color: 'var(--text-primary)', fontSize: '0.9rem' }}>Target Job Role *</label>
+        {/* Form Container — Exact Dashboard Curriculum Card Color Pattern */}
+        <form onSubmit={handleGenerate} className="bento-card card-teal rise-item-3 hover-lift"
+          style={{
+            padding: '2.5rem', display: 'flex', flexDirection: 'column', gap: '1.5rem',
+            position: 'relative', overflow: 'hidden', borderRadius: 28, background: 'var(--accent-teal)', color: '#ffffff',
+            boxShadow: '0 18px 45px rgba(42, 118, 106, 0.25)', border: 'none'
+          }}>
+          <div style={{ position: 'absolute', right: -20, top: -20, fontSize: 150, opacity: 0.1, pointerEvents: 'none' }}>🎯</div>
+
+          <div style={{ position: 'relative', zIndex: 1 }}>
+            <label style={{ display: 'block', marginBottom: '0.6rem', fontWeight: 800, color: '#ffffff', fontSize: '1rem', fontFamily: 'Outfit, sans-serif' }}>Target Job Role *</label>
             <input type="text" value={jobRole} onChange={e => setJobRole(e.target.value)} required placeholder="e.g. Frontend Developer, Data Scientist, Product Manager"
-              style={{ width: '100%', boxSizing: 'border-box', padding: '13px 16px', borderRadius: 10, border: '1px solid var(--border-color)', background: 'var(--bg-color)', color: 'var(--text-primary)', fontSize: '1rem', outline: 'none' }} />
-          </div>
-          <div>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600, color: 'var(--text-primary)', fontSize: '0.9rem' }}>Your Skills <span style={{ fontWeight: 400, color: 'var(--text-secondary)' }}>(comma separated)</span></label>
-            <input type="text" value={skills} onChange={e => setSkills(e.target.value)} placeholder="e.g. React, Python, SQL, Machine Learning"
-              style={{ width: '100%', boxSizing: 'border-box', padding: '13px 16px', borderRadius: 10, border: '1px solid var(--border-color)', background: 'var(--bg-color)', color: 'var(--text-primary)', fontSize: '1rem', outline: 'none' }} />
+              style={{ width: '100%', boxSizing: 'border-box', padding: '16px 24px', borderRadius: 100, border: 'none', fontSize: 15, fontFamily: 'Inter', outline: 'none', background: 'var(--surface-color)', color: 'var(--text-primary)', boxShadow: '0 6px 20px rgba(0,0,0,0.1)' }} />
           </div>
 
-          {/* ── Question Count Picker ── */}
-          <div>
-            <label style={{ display: 'block', marginBottom: '0.75rem', fontWeight: 600, color: 'var(--text-primary)', fontSize: '0.9rem' }}>
+          <div style={{ position: 'relative', zIndex: 1 }}>
+            <label style={{ display: 'block', marginBottom: '0.6rem', fontWeight: 800, color: '#ffffff', fontSize: '1rem', fontFamily: 'Outfit, sans-serif' }}>Your Skills <span style={{ fontWeight: 500, color: 'rgba(255,255,255,0.8)', fontSize: 13 }}>(comma separated)</span></label>
+            <input type="text" value={skills} onChange={e => setSkills(e.target.value)} placeholder="e.g. React, Python, SQL, Machine Learning"
+              style={{ width: '100%', boxSizing: 'border-box', padding: '16px 24px', borderRadius: 100, border: 'none', fontSize: 15, fontFamily: 'Inter', outline: 'none', background: 'var(--surface-color)', color: 'var(--text-primary)', boxShadow: '0 6px 20px rgba(0,0,0,0.1)' }} />
+          </div>
+
+          {/* Question Count Picker — Translucent Segment Control like Dashboard Level Switcher */}
+          <div style={{ position: 'relative', zIndex: 1 }}>
+            <label style={{ display: 'block', marginBottom: '0.75rem', fontWeight: 800, color: '#ffffff', fontSize: '1rem', fontFamily: 'Outfit, sans-serif' }}>
               Number of Questions
-              <span style={{ marginLeft: 10, fontSize: 13, fontWeight: 400, color: 'var(--text-secondary)' }}>(applies per section for focused modes)</span>
+              <span style={{ marginLeft: 10, fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,0.8)' }}>(total questions — max 5 for coding)</span>
             </label>
-            <div style={{ display: 'flex', gap: '0.6rem', alignItems: 'center', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', gap: 8, background: 'rgba(0,0,0,0.2)', padding: 6, borderRadius: 100, alignItems: 'center' }}>
               {[20, 30, 40, 50].map(n => (
-                <button key={n} type="button" onClick={() => setQuestionCount(n)}
+                <button
+                  key={n}
+                  type="button"
+                  onClick={() => setQuestionCount(n)}
                   style={{
-                    padding: '9px 20px', borderRadius: 100, border: `2px solid ${questionCount === n ? 'var(--accent-pink)' : 'var(--border-color)'}`,
-                    background: questionCount === n ? 'var(--accent-pink)' : 'transparent',
-                    color: questionCount === n ? '#fff' : 'var(--text-secondary)',
-                    fontWeight: 700, fontSize: 14, cursor: 'pointer', transition: 'all 0.18s',
-                    boxShadow: questionCount === n ? '0 2px 8px rgba(235, 99, 131, 0.3)' : 'none',
-                  }}>
+                    flex: 1, padding: '12px 0', borderRadius: 100, border: 'none',
+                    background: questionCount === n ? 'var(--surface-color)' : 'transparent',
+                    color: questionCount === n ? 'var(--accent-teal)' : '#ffffff',
+                    fontSize: 14, fontWeight: 800, cursor: 'pointer', transition: 'all 0.25s',
+                    boxShadow: questionCount === n ? '0 4px 12px rgba(0,0,0,0.15)' : 'none',
+                    fontFamily: 'Outfit, sans-serif'
+                  }}
+                >
                   {n}
                 </button>
               ))}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginLeft: 4 }}>
-                <span style={{ color: 'var(--text-secondary)', fontSize: 13 }}>Custom:</span>
-                <input type="number" min={10} max={50} value={questionCount}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, paddingRight: 10, paddingLeft: 6 }}>
+                <span style={{ color: 'rgba(255,255,255,0.85)', fontSize: 12, fontWeight: 700 }}>Custom:</span>
+                <input
+                  type="number"
+                  min={10}
+                  max={50}
+                  value={questionCount}
                   onChange={e => setQuestionCount(Math.max(10, Math.min(50, Number(e.target.value))))}
-                  style={{ width: 68, padding: '8px 10px', borderRadius: 8, border: '1px solid var(--border-color)', background: 'var(--bg-color)', color: 'var(--text-primary)', fontSize: 14, fontWeight: 700, outline: 'none', textAlign: 'center' }} />
+                  style={{ width: 56, padding: '6px 8px', borderRadius: 100, border: 'none', background: 'var(--surface-color)', color: 'var(--accent-teal)', fontSize: 13, fontWeight: 800, outline: 'none', textAlign: 'center' }}
+                />
               </div>
             </div>
             {/* Slider */}
             <input type="range" min={10} max={50} value={questionCount}
               onChange={e => setQuestionCount(Number(e.target.value))}
-              style={{ width: '100%', marginTop: '0.85rem', accentColor: '#eb6383', cursor: 'pointer' }} />
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: 'var(--text-secondary)', marginTop: 2 }}>
+              style={{ width: '100%', marginTop: '1rem', accentColor: '#ffffff', cursor: 'pointer' }} />
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: 'rgba(255,255,255,0.85)', marginTop: 4, fontWeight: 600 }}>
               <span>10 (Quick)</span>
-              <span style={{ fontWeight: 700, color: 'var(--accent-pink)' }}>{questionCount} selected</span>
+              <span style={{ fontWeight: 800, color: '#ffffff' }}>{questionCount} Questions Selected</span>
               <span>50 (Comprehensive)</span>
             </div>
           </div>
 
-          <div>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600, color: 'var(--text-primary)', fontSize: '0.9rem' }}>Job Description <span style={{ fontWeight: 400, color: 'var(--text-secondary)' }}>(optional — improves question relevance)</span></label>
+          <div style={{ position: 'relative', zIndex: 1 }}>
+            <label style={{ display: 'block', marginBottom: '0.6rem', fontWeight: 800, color: '#ffffff', fontSize: '1rem', fontFamily: 'Outfit, sans-serif' }}>Job Description <span style={{ fontWeight: 500, color: 'rgba(255,255,255,0.8)', fontSize: 13 }}>(optional — improves relevance)</span></label>
             <textarea value={jd} onChange={e => setJd(e.target.value)} placeholder="Paste the job description here..."
-              style={{ width: '100%', boxSizing: 'border-box', padding: '13px 16px', borderRadius: 10, border: '1px solid var(--border-color)', background: 'var(--bg-color)', color: 'var(--text-primary)', fontSize: '1rem', minHeight: 100, outline: 'none', resize: 'vertical' }} />
+              style={{ width: '100%', boxSizing: 'border-box', minHeight: 110, padding: '16px 24px', borderRadius: 20, border: 'none', fontSize: 14, fontFamily: 'Inter', outline: 'none', background: 'var(--surface-color)', color: 'var(--text-primary)', resize: 'vertical', boxShadow: '0 6px 20px rgba(0,0,0,0.1)' }} />
           </div>
 
-          {error && <div style={{ padding: '0.75rem 1rem', background: 'rgba(255,80,80,0.1)', borderRadius: 8, color: '#ff5050', fontSize: 14, border: '1px solid rgba(255,80,80,0.3)' }}>⚠️ {error}</div>}
+          {error && (
+            <div style={{ padding: '0.85rem 1.25rem', background: 'rgba(255,80,80,0.2)', borderRadius: 14, color: '#ffffff', fontSize: 14, border: '1px solid rgba(255,255,255,0.3)', fontWeight: 600 }}>
+              ⚠️ {error}
+            </div>
+          )}
 
-          <button type="submit" disabled={loading || !jobRole.trim()}
-            style={{ padding: '15px', borderRadius: 12, border: 'none', background: loading ? 'var(--border-color)' : 'var(--text-primary)', color: 'var(--bg-color)', fontSize: '1.05rem', fontWeight: 800, cursor: loading ? 'not-allowed' : 'pointer', transition: 'all 0.2s' }}>
-            {loading ? `⏳ Generating ${questionCount} questions...` : `🚀 Generate ${questionCount} Questions`}
+          <button type="submit" disabled={loading || !jobRole.trim()} className={`btn-primary hover-pill ${loading ? 'btn-loading-fill' : ''}`}
+            style={{
+              padding: '16px 28px', borderRadius: 100, border: 'none',
+              background: loading ? 'var(--surface-color)' : 'var(--text-primary)',
+              color: loading ? 'var(--text-primary)' : 'var(--bg-color)', 
+              fontSize: '1.1rem', fontWeight: 900,
+              cursor: loading || !jobRole.trim() ? 'not-allowed' : 'pointer',
+              transition: 'all 0.2s', marginTop: '0.5rem',
+              boxShadow: 'none'
+            }}>
+            <span className="btn-loading-text">{loading ? loadingText : `Preparing ${questionCount} Questions`}</span>
           </button>
         </form>
       </div>
     </div>
   );
 }
+

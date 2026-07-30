@@ -352,6 +352,7 @@ export default function Landing() {
         .land-rise-4 { animation: smoothRiseUp 1.35s cubic-bezier(0.16, 1, 0.3, 1) 0.58s both; }
         .land-rise-5 { animation: smoothRiseUp 1.35s cubic-bezier(0.16, 1, 0.3, 1) 0.76s both; }
         .land-rise-6 { animation: smoothRiseUp 1.35s cubic-bezier(0.16, 1, 0.3, 1) 0.94s both; }
+        @keyframes bounceDown { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(8px); } }
       `}</style>
 
       {/* Navigation */}
@@ -406,7 +407,7 @@ export default function Landing() {
             </div>
             <div style={{ width: 1, height: 24, background: 'var(--border-color)' }}></div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--accent-pink)' }}>AI Skill Path, Interview Prep & CV Analyzer</span>
+              <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--accent-pink)' }}>AI Skill Path, Interview Preparation & CV Analyzer</span>
             </div>
           </div>
 
@@ -428,6 +429,14 @@ export default function Landing() {
           </div>
         </div>
 
+
+        {/* Scroll Down Icon */}
+        <div className="land-rise-6" style={{ marginTop: '5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', color: 'var(--text-secondary)', animation: 'bounceDown 2s infinite ease-in-out' }}>
+          <span style={{ fontSize: '0.85rem', fontWeight: 600, letterSpacing: '2px', textTransform: 'uppercase' }}>Scroll Down</span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 5v14M19 12l-7 7-7-7"/>
+          </svg>
+        </div>
 
 
         {/* How It Works Section */}
@@ -468,7 +477,7 @@ export default function Landing() {
               </p>
               <div>
                 <Link to={user ? "/interview-prep" : "/register"} className="btn-primary" style={{ background: 'var(--accent-teal)', color: 'white', textDecoration: 'none', padding: '12px 32px', fontSize: 16, borderRadius: 100, display: 'inline-flex', alignItems: 'center', gap: 8, fontWeight: 800 }}>
-                  <span>Try Interview Prep</span> <span>→</span>
+                  <span>Try Interview Preparation</span> <span>→</span>
                 </Link>
               </div>
             </div>
