@@ -93,13 +93,14 @@ REST_FRAMEWORK = {
     'DEFAULT_THROTTLE_RATES': {
         'anon': '10000/day' if DEBUG else '100/day',
         'user': '100000/day' if DEBUG else '1000/day',
-        'otp_request': '3/minute'
+        'otp_request': '3/minute',
+        'login': '5/minute'
     }
 }
 
 from datetime import timedelta
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(hours=24),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
 }
 
@@ -119,6 +120,11 @@ if not DEBUG:
     SECURE_HSTS_SECONDS = 31536000
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
+
+# Security Headers (CSP, X-XSS-Protection, etc.)
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = 'DENY'
 # Do NOT set CORS_ALLOW_CREDENTIALS=True with CORS_ALLOW_ALL_ORIGINS=True
 # (CORS spec forbids Access-Control-Allow-Credentials:true with origin:*)
 # We use JWT in Authorization headers, not cookies, so credentials mode is not needed.

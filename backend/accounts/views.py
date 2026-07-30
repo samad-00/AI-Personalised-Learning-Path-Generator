@@ -109,6 +109,14 @@ from .models import OTPCode
 class OTPRequestThrottle(AnonRateThrottle):
     scope = 'otp_request'
 
+class LoginThrottle(AnonRateThrottle):
+    scope = 'login'
+
+from rest_framework_simplejwt.views import TokenObtainPairView
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    throttle_classes = [LoginThrottle]
+
 class OTPRequestView(APIView):
     permission_classes = [permissions.AllowAny]
     throttle_classes = [OTPRequestThrottle]
