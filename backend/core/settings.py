@@ -200,7 +200,7 @@ AWS_STORAGE_BUCKET_NAME = env('AWS_STORAGE_BUCKET_NAME', default='')
 AWS_S3_REGION_NAME = env('AWS_S3_REGION_NAME', default='us-east-1')
 
 # Email Configuration for OTP Verification
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' # Changed to console to bypass Render SMTP block
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
