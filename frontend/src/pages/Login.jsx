@@ -141,9 +141,9 @@ export default function Login() {
               
               <input type="email" placeholder="Email Address" className="input-field" value={email} onChange={e => setEmail(e.target.value)} required autoComplete="email" style={{ padding: '16px 24px', fontSize: 15, background: 'transparent' }} />
               
-              <div style={{ position: 'relative' }}>
-                <input type="date" className="input-field" value={dob} onChange={e => setDob(e.target.value)} required aria-label="Date of Birth" style={{ padding: '16px 24px', fontSize: 15, background: 'transparent', width: '100%', color: dob ? 'inherit' : 'var(--text-secondary)' }} />
-                {!dob && <span style={{ position: 'absolute', left: '24px', top: '16px', pointerEvents: 'none', color: 'var(--text-secondary)', fontSize: 15 }}>Date of Birth</span>}
+              <div>
+                <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text-secondary)', fontSize: 14, fontWeight: 600, textAlign: 'left', paddingLeft: '4px' }}>Date of Birth</label>
+                <input type="date" className="input-field" value={dob} onChange={e => setDob(e.target.value)} required aria-label="Date of Birth" style={{ padding: '16px 24px', fontSize: 15, background: 'transparent', width: '100%', color: 'inherit' }} />
               </div>
 
               <input type="password" placeholder="New Password" className="input-field" value={newPassword} onChange={e => setNewPassword(e.target.value)} required autoComplete="new-password" minLength={8} style={{ padding: '16px 24px', fontSize: 15, background: 'transparent' }} />
