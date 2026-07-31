@@ -11,7 +11,7 @@ export default function Register() {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [otpCode, setOtpCode] = useState('');
+  const [dob, setDob] = useState('');
   
   const { register } = useAuth();
   const navigate = useNavigate();
@@ -43,7 +43,7 @@ export default function Register() {
     setLoading(true);
     setError('');
     try {
-      await register(username, email, password, otpCode);
+      await register(username, email, password, dob);
       navigate('/dashboard');
     } catch (err) {
       const data = err.response?.data;
@@ -97,20 +97,15 @@ export default function Register() {
               <>
                 <input type="text" placeholder="Username" className="input-field" value={username} onChange={e => setUsername(e.target.value)} required autoComplete="username" style={{ padding: '16px 24px', fontSize: 15, background: 'transparent' }} />
                 <input type="email" placeholder="Email Address" className="input-field" value={email} onChange={e => setEmail(e.target.value)} required autoComplete="email" style={{ padding: '16px 24px', fontSize: 15, background: 'transparent' }} />
+                <div style={{ position: 'relative' }}>
+                  <input type="date" className="input-field" value={dob} onChange={e => setDob(e.target.value)} required aria-label="Date of Birth" title="Date of Birth (Required for password recovery)" style={{ padding: '16px 24px', fontSize: 15, background: 'transparent', width: '100%', color: dob ? 'inherit' : 'var(--text-secondary)' }} />
+                  {!dob && <span style={{ position: 'absolute', left: '24px', top: '16px', pointerEvents: 'none', color: 'var(--text-secondary)', fontSize: 15 }}>Date of Birth</span>}
+                </div>
                 <input type="password" placeholder="Password" className="input-field" value={password} onChange={e => setPassword(e.target.value)} required autoComplete="new-password" minLength={8} style={{ padding: '16px 24px', fontSize: 15, background: 'transparent' }} />
               </>
             )}
 
-            {step === 'verify' && (
-              <>
-                <input type="text" placeholder="6-digit OTP Code" className="input-field" value={otpCode} onChange={e => setOtpCode(e.target.value)} required autoComplete="off" maxLength={6} style={{ padding: '16px 24px', fontSize: 15, background: 'transparent', textAlign: 'center', letterSpacing: '4px', fontWeight: 'bold' }} />
-                <div style={{ textAlign: 'right', marginTop: '-5px' }}>
-                  <button type="button" disabled={resendTimer > 0} onClick={requestOTP} style={{ background: 'none', border: 'none', color: resendTimer > 0 ? 'var(--text-secondary)' : 'var(--accent-orange)', fontSize: 14, fontWeight: 600, cursor: resendTimer > 0 ? 'not-allowed' : 'pointer' }}>
-                    {resendTimer > 0 ? `Resend Code in ${resendTimer}s` : 'Resend Code'}
-                  </button>
-                </div>
-              </>
-            )}
+
 
             {error && <div style={{ color: '#ef4444', fontSize: 14, fontWeight: 600, textAlign: 'center' }}>{error}</div>}
             {message && <div style={{ color: 'var(--accent-teal)', fontSize: 14, fontWeight: 600, textAlign: 'center' }}>{message}</div>}
@@ -119,11 +114,7 @@ export default function Register() {
               {loading ? 'Processing...' : (step === 'request' ? 'Sign Up' : 'Verify & Sign Up')}
             </button>
 
-            {step === 'verify' && (
-              <button type="button" onClick={() => { setStep('request'); setError(''); setMessage(''); setOtpCode(''); }} className="btn-secondary" style={{ padding: '16px', fontSize: 16, border: 'none', background: 'transparent', color: 'var(--text-secondary)', fontWeight: 600 }}>
-                Go Back
-              </button>
-            )}
+
           </form>
 
           {step === 'request' && (

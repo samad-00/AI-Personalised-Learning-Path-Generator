@@ -2,7 +2,7 @@ from django.urls import path
 from rest_framework_simplejwt.views import TokenRefreshView
 from .views import (
     RegisterView, ProfileView, GoogleAuthView, 
-    OTPRequestView, OTPLoginView, OTPResetPasswordView,
+    OTPRequestView, ResetPasswordView,
     CustomTokenObtainPairView
 )
 
@@ -13,6 +13,5 @@ urlpatterns = [
     path('profile/', ProfileView.as_view(), name='profile'),
     path('google/', GoogleAuthView.as_view(), name='google-auth'),
     path('otp/request/', OTPRequestView.as_view(), name='otp-request'),
-    path('otp/login/', OTPLoginView.as_view(), name='otp-login'),
-    path('otp/reset-password/', OTPResetPasswordView.as_view(), name='otp-reset-password'),
+    path('reset-password/', ResetPasswordView.as_view(), name='reset-password'),
 ]

@@ -13,7 +13,7 @@ export default function Login() {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [otpCode, setOtpCode] = useState('');
+  const [dob, setDob] = useState('');
   const [newPassword, setNewPassword] = useState('');
 
   const [error, setError] = useState('');
@@ -57,60 +57,24 @@ export default function Login() {
     }
   };
 
-  const requestOTP = async (e) => {
-    e?.preventDefault();
-    setLoading(true);
-    setError('');
-    setMessage('');
-    try {
-      const res = await API.post('/accounts/otp/request/', {
-        email,
-        purpose: mode === 'otp' ? 'login' : 'reset'
-      });
-      setMessage('OTP has been sent to your email.');
-      setStep('verify');
-      setResendTimer(30);
-    } catch (err) {
-      setError(err.response?.data?.error || 'Failed to request OTP.');
-    } finally {
-      setLoading(false);
-    }
-  };
 
-  const verifyOTPLogin = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
-    try {
-      const res = await API.post('/accounts/otp/login/', { email, code: otpCode });
-      localStorage.setItem('token', res.data.access);
-      localStorage.setItem('refresh_token', res.data.refresh);
-      setUser(res.data.user);
-      navigate('/dashboard');
-    } catch (err) {
-      setError(err.response?.data?.error || 'Invalid OTP.');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const verifyOTPReset = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
     try {
-      await API.post('/accounts/otp/reset-password/', {
+      await API.post('/accounts/reset-password/', {
         email,
-        code: otpCode,
+        dob: dob,
         new_password: newPassword
       });
       setMessage('Password reset successfully! You can now log in.');
       setMode('password');
-      setStep('request');
-      setOtpCode('');
+      setDob('');
       setNewPassword('');
     } catch (err) {
-      setError(err.response?.data?.error || 'Invalid OTP.');
+      setError(err.response?.data?.error || 'Password reset failed. Check your details.');
     } finally {
       setLoading(false);
     }
@@ -119,8 +83,7 @@ export default function Login() {
   const resetState = () => {
     setError('');
     setMessage('');
-    setStep('request');
-    setOtpCode('');
+    setDob('');
     setNewPassword('');
   };
 
@@ -144,10 +107,10 @@ export default function Login() {
           
           <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
             <h1 style={{ fontSize: 32, fontWeight: 800, margin: '0 0 0.5rem', letterSpacing: '-1px' }}>
-              {mode === 'password' ? 'Welcome Back' : mode === 'otp' ? 'Login with OTP' : 'Reset Password'}
+              {mode === 'password' ? 'Welcome Back' : 'Reset Password'}
             </h1>
             <p style={{ color: 'var(--text-secondary)', fontSize: 15, margin: 0, fontWeight: 500 }}>
-              {mode === 'password' ? 'Sign in to continue your learning journey' : step === 'request' ? 'Enter your email to receive a code' : 'Enter the code sent to your email'}
+              {mode === 'password' ? 'Sign in to continue your learning journey' : 'Enter your email and Date of Birth to reset your password'}
             </p>
           </div>
 
@@ -168,39 +131,28 @@ export default function Login() {
                 {loading ? 'Signing in...' : 'Sign In'}
               </button>
 
-              <button type="button" onClick={() => { setMode('otp'); resetState(); }} className="btn-primary" style={{ padding: '16px', fontSize: 16, border: 'none', background: '#047857', color: '#ffffff', fontWeight: 600 }}>
-                Login with Email OTP
-              </button>
+
             </form>
           )}
 
-          {/* OTP Login or Reset Password */}
-          {mode !== 'password' && (
-            <form onSubmit={step === 'request' ? requestOTP : (mode === 'otp' ? verifyOTPLogin : verifyOTPReset)} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+          {/* Reset Password */}
+          {mode === 'reset' && (
+            <form onSubmit={verifyOTPReset} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
               
-              {step === 'request' && (
-                <input type="email" placeholder="Email Address" className="input-field" value={email} onChange={e => setEmail(e.target.value)} required autoComplete="email" style={{ padding: '16px 24px', fontSize: 15, background: 'transparent' }} />
-              )}
+              <input type="email" placeholder="Email Address" className="input-field" value={email} onChange={e => setEmail(e.target.value)} required autoComplete="email" style={{ padding: '16px 24px', fontSize: 15, background: 'transparent' }} />
+              
+              <div style={{ position: 'relative' }}>
+                <input type="date" className="input-field" value={dob} onChange={e => setDob(e.target.value)} required aria-label="Date of Birth" style={{ padding: '16px 24px', fontSize: 15, background: 'transparent', width: '100%', color: dob ? 'inherit' : 'var(--text-secondary)' }} />
+                {!dob && <span style={{ position: 'absolute', left: '24px', top: '16px', pointerEvents: 'none', color: 'var(--text-secondary)', fontSize: 15 }}>Date of Birth</span>}
+              </div>
 
-              {step === 'verify' && (
-                <>
-                  <input type="text" placeholder="6-digit OTP Code" className="input-field" value={otpCode} onChange={e => setOtpCode(e.target.value)} required autoComplete="off" maxLength={6} style={{ padding: '16px 24px', fontSize: 15, background: 'transparent', textAlign: 'center', letterSpacing: '4px', fontWeight: 'bold' }} />
-                  {mode === 'reset' && (
-                    <input type="password" placeholder="New Password" className="input-field" value={newPassword} onChange={e => setNewPassword(e.target.value)} required autoComplete="new-password" style={{ padding: '16px 24px', fontSize: 15, background: 'transparent' }} />
-                  )}
-                  <div style={{ textAlign: 'right', marginTop: '-5px' }}>
-                    <button type="button" disabled={resendTimer > 0} onClick={requestOTP} style={{ background: 'none', border: 'none', color: resendTimer > 0 ? 'var(--text-secondary)' : 'var(--accent-orange)', fontSize: 14, fontWeight: 600, cursor: resendTimer > 0 ? 'not-allowed' : 'pointer' }}>
-                      {resendTimer > 0 ? `Resend Code in ${resendTimer}s` : 'Resend Code'}
-                    </button>
-                  </div>
-                </>
-              )}
-
+              <input type="password" placeholder="New Password" className="input-field" value={newPassword} onChange={e => setNewPassword(e.target.value)} required autoComplete="new-password" minLength={8} style={{ padding: '16px 24px', fontSize: 15, background: 'transparent' }} />
+              
               {error && <div style={{ color: '#ef4444', fontSize: 14, fontWeight: 600, textAlign: 'center' }}>{error}</div>}
               {message && <div style={{ color: 'var(--accent-teal)', fontSize: 14, fontWeight: 600, textAlign: 'center' }}>{message}</div>}
 
               <button type="submit" className="btn-primary card-teal" disabled={loading} style={{ padding: '18px', fontSize: 18, border: 'none' }}>
-                {loading ? 'Processing...' : (step === 'request' ? 'Send Code' : (mode === 'otp' ? 'Login' : 'Reset Password'))}
+                {loading ? 'Processing...' : 'Reset Password'}
               </button>
 
               <button type="button" onClick={() => { setMode('password'); resetState(); }} className="btn-secondary" style={{ padding: '16px', fontSize: 16, border: 'none', background: 'transparent', color: 'var(--text-secondary)', fontWeight: 600 }}>

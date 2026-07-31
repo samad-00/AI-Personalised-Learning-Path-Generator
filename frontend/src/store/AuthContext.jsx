@@ -62,8 +62,8 @@ export function AuthProvider({ children }) {
     }
   };
 
-  const register = async (username, email, password, otp_code) => {
-    await registerAPI({ username, email, password, otp_code });
+  const register = async (username, email, password, dob) => {
+    await registerAPI({ username, email, password, dob });
     await login(email, password);
     localStorage.setItem('is_new_user', 'true');
   };

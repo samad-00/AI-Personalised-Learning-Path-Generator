@@ -177,90 +177,33 @@ class OTPRequestView(APIView):
             return Response({'error': f'Failed to send email: {str(e)}'}, status=500)
 
 
-class OTPLoginView(APIView):
+# OTPLoginView removed as per new authentication flow
+
+
+class ResetPasswordView(APIView):
     permission_classes = [permissions.AllowAny]
 
     def post(self, request):
         email = request.data.get('email')
-        code = request.data.get('code')
-
-        if not email or not code:
-            return Response({'error': 'Email and code are required'}, status=400)
-
-        otp_obj = OTPCode.objects.filter(email=email, purpose='login', code=code, is_used=False).last()
-
-        if not otp_obj or otp_obj.is_expired():
-            return Response({'error': 'Invalid or expired OTP'}, status=400)
-
-        otp_obj.is_used = True
-        otp_obj.save()
-
-        user, created = User.objects.get_or_create(
-            email=email,
-            defaults={
-                'username': email.split('@')[0],
-            }
-        )
-
-        refresh = RefreshToken.for_user(user)
-        return Response({
-            'access': str(refresh.access_token),
-            'refresh': str(refresh),
-            'user': UserSerializer(user).data,
-            'created': created
-        })
-
-
-class OTPResetPasswordView(APIView):
-    permission_classes = [permissions.AllowAny]
-
-    def post(self, request):
-        email = request.data.get('email')
-        code = request.data.get('code')
+        dob = request.data.get('dob')
         new_password = request.data.get('new_password')
 
-        if not all([email, code, new_password]):
-            return Response({'error': 'Email, code, and new password are required'}, status=400)
-
-        otp_obj = OTPCode.objects.filter(email=email, purpose='reset', code=code, is_used=False).last()
-
-        if not otp_obj or otp_obj.is_expired():
-            return Response({'error': 'Invalid or expired OTP'}, status=400)
+        if not all([email, dob, new_password]):
+            return Response({'error': 'Email, Date of Birth, and New Password are required'}, status=400)
 
         try:
             user = User.objects.get(email=email)
+            
+            # Check if DOB matches
+            # user.dob is a datetime.date object. We convert request dob (string) to compare.
+            if not user.dob:
+                return Response({'error': 'No Date of Birth is associated with this account. Password cannot be reset.'}, status=400)
+                
+            if str(user.dob) != str(dob):
+                return Response({'error': 'Incorrect Date of Birth'}, status=400)
+
             user.set_password(new_password)
             user.save()
-
-            otp_obj.is_used = True
-            otp_obj.save()
-
-            return Response({'message': 'Password reset successfully'})
-        except User.DoesNotExist:
-            return Response({'error': 'User not found'}, status=404)
-class OTPResetPasswordView(APIView):
-    permission_classes = [permissions.AllowAny]
-
-    def post(self, request):
-        email = request.data.get('email')
-        code = request.data.get('code')
-        new_password = request.data.get('new_password')
-
-        if not all([email, code, new_password]):
-            return Response({'error': 'Email, code, and new password are required'}, status=400)
-
-        otp_obj = OTPCode.objects.filter(email=email, purpose='reset', code=code, is_used=False).last()
-
-        if not otp_obj or otp_obj.is_expired():
-            return Response({'error': 'Invalid or expired OTP'}, status=400)
-
-        try:
-            user = User.objects.get(email=email)
-            user.set_password(new_password)
-            user.save()
-
-            otp_obj.is_used = True
-            otp_obj.save()
 
             return Response({'message': 'Password reset successfully'})
         except User.DoesNotExist:

@@ -14,7 +14,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'password', 'learning_goal', 'experience_level']
+        fields = ['id', 'username', 'email', 'password', 'dob', 'learning_goal', 'experience_level']
 
     def create(self, validated_data):
         user = User.objects.create_user(
@@ -24,6 +24,9 @@ class RegisterSerializer(serializers.ModelSerializer):
             learning_goal=validated_data.get('learning_goal', ''),
             experience_level=validated_data.get('experience_level', 'beginner'),
         )
+        if 'dob' in validated_data:
+            user.dob = validated_data['dob']
+            user.save()
         return user
 
 class UserSerializer(serializers.ModelSerializer):
