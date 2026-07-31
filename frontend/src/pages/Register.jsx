@@ -11,6 +11,7 @@ export default function Register() {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [dob, setDob] = useState('');
   
   const { register } = useAuth();
@@ -40,6 +41,10 @@ export default function Register() {
 
   const handleRegister = async (e) => {
     e.preventDefault();
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
     setLoading(true);
     setError('');
     try {
@@ -102,6 +107,7 @@ export default function Register() {
                   <input type="date" className="input-field" value={dob} onChange={e => setDob(e.target.value)} onClick={(e) => { if(e.target.showPicker) e.target.showPicker(); }} required aria-label="Date of Birth" title="Date of Birth (Required for password recovery)" style={{ padding: '16px 24px', fontSize: 15, background: 'transparent', width: '100%', cursor: 'pointer' }} />
                 </div>
                 <input type="password" placeholder="Password" className="input-field" value={password} onChange={e => setPassword(e.target.value)} required autoComplete="new-password" minLength={8} style={{ padding: '16px 24px', fontSize: 15, background: 'transparent' }} />
+                <input type="password" placeholder="Confirm Password" className="input-field" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required autoComplete="new-password" minLength={8} style={{ padding: '16px 24px', fontSize: 15, background: 'transparent' }} />
               </>
             )}
 

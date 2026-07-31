@@ -15,6 +15,7 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [dob, setDob] = useState('');
   const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
 
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
@@ -61,6 +62,10 @@ export default function Login() {
 
   const verifyOTPReset = async (e) => {
     e.preventDefault();
+    if (newPassword !== confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
     setLoading(true);
     setError('');
     try {
@@ -73,6 +78,7 @@ export default function Login() {
       setMode('password');
       setDob('');
       setNewPassword('');
+      setConfirmPassword('');
     } catch (err) {
       setError(err.response?.data?.error || 'Password reset failed. Check your details.');
     } finally {
@@ -85,6 +91,7 @@ export default function Login() {
     setMessage('');
     setDob('');
     setNewPassword('');
+    setConfirmPassword('');
   };
 
   return (
@@ -147,6 +154,7 @@ export default function Login() {
               </div>
 
               <input type="password" placeholder="New Password" className="input-field" value={newPassword} onChange={e => setNewPassword(e.target.value)} required autoComplete="new-password" minLength={8} style={{ padding: '16px 24px', fontSize: 15, background: 'transparent' }} />
+              <input type="password" placeholder="Confirm Password" className="input-field" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required autoComplete="new-password" minLength={8} style={{ padding: '16px 24px', fontSize: 15, background: 'transparent' }} />
               
               {error && <div style={{ color: '#ef4444', fontSize: 14, fontWeight: 600, textAlign: 'center' }}>{error}</div>}
               {message && <div style={{ color: 'var(--accent-teal)', fontSize: 14, fontWeight: 600, textAlign: 'center' }}>{message}</div>}
