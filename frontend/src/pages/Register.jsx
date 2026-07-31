@@ -34,27 +34,8 @@ export default function Register() {
   }, [resendTimer]);
 
   const requestOTP = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
-    setMessage('');
-    try {
-      await API.post('/accounts/otp/request/', {
-        email,
-        purpose: 'register'
-      });
-      setMessage('Verification code sent to your email.');
-      setStep('verify');
-      setResendTimer(30);
-    } catch (err) {
-      if (err.response?.status === 429) {
-        setError('Rate limit exceeded. Too many requests.');
-      } else {
-        setError(err.response?.data?.error || err.response?.data?.detail || 'Failed to request OTP. Email might be in use.');
-      }
-    } finally {
-      setLoading(false);
-    }
+    // OTP verification disabled - allow direct registration
+    return handleRegister(e);
   };
 
   const handleRegister = async (e) => {
@@ -135,7 +116,7 @@ export default function Register() {
             {message && <div style={{ color: 'var(--accent-teal)', fontSize: 14, fontWeight: 600, textAlign: 'center' }}>{message}</div>}
 
             <button type="submit" className="btn-primary card-orange" disabled={loading} style={{ marginTop: '0.5rem', padding: '18px', fontSize: 18, border: 'none' }}>
-              {loading ? 'Processing...' : (step === 'request' ? 'Send Verification Code' : 'Verify & Sign Up')}
+              {loading ? 'Processing...' : (step === 'request' ? 'Sign Up' : 'Verify & Sign Up')}
             </button>
 
             {step === 'verify' && (

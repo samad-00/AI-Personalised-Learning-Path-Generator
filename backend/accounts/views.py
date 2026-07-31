@@ -16,25 +16,8 @@ class RegisterView(generics.CreateAPIView):
     permission_classes = [permissions.AllowAny]
 
     def create(self, request, *args, **kwargs):
-        email = request.data.get('email')
-        otp_code = request.data.get('otp_code')
-
-        if not otp_code:
-            return Response({'error': 'OTP code is required for registration'}, status=status.HTTP_400_BAD_REQUEST)
-
-        otp_obj = OTPCode.objects.filter(email=email, purpose='register', code=otp_code, is_used=False).last()
-
-        if not otp_obj or otp_obj.is_expired():
-            return Response({'error': 'Invalid or expired OTP'}, status=status.HTTP_400_BAD_REQUEST)
-
-        # OTP is valid, proceed with registration
-        response = super().create(request, *args, **kwargs)
-        
-        # Invalidate OTP after successful registration
-        otp_obj.is_used = True
-        otp_obj.save()
-
-        return response
+        # OTP verification disabled - allow direct registration
+        return super().create(request, *args, **kwargs)
 
 class ProfileView(APIView):
     permission_classes = [permissions.IsAuthenticated]
