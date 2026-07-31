@@ -35,7 +35,7 @@ export const exportPDF = (id) => API.get(`/roadmaps/${id}/export-pdf/`);
 // Career endpoints - use fetch directly to avoid axios CORS preflight issues
 export const generateMockInterview = async (data) => {
   const token = localStorage.getItem('token');
-  const res = await fetch('/api/careers/mock-interview/', {
+  const res = await fetch(`${BASE_URL}/api/careers/mock-interview/`, {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${token}`,
@@ -50,7 +50,7 @@ export const generateMockInterview = async (data) => {
 
 export const analyzeCVText = async (formData) => {
   const token = localStorage.getItem('token');
-  const res = await fetch('/api/careers/cv-analyze/', {
+  const res = await fetch(`${BASE_URL}/api/careers/cv-analyze/`, {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${token}`,
@@ -66,7 +66,7 @@ export const analyzeCVText = async (formData) => {
 // Code execution — runs on Django server (no CORS issues)
 export const executeCode = async ({ code, language, stdin }) => {
   const token = localStorage.getItem('token');
-  const res = await fetch('/api/careers/execute/', {
+  const res = await fetch(`${BASE_URL}/api/careers/execute/`, {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${token}`,

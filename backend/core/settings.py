@@ -8,7 +8,7 @@ environ.Env.read_env(BASE_DIR / '.env')
 
 SECRET_KEY = env('SECRET_KEY')
 DEBUG = env('DEBUG')
-ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1'])
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1', '.onrender.com', '.vercel.app'])
 
 INSTALLED_APPS = [
     'django.contrib.sites',
@@ -109,6 +109,7 @@ CORS_ALLOWED_ORIGINS = env.list('CORS_ALLOWED_ORIGINS', default=[
     'http://localhost:5173',
     'http://127.0.0.1:5173',
     'http://localhost:3000',
+    'https://ai-learnpath.vercel.app',
 ])
 # Only allow all origins in local dev, otherwise use CORS_ALLOWED_ORIGINS
 CORS_ALLOW_ALL_ORIGINS = env.bool('CORS_ALLOW_ALL_ORIGINS', default=DEBUG)
@@ -117,6 +118,7 @@ CSRF_TRUSTED_ORIGINS = env.list('CSRF_TRUSTED_ORIGINS', default=[
     'http://localhost:5173',
     'http://127.0.0.1:5173',
     'http://localhost:3000',
+    'https://ai-learnpath.vercel.app',
 ])
 
 # Enforce HTTPS and secure cookies in production
