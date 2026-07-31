@@ -21,9 +21,9 @@ url- https://ai-learnpath.vercel.app/
 
 ✅ **Robust API Fallback System** (Groq Primary → Groq Fallback → OpenRouter) to prevent rate limit crashes
 
-✅ **Real Email OTP Authentication System** (Secure Registration & Login with 30-sec resend timers)
+✅ **Seamless Authentication Flow** (Secure Registration & Login)
 
-✅ **Premium HTML Animated Emails** (Stunning light/dark theme embedded GIF emails)
+✅ **Date of Birth Verification** (Secure Password Recovery mechanism without relying on external email providers)
 
 ✅ **Shareable Learning Roadmaps**
 
@@ -88,9 +88,6 @@ SECRET_KEY=your_django_secret_key
 GROQ_API_KEY=your_groq_api_key
 OPENROUTER_API_KEY=your_openrouter_api_key # Optional backup
 
-# Email SMTP Setup (For OTP Authentication)
-EMAIL_HOST_USER=your_email@gmail.com
-EMAIL_HOST_PASSWORD=your_app_password
 ```
 
 Run migrations and start the server:
@@ -128,7 +125,7 @@ npm run dev
 - Add Environment Variables:
   - `DEBUG`: `False`
   - `DATABASE_URL`: Your Supabase Connection Pooling URL (delete `?pgbouncer=true` from the end if it exists)
-  - `GROQ_API_KEY`, `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD`
+  - `GROQ_API_KEY`
   - `ALLOWED_HOSTS`: `.onrender.com`
   - `CORS_ALLOWED_ORIGINS` & `CSRF_TRUSTED_ORIGINS`: Your Vercel frontend URL (e.g. `https://your-app.vercel.app`) - **Important: Do not include a trailing slash `/` at the end!**
 
