@@ -43,7 +43,6 @@ url- https://ai-learnpath.vercel.app/
 ### Backend
 * Django
 * Django REST Framework (DRF)
-* SMTP Email Integration
 
 ### AI Integration
 * Groq API (Primary: `llama-3.3-70b-versatile`, Backup: `llama-3.1-8b-instant`)
