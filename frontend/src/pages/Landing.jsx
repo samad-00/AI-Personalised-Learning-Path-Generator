@@ -571,7 +571,7 @@ export default function Landing() {
           {/* Widened Column-wise Grid: 3 Separated Parts without Unnecessary Spaces */}
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
             gap: '1.4rem',
             marginBottom: '4rem',
             alignItems: 'stretch'

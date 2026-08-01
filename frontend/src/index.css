@@ -226,3 +226,84 @@ body.dark-mode input[type="date"] {
 .animate-float-horizontal {
   animation: float-horizontal 8s ease-in-out infinite;
 }
+
+/* ==========================================================================
+   Responsive Utility Classes & Media Queries
+   ========================================================================== */
+
+/* Responsive Flex Container: Row on desktop, Column on mobile */
+.responsive-flex {
+  display: flex;
+  flex-direction: row;
+  gap: 2rem;
+}
+
+/* Responsive Grid Container: 2-3 columns on desktop, 1 on mobile */
+.responsive-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+/* Responsive Padding / Container Widths */
+.responsive-padding {
+  padding: 4rem 2rem;
+}
+
+.roadmap-grid {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+/* --------------------------------------------------------------------------
+   Tablet & Mobile Breakpoints
+   -------------------------------------------------------------------------- */
+@media (max-width: 1024px) {
+  .responsive-flex {
+    gap: 1.5rem;
+  }
+  .bento-card {
+    padding: 2rem !important;
+  }
+  .roadmap-grid {
+    grid-template-columns: 250px 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Stack flex rows into columns on phones */
+  .responsive-flex {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 1.5rem;
+  }
+  
+  .roadmap-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  /* Reduce excessive padding on small screens */
+  .responsive-padding {
+    padding: 2rem 1.5rem;
+  }
+
+  /* Typography adjustments for mobile */
+  h1 { font-size: 2.2rem !important; }
+  h2 { font-size: 1.8rem !important; }
+  h3 { font-size: 1.5rem !important; }
+
+  /* Bento cards shouldn't have massive padding on tiny screens */
+  .bento-card {
+    padding: 1.5rem !important;
+    border-radius: 20px;
+  }
+  
+  /* Buttons can take full width */
+  .responsive-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
