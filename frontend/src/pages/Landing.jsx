@@ -356,7 +356,7 @@ export default function Landing() {
       `}</style>
 
       {/* Navigation */}
-      <nav className="land-rise-1 responsive-nav" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative', zIndex: 10 }}>
+      <nav className="land-rise-1" style={{ padding: '2rem 3.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative', zIndex: 10 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
           <div style={{ width: 52, height: 52, borderRadius: '50%', background: 'var(--accent-pink)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 26, boxShadow: '0 4px 15px rgba(226, 85, 131, 0.25)' }}>
             📖
@@ -370,7 +370,7 @@ export default function Landing() {
       </nav>
 
       {/* Hero Section */}
-      <main className="responsive-hero-padding" style={{ flex: 1, display: 'flex', flexDirection: 'column', position: 'relative', zIndex: 10, maxWidth: 1400, margin: '0 auto', width: '100%' }}>
+      <main style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '6rem 4rem', position: 'relative', zIndex: 10, maxWidth: 1400, margin: '0 auto', width: '100%' }}>
 
         <div style={{ maxWidth: 750 }}>
           <h1 className="land-rise-2" style={{ fontSize: 'clamp(3rem, 6vw, 5.5rem)', fontWeight: 800, margin: '0 0 1rem', lineHeight: 1.05, letterSpacing: '-2px' }}>
@@ -400,7 +400,7 @@ export default function Landing() {
             />
           </p>
 
-          <div className="bento-card land-rise-5" style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 16, padding: '12px 24px', borderRadius: 20, marginBottom: '3rem', border: '1px solid var(--border-color)', background: 'var(--surface-color)' }}>
+          <div className="bento-card land-rise-5" style={{ display: 'inline-flex', alignItems: 'center', gap: 16, padding: '12px 24px', borderRadius: 100, marginBottom: '3rem', border: '1px solid var(--border-color)', background: 'var(--surface-color)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <span style={{ width: 12, height: 12, borderRadius: '50%', background: 'var(--accent-teal)' }}></span>
               <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>Current activity</span>
@@ -411,17 +411,17 @@ export default function Landing() {
             </div>
           </div>
 
-          <div className="land-rise-6 responsive-flex-btn" style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+          <div className="land-rise-6" style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
             {user ? (
-              <Link to="/dashboard" className="btn-primary responsive-btn" style={{ background: 'var(--text-primary)', color: 'var(--bg-color)', textDecoration: 'none', padding: '18px 40px', fontSize: 18, borderRadius: 100 }}>
+              <Link to="/dashboard" className="btn-primary" style={{ background: 'var(--text-primary)', color: 'var(--bg-color)', textDecoration: 'none', padding: '18px 40px', fontSize: 18, borderRadius: 100 }}>
                 Go to Dashboard
               </Link>
             ) : (
               <>
-                <Link to="/register" className="btn-primary responsive-btn" style={{ background: 'var(--text-primary)', color: 'var(--bg-color)', textDecoration: 'none', padding: '18px 40px', fontSize: 18, borderRadius: 100 }}>
+                <Link to="/register" className="btn-primary" style={{ background: 'var(--text-primary)', color: 'var(--bg-color)', textDecoration: 'none', padding: '18px 40px', fontSize: 18, borderRadius: 100 }}>
                   Start Learning Free
                 </Link>
-                <Link to="/login" className="btn-secondary responsive-btn" style={{ textDecoration: 'none', padding: '18px 40px', fontSize: 18, borderRadius: 100, border: '2px solid var(--border-color)', background: 'var(--surface-color)', color: 'var(--text-primary)', fontWeight: 600 }}>
+                <Link to="/login" className="btn-secondary" style={{ textDecoration: 'none', padding: '18px 40px', fontSize: 18, borderRadius: 100, border: '2px solid var(--border-color)', background: 'var(--surface-color)', color: 'var(--text-primary)', fontWeight: 600 }}>
                   Log in to account
                 </Link>
               </>
@@ -571,7 +571,7 @@ export default function Landing() {
           {/* Widened Column-wise Grid: 3 Separated Parts without Unnecessary Spaces */}
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))',
             gap: '1.4rem',
             marginBottom: '4rem',
             alignItems: 'stretch'

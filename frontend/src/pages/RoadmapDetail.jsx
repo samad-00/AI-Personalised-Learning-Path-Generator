@@ -131,7 +131,7 @@ export default function RoadmapDetail() {
       <AnimatedBackground />
 
       {/* Top Navbar */}
-      <nav style={{ padding: '1rem 2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative', zIndex: 10 }}>
+      <nav style={{ padding: '1.5rem 2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative', zIndex: 10 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 32 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <div style={{ width: 40, height: 40, borderRadius: '50%', background: 'var(--accent-pink)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>
@@ -140,7 +140,7 @@ export default function RoadmapDetail() {
             <span style={{ fontSize: 24, fontWeight: 800, fontFamily: 'Outfit, sans-serif', color: 'var(--text-primary)' }}>LearnPath</span>
           </div>
           
-          <div className="nav-links" style={{ display: 'flex', gap: 24, fontSize: 15, fontWeight: 600, color: 'var(--text-primary)' }}>
+          <div style={{ display: 'flex', gap: 24, fontSize: 15, fontWeight: 600, color: 'var(--text-primary)' }}>
             <span style={{ cursor: 'pointer', opacity: 0.7 }} onClick={() => navigate('/dashboard')}>Home</span>
             <span style={{ color: 'var(--accent-pink)' }}>Learning Plan</span>
           </div>
@@ -158,7 +158,7 @@ export default function RoadmapDetail() {
         <div className="bento-card card-orange" style={{ padding: '3rem', position: 'relative', overflow: 'hidden' }}>
           <div style={{ position: 'absolute', right: -30, top: -50, fontSize: 200, opacity: 0.1, transform: 'rotate(15deg)' }}>🎯</div>
           
-          <div className="responsive-flex" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative', zIndex: 1, flexWrap: 'wrap', gap: '2rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative', zIndex: 1, flexWrap: 'wrap', gap: '2rem' }}>
             <div style={{ flex: 1, minWidth: 300 }}>
               <span className="pill-tag" style={{ background: 'rgba(255,255,255,0.2)', color: 'white', border: 'none', marginBottom: '1rem' }}>
                 {roadmap.experience_level.toUpperCase()}
@@ -203,7 +203,7 @@ export default function RoadmapDetail() {
               <div style={{ position: 'absolute', left: 100, top: 20, bottom: 20, width: 2, background: 'var(--border-color)', zIndex: 0 }} />
               
               {roadmap.topics_overview.map((topicItem, index) => (
-                <div key={index} className="responsive-flex" style={{ display: 'flex', alignItems: 'center', gap: '2rem', position: 'relative', zIndex: 1 }}>
+                <div key={index} style={{ display: 'flex', alignItems: 'center', gap: '2rem', position: 'relative', zIndex: 1 }}>
                   
                   {/* Topic Node */}
                   <div style={{ 
@@ -239,7 +239,7 @@ export default function RoadmapDetail() {
           </div>
         )}
 
-        <div className="roadmap-grid">
+        <div style={{ display: 'grid', gridTemplateColumns: '300px 1fr', gap: '2rem', alignItems: 'start' }}>
           
           {/* Sidebar / Week Navigation */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', position: 'sticky', top: '2rem' }}>

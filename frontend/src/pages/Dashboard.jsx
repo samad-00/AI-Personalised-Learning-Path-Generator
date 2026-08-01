@@ -161,7 +161,7 @@ export default function Dashboard() {
       `}</style>
 
       {/* Prominent Scaled-Up Top Navbar */}
-      <nav style={{ padding: '1rem 2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative', zIndex: 10 }}>
+      <nav style={{ padding: '2rem 3.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative', zIndex: 10 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 50 }}>
           <div
             onClick={() => navigate('/')}
@@ -173,7 +173,7 @@ export default function Dashboard() {
             <span style={{ fontSize: 32, fontWeight: 900, fontFamily: 'Outfit, sans-serif', color: 'var(--text-primary)', letterSpacing: '-0.5px' }}>LearnPath</span>
           </div>
 
-          <div className="nav-links" style={{ display: 'flex', gap: 36, fontSize: 19, fontWeight: 700, color: 'var(--text-primary)' }}>
+          <div style={{ display: 'flex', gap: 36, fontSize: 19, fontWeight: 700, color: 'var(--text-primary)' }}>
             <span style={{ color: 'var(--accent-pink)', cursor: 'pointer' }}>Home</span>
             <span style={{ cursor: 'pointer', transition: 'opacity 0.2s', opacity: 0.85 }} onMouseEnter={e => e.currentTarget.style.opacity = 1} onMouseLeave={e => e.currentTarget.style.opacity = 0.85} onClick={() => navigate('/interview-prep')}>Interview Preparation</span>
             <span style={{ cursor: 'pointer', transition: 'opacity 0.2s', opacity: 0.85 }} onMouseEnter={e => e.currentTarget.style.opacity = 1} onMouseLeave={e => e.currentTarget.style.opacity = 0.85} onClick={() => navigate('/cv-analyzer')}>CV Analyzer</span>
@@ -209,7 +209,7 @@ export default function Dashboard() {
       </nav>
 
       {/* Main Content Layout */}
-      <main className="dashboard-grid" style={{ flex: 1, maxWidth: 1400, margin: '0 auto', width: '100%', padding: '1rem', gap: '2rem', position: 'relative', zIndex: 10 }}>
+      <main style={{ flex: 1, maxWidth: 1400, margin: '0 auto', width: '100%', padding: '2rem', display: 'grid', gridTemplateColumns: '1.2fr 1fr 300px', gap: '2rem', position: 'relative', zIndex: 10 }}>
 
         {/* Left Column */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
@@ -265,7 +265,7 @@ export default function Dashboard() {
             </form>
           </div>
 
-          <div className="dashboard-stats-grid" style={{ display: 'grid', gap: '1.5rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
             <div className="bento-card card-pink rise-item-3 hover-card-effects" style={{ padding: '2rem', borderRadius: 24, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
               <div style={{ fontSize: 28, marginBottom: '1rem', animation: 'floatEmoji 4s infinite ease-in-out 0.2s' }}>⏱️</div>
               <div>

@@ -22,7 +22,7 @@ export default function AnimatedBackground() {
   }, []);
 
   return (
-    <div className="animated-bg-container" style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none', overflow: 'hidden' }}>
+    <div style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none', overflow: 'hidden' }}>
       {/* Pills */}
       <div className="pill-tag animate-float-reverse" style={{ position: 'absolute', top: '6%', left: '5%', background: 'var(--accent-pink)', color: 'white', border: 'none', padding: '8px 24px', fontSize: 14 }}>
         {pills[0] || '#Focus'}
