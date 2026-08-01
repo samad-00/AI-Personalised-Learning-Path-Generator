@@ -9,7 +9,7 @@ import AnimatedBackground from '../components/AnimatedBackground';
 export default function RoadmapDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  
+
   const [roadmap, setRoadmap] = useState(null);
   const [loading, setLoading] = useState(true);
   const [regenerating, setRegenerating] = useState(null);
@@ -22,7 +22,12 @@ export default function RoadmapDetail() {
   const [exporting, setExporting] = useState(false);
 
   useEffect(() => {
-    getRoadmap(id).then(res => setRoadmap(res.data)).finally(() => setLoading(false));
+    getRoadmap(id)
+      .then(res => setRoadmap(res.data))
+      .catch(err => {
+        console.error("Failed to load roadmap:", err);
+      })
+      .finally(() => setLoading(false));
   }, [id]);
 
   const getProgress = (week) => {
@@ -73,7 +78,7 @@ export default function RoadmapDetail() {
     let url;
     const q = encodeURIComponent(resource.title);
     const qtutorial = encodeURIComponent(resource.title + ' tutorial');
-    
+
     if (resource.resource_type === 'video') {
       url = `https://www.youtube.com/results?search_query=${qtutorial}`;
     } else if (resource.resource_type === 'book') {
@@ -85,7 +90,7 @@ export default function RoadmapDetail() {
     } else {
       url = resource.url && resource.url.startsWith('http') ? resource.url : `https://www.google.com/search?q=${qtutorial}`;
     }
-    
+
     window.open(url, '_blank');
   };
 
@@ -105,7 +110,7 @@ export default function RoadmapDetail() {
       setNotesText(prev => ({ ...prev, [resourceId]: existingNotes || '' }));
     }
   };
-    
+
   if (loading) return (
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-secondary)' }}>
       Loading roadmap...
@@ -139,13 +144,13 @@ export default function RoadmapDetail() {
             </div>
             <span style={{ fontSize: 24, fontWeight: 800, fontFamily: 'Outfit, sans-serif', color: 'var(--text-primary)' }}>LearnPath</span>
           </div>
-          
+
           <div style={{ display: 'flex', gap: 24, fontSize: 15, fontWeight: 600, color: 'var(--text-primary)' }}>
             <span style={{ cursor: 'pointer', opacity: 0.7 }} onClick={() => navigate('/dashboard')}>Home</span>
             <span style={{ color: 'var(--accent-pink)' }}>Learning Plan</span>
           </div>
         </div>
-        
+
         <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
           <ThemeToggle />
         </div>
@@ -153,11 +158,11 @@ export default function RoadmapDetail() {
 
       {/* Main Content */}
       <main style={{ flex: 1, maxWidth: 1200, margin: '0 auto', width: '100%', padding: '2rem', display: 'flex', flexDirection: 'column', gap: '2rem', position: 'relative', zIndex: 10 }}>
-        
+
         {/* Header Hero Card */}
         <div className="bento-card card-orange" style={{ padding: '3rem', position: 'relative', overflow: 'hidden' }}>
           <div style={{ position: 'absolute', right: -30, top: -50, fontSize: 200, opacity: 0.1, transform: 'rotate(15deg)' }}>🎯</div>
-          
+
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative', zIndex: 1, flexWrap: 'wrap', gap: '2rem' }}>
             <div style={{ flex: 1, minWidth: 300 }}>
               <span className="pill-tag" style={{ background: 'rgba(255,255,255,0.2)', color: 'white', border: 'none', marginBottom: '1rem' }}>
@@ -166,14 +171,14 @@ export default function RoadmapDetail() {
               <h1 style={{ fontSize: 'clamp(2.5rem, 4vw, 3.5rem)', fontWeight: 800, margin: '0 0 1rem', lineHeight: 1.1, letterSpacing: '-1px', color: '#ffffff' }}>
                 {roadmap.goal}
               </h1>
-              
+
               <div style={{ display: 'flex', gap: 12 }}>
                 <button className="btn-primary" style={{ background: 'var(--text-primary)', color: 'var(--bg-color)' }} onClick={handleExportPDF} disabled={exporting}>
                   {exporting ? 'Generating PDF...' : 'Download PDF'}
                 </button>
               </div>
             </div>
-            
+
             {/* Circular Progress (matches the image's "78%") */}
             <div style={{ width: 160, height: 160, borderRadius: '50%', background: 'rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', flexShrink: 0 }}>
               <svg width="160" height="160" viewBox="0 0 100 100" style={{ transform: 'rotate(-90deg)' }}>
@@ -201,21 +206,21 @@ export default function RoadmapDetail() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem', position: 'relative' }}>
               {/* Vertical connecting line */}
               <div style={{ position: 'absolute', left: 100, top: 20, bottom: 20, width: 2, background: 'var(--border-color)', zIndex: 0 }} />
-              
+
               {roadmap.topics_overview.map((topicItem, index) => (
                 <div key={index} style={{ display: 'flex', alignItems: 'center', gap: '2rem', position: 'relative', zIndex: 1 }}>
-                  
+
                   {/* Topic Node */}
-                  <div style={{ 
-                    background: index % 2 === 0 ? 'var(--accent-pink)' : 'var(--accent-teal)', 
-                    color: 'white', 
-                    padding: '1.25rem 1.5rem', 
-                    borderRadius: '16px', 
-                    fontWeight: 800, 
+                  <div style={{
+                    background: index % 2 === 0 ? 'var(--accent-pink)' : 'var(--accent-teal)',
+                    color: 'white',
+                    padding: '1.25rem 1.5rem',
+                    borderRadius: '16px',
+                    fontWeight: 800,
                     width: '200px',
                     flexShrink: 0,
-                    display: 'flex', 
-                    alignItems: 'center', 
+                    display: 'flex',
+                    alignItems: 'center',
                     justifyContent: 'center',
                     textAlign: 'center',
                     boxShadow: '0 8px 25px rgba(0, 0, 0, 0.15)',
@@ -223,7 +228,7 @@ export default function RoadmapDetail() {
                   }}>
                     {topicItem.topic}
                   </div>
-                  
+
                   {/* Horizontal line to subtopics */}
                   <div style={{ flex: 1, display: 'flex', flexWrap: 'wrap', gap: '0.75rem', alignItems: 'center', background: 'var(--bg-color)', padding: '1.5rem', borderRadius: '16px', border: '1px solid var(--border-color)' }}>
                     {topicItem.subtopics && topicItem.subtopics.map((sub, i) => (
@@ -232,7 +237,7 @@ export default function RoadmapDetail() {
                       </span>
                     ))}
                   </div>
-                  
+
                 </div>
               ))}
             </div>
@@ -240,20 +245,20 @@ export default function RoadmapDetail() {
         )}
 
         <div style={{ display: 'grid', gridTemplateColumns: '300px 1fr', gap: '2rem', alignItems: 'start' }}>
-          
+
           {/* Sidebar / Week Navigation */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', position: 'sticky', top: '2rem' }}>
             <h3 style={{ fontSize: 20, margin: '0 0 0.5rem', fontWeight: 800 }}>Syllabus</h3>
-            
+
             {roadmap.weeks.map((w, i) => {
               const prog = getProgress(w);
               const isActive = activeWeek === i;
               return (
-                <div 
-                  key={w.id} 
+                <div
+                  key={w.id}
                   onClick={() => setActiveWeek(i)}
                   className="bento-card"
-                  style={{ 
+                  style={{
                     padding: '1.25rem', cursor: 'pointer',
                     background: isActive ? 'var(--accent-teal)' : 'var(--surface-color)',
                     color: isActive ? 'white' : 'var(--text-primary)',
@@ -295,26 +300,26 @@ export default function RoadmapDetail() {
                 {week.resources.map((r, i) => {
                   return (
                     <div key={r.id} className="bento-card" style={{ padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.5rem', background: 'var(--surface-color)' }}>
-                      
+
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                         <span className="pill-tag" style={{ background: 'var(--bg-color)', color: 'var(--accent-teal)' }}>
                           #{r.resource_type}
                         </span>
-                        
-                        <button 
+
+                        <button
                           onClick={() => handleRate(r.id, r.difficulty_rating || 3, !r.is_completed)}
-                          style={{ 
-                            width: 36, height: 36, borderRadius: '50%', 
-                            border: `2px solid ${r.is_completed ? 'var(--accent-teal)' : 'var(--border-color)'}`, 
-                            background: r.is_completed ? 'var(--accent-teal)' : 'var(--bg-color)', 
-                            color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', 
+                          style={{
+                            width: 36, height: 36, borderRadius: '50%',
+                            border: `2px solid ${r.is_completed ? 'var(--accent-teal)' : 'var(--border-color)'}`,
+                            background: r.is_completed ? 'var(--accent-teal)' : 'var(--bg-color)',
+                            color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center',
                             cursor: 'pointer', transition: 'all 0.2s'
                           }}
                         >
                           {r.is_completed && <span style={{ fontWeight: 900, fontSize: 16 }}>✓</span>}
                         </button>
                       </div>
-                      
+
                       <div>
                         <h3 style={{ fontSize: 20, fontWeight: 700, margin: '0 0 0.5rem', color: r.is_completed ? 'var(--text-secondary)' : 'var(--text-primary)', textDecoration: r.is_completed ? 'line-through' : 'none' }}>
                           {r.title}
@@ -327,13 +332,13 @@ export default function RoadmapDetail() {
 
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--border-color)', paddingTop: '1rem', marginTop: 'auto' }}>
                         <div style={{ display: 'flex', gap: 6 }}>
-                          {[1,2,3,4,5].map(n => (
+                          {[1, 2, 3, 4, 5].map(n => (
                             <button key={n} onClick={() => handleRate(r.id, n, r.is_completed)}
-                              style={{ 
-                                width: 24, height: 24, borderRadius: '50%', border: 'none', 
-                                background: r.difficulty_rating === n ? 'var(--text-primary)' : 'var(--bg-color)', 
-                                color: r.difficulty_rating === n ? 'var(--bg-color)' : 'var(--text-secondary)', 
-                                fontSize: 11, fontWeight: 700, cursor: 'pointer' 
+                              style={{
+                                width: 24, height: 24, borderRadius: '50%', border: 'none',
+                                background: r.difficulty_rating === n ? 'var(--text-primary)' : 'var(--bg-color)',
+                                color: r.difficulty_rating === n ? 'var(--bg-color)' : 'var(--text-secondary)',
+                                fontSize: 11, fontWeight: 700, cursor: 'pointer'
                               }}>
                               {n}
                             </button>

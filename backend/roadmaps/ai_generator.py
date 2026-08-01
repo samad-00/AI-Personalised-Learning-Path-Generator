@@ -123,16 +123,17 @@ def _fix_resources_parallel(resources):
 
 def verify_url(url):
     try:
+        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36'}
         if 'youtube.com/watch' in url or 'youtu.be/' in url:
             oembed_url = f"https://www.youtube.com/oembed?url={urllib.parse.quote(url)}"
-            response = requests.get(oembed_url, timeout=URL_CHECK_TIMEOUT)
+            response = requests.get(oembed_url, timeout=URL_CHECK_TIMEOUT, headers=headers)
             return response.status_code == 200
 
-        response = requests.head(url, timeout=URL_CHECK_TIMEOUT, allow_redirects=True)
+        response = requests.head(url, timeout=URL_CHECK_TIMEOUT, allow_redirects=True, headers=headers)
 
         # Some sites block HEAD requests — fallback to a lightweight GET
         if response.status_code in (403, 405):
-            response = requests.get(url, timeout=URL_CHECK_TIMEOUT, stream=True)
+            response = requests.get(url, timeout=URL_CHECK_TIMEOUT, stream=True, headers=headers)
 
         return response.status_code < 400
     except Exception:
