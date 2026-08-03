@@ -434,7 +434,7 @@ export default function Landing() {
         <div className="land-rise-6" style={{ marginTop: '5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', color: 'var(--text-secondary)', animation: 'bounceDown 2s infinite ease-in-out' }}>
           <span style={{ fontSize: '0.85rem', fontWeight: 600, letterSpacing: '2px', textTransform: 'uppercase' }}>Scroll Down</span>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M12 5v14M19 12l-7 7-7-7"/>
+            <path d="M12 5v14M19 12l-7 7-7-7" />
           </svg>
         </div>
 

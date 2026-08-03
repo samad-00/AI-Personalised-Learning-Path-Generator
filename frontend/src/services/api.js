@@ -30,7 +30,7 @@ export const saveNotes = (id, data) => API.post(`/roadmaps/resource/${id}/notes/
 export const getSharedRoadmap = (token) => API.get(`/roadmaps/shared/${token}/`);
 export default { register, login, getProfile, generateRoadmap, getRoadmaps, getRoadmap, deleteRoadmap, rateResource, regenerateWeek, getLeaderboard, saveNotes, getSharedRoadmap };
 export const searchResource = (q, type) => API.get(`/roadmaps/search/?q=${encodeURIComponent(q)}&type=${type}`);
-export const exportPDF = (id) => API.get(`/roadmaps/${id}/export-pdf/`);
+export const exportPDF = (id) => API.get(`/roadmaps/${id}/export-pdf/`, { responseType: 'blob' });
 
 // Career endpoints - use fetch directly to avoid axios CORS preflight issues
 export const generateMockInterview = async (data) => {

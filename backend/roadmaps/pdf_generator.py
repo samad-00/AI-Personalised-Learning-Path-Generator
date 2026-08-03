@@ -1,4 +1,3 @@
-import boto3
 import io
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
@@ -141,31 +140,3 @@ def generate_roadmap_pdf(roadmap, user):
     doc.build(story)
     buffer.seek(0)
     return buffer
-
-
-def upload_to_s3(buffer, filename):
-    s3_client = boto3.client(
-        's3',
-        aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
-        aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
-        region_name=settings.AWS_S3_REGION_NAME
-    )
-
-    s3_client.upload_fileobj(
-        buffer,
-        settings.AWS_STORAGE_BUCKET_NAME,
-        filename,
-        ExtraArgs={
-            'ContentType': 'application/pdf',
-        }
-    )
-
-    url = s3_client.generate_presigned_url(
-        'get_object',
-        Params={
-            'Bucket': settings.AWS_STORAGE_BUCKET_NAME,
-            'Key': filename
-        },
-        ExpiresIn=3600
-    )
-    return url

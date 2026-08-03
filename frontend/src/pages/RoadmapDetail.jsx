@@ -65,8 +65,16 @@ export default function RoadmapDetail() {
     setExporting(true);
     try {
       const res = await exportPDF(id);
-      window.open(res.data.pdf_url, '_blank');
+      const url = window.URL.createObjectURL(new Blob([res.data], { type: 'application/pdf' }));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `roadmap_${id}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
     } catch (err) {
+      console.error('PDF Export Error:', err);
       alert('Failed to export PDF.');
     } finally {
       setExporting(false);

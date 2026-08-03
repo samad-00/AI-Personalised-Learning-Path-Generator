@@ -11,6 +11,7 @@ class BadgeSerializer(serializers.ModelSerializer):
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, min_length=8)
+    dob = serializers.DateField(required=True)
 
     class Meta:
         model = User

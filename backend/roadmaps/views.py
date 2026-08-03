@@ -265,17 +265,17 @@ class ExportRoadmapPDFView(APIView):
 
     def get(self, request, pk):
         try:
-            from .pdf_generator import generate_roadmap_pdf, upload_to_s3
-            import uuid
+            from .pdf_generator import generate_roadmap_pdf
+            from django.http import FileResponse
 
             roadmap = Roadmap.objects.get(id=pk, user=request.user)
             buffer = generate_roadmap_pdf(roadmap, request.user)
 
-            filename = f"roadmaps/{request.user.id}/{uuid.uuid4()}-{roadmap.goal[:30].replace(' ', '-')}.pdf"
-            url = upload_to_s3(buffer, filename)
-
-            return Response({'pdf_url': url, 'filename': filename})
+            filename = f"roadmap_{roadmap.goal[:30].replace(' ', '_')}.pdf"
+            return FileResponse(buffer, as_attachment=True, filename=filename, content_type='application/pdf')
         except Roadmap.DoesNotExist:
             return Response({'error': 'Roadmap not found'}, status=404)
         except Exception as e:
+            import traceback
+            traceback.print_exc()
             return Response({'error': str(e)}, status=500)
