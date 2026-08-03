@@ -77,6 +77,22 @@ def generate_roadmap_pdf(roadmap, user):
     ))
     story.append(Spacer(1, 20))
 
+    # Topics Overview
+    if roadmap.topics_overview and len(roadmap.topics_overview) > 0:
+        story.append(Paragraph('🗺️ Course Overview Map', week_style))
+        story.append(Spacer(1, 10))
+        for topic_obj in roadmap.topics_overview:
+            topic = topic_obj.get('topic', 'Unknown Topic')
+            subtopics = topic_obj.get('subtopics', [])
+            story.append(Paragraph(f'<b>• {topic}</b>', res_title_style))
+            if subtopics:
+                subtopics_str = ', '.join(subtopics)
+                story.append(Paragraph(f'&nbsp;&nbsp;&nbsp;&nbsp;↳ <font color="#666666">{subtopics_str}</font>', res_desc_style))
+            story.append(Spacer(1, 6))
+        story.append(Spacer(1, 16))
+        story.append(HRFlowable(width="100%", thickness=1, color=colors.HexColor('#e5e7eb')))
+        story.append(Spacer(1, 16))
+
     # Weeks
     for week in roadmap.weeks.all().order_by('week_number'):
         week_items = []
