@@ -117,8 +117,8 @@ export default function CVAnalyzer() {
             style={{ display: 'flex', alignItems: 'center', gap: 16, cursor: 'pointer' }}
           >
             <div style={{ width: 52, height: 52, borderRadius: '50%', background: 'var(--accent-pink)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 26, boxShadow: '0 4px 15px rgba(226, 85, 131, 0.25)' }}>
-              📖
-            </div>
+                📖
+              </div>
             <span style={{ fontSize: 32, fontWeight: 900, fontFamily: 'Outfit, sans-serif', color: 'var(--text-primary)', letterSpacing: '-0.5px' }}>LearnPath</span>
           </div>
 

@@ -495,7 +495,7 @@ export default function Landing() {
           <ScrollRiseUp distance={110} scaleShape={true}>
             <ScrollPathCard
               cardClass="card-teal"
-              travelerIcon="🎤"
+              travelerIcon="💼"
               pathData="M0,30 Q20,80 50,50 T80,40 T100,70"
               steps={[
                 { x: 18, y: 60, step: "Step 1", title: "Choose Your Role", desc: "Select your job title, target company type, and desired difficulty." },
