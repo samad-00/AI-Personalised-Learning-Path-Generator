@@ -14,8 +14,9 @@ export default function Register() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [dob, setDob] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [otpCode, setOtpCode] = useState('');
   
-  const { register } = useAuth();
+  const { registerWithOTP } = useAuth();
   const navigate = useNavigate();
   
   const [loading, setLoading] = useState(false);
@@ -36,11 +37,6 @@ export default function Register() {
   }, [resendTimer]);
 
   const requestOTP = async (e) => {
-    // OTP verification disabled - allow direct registration
-    return handleRegister(e);
-  };
-
-  const handleRegister = async (e) => {
     e.preventDefault();
     if (password !== confirmPassword) {
       setError('Passwords do not match');
@@ -49,7 +45,23 @@ export default function Register() {
     setLoading(true);
     setError('');
     try {
-      await register(username, email, password, dob);
+      const { requestOTP: reqOTP } = await import('../services/api');
+      await reqOTP({ email, purpose: 'register' });
+      setStep('verify');
+      setMessage('A verification code has been sent to your email.');
+    } catch (err) {
+      setError(err.response?.data?.error || 'Failed to send OTP.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+    try {
+      await registerWithOTP(username, email, password, dob, otpCode);
       navigate('/dashboard');
     } catch (err) {
       const data = err.response?.data;
@@ -122,7 +134,19 @@ export default function Register() {
               </>
             )}
 
-
+            {step === 'verify' && (
+              <>
+                <div style={{ textAlign: 'center', marginBottom: '0.5rem' }}>
+                  <p style={{ color: 'var(--text-secondary)', fontSize: 14 }}>
+                    We sent a 6-digit code to <strong>{email}</strong>
+                  </p>
+                </div>
+                <input type="text" placeholder="Code" className="input-field" value={otpCode} onChange={e => setOtpCode(e.target.value)} required maxLength={6} style={{ padding: '16px 24px', fontSize: 24, letterSpacing: '12px', textAlign: 'center', background: 'transparent', fontFamily: 'monospace', fontWeight: 'bold' }} />
+                <button type="button" onClick={() => setStep('request')} style={{ background: 'none', border: 'none', color: 'var(--accent-teal)', cursor: 'pointer', fontSize: 14, fontWeight: 600 }}>
+                  Wrong email? Go back
+                </button>
+              </>
+            )}
 
             {error && <div style={{ color: '#ef4444', fontSize: 14, fontWeight: 600, textAlign: 'center' }}>{error}</div>}
             {message && <div style={{ color: 'var(--accent-teal)', fontSize: 14, fontWeight: 600, textAlign: 'center' }}>{message}</div>}

@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import { login as loginAPI, register as registerAPI, getProfile } from '../services/api';
+import { login as loginAPI, register as registerAPI, getProfile, verifyOTP } from '../services/api';
 import axios from 'axios';
 
 const AuthContext = createContext();
@@ -68,6 +68,31 @@ export function AuthProvider({ children }) {
     localStorage.setItem('is_new_user', 'true');
   };
 
+  const loginWithOTP = async (email, code) => {
+    localStorage.removeItem('is_new_user');
+    const res = await verifyOTP({ email, code, purpose: 'login' });
+    localStorage.setItem('token', res.data.access);
+    localStorage.setItem('refresh_token', res.data.refresh);
+    try {
+      const profile = await getProfile();
+      setUser(profile.data);
+      localStorage.setItem('cached_user', JSON.stringify(profile.data));
+    } catch (profileErr) {
+      const minimal = { email, username: email.split('@')[0] };
+      setUser(minimal);
+      localStorage.setItem('cached_user', JSON.stringify(minimal));
+    }
+  };
+
+  const registerWithOTP = async (username, email, password, dob, code) => {
+    const res = await verifyOTP({ username, email, password, dob, code, purpose: 'register' });
+    localStorage.setItem('token', res.data.access);
+    localStorage.setItem('refresh_token', res.data.refresh);
+    localStorage.setItem('is_new_user', 'true');
+    setUser(res.data.user);
+    localStorage.setItem('cached_user', JSON.stringify(res.data.user));
+  };
+
   const loginWithGoogle = async (googleToken) => {
     const BASE_URL = import.meta.env.VITE_API_URL || '';
     const res = await axios.post(`${BASE_URL}/api/accounts/google/`, {
@@ -87,7 +112,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, loginWithGoogle, logout, loading, setToken, setUser }}>
+    <AuthContext.Provider value={{ user, login, register, loginWithOTP, registerWithOTP, loginWithGoogle, logout, loading, setToken, setUser }}>
       {children}
     </AuthContext.Provider>
   );

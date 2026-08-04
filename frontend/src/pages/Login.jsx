@@ -17,6 +17,7 @@ export default function Login() {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [otpCode, setOtpCode] = useState('');
 
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
@@ -37,7 +38,7 @@ export default function Login() {
     return () => clearInterval(interval);
   }, [resendTimer]);
 
-  const { login, setToken, setUser } = useAuth();
+  const { login, loginWithOTP, setToken, setUser } = useAuth();
 
   const handlePasswordLogin = async (e) => {
     e.preventDefault();
@@ -59,7 +60,35 @@ export default function Login() {
     }
   };
 
+  const handleOTPRequest = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+    try {
+      const { requestOTP } = await import('../services/api');
+      await requestOTP({ email, purpose: 'login' });
+      setStep('verify');
+      setMessage('A verification code has been sent to your email.');
+    } catch (err) {
+      setError(err.response?.data?.error || 'Failed to send OTP.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  const handleOTPLogin = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+    try {
+      await loginWithOTP(email, otpCode);
+      navigate('/dashboard');
+    } catch (err) {
+      setError(err.response?.data?.error || 'Invalid or expired OTP.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const verifyOTPReset = async (e) => {
     e.preventDefault();
@@ -93,6 +122,7 @@ export default function Login() {
     setDob('');
     setNewPassword('');
     setConfirmPassword('');
+    setOtpCode('');
   };
 
   return (
@@ -115,12 +145,19 @@ export default function Login() {
           
           <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
             <h1 style={{ fontSize: 32, fontWeight: 800, margin: '0 0 0.5rem', letterSpacing: '-1px' }}>
-              {mode === 'password' ? 'Welcome Back' : 'Reset Password'}
+              {mode === 'reset' ? 'Reset Password' : 'Welcome Back'}
             </h1>
             <p style={{ color: 'var(--text-secondary)', fontSize: 15, margin: 0, fontWeight: 500 }}>
-              {mode === 'password' ? 'Sign in to continue your learning journey' : 'Enter your email and Date of Birth to reset your password'}
+              {mode === 'reset' ? 'Enter your email and Date of Birth to reset your password' : 'Sign in to continue your learning journey'}
             </p>
           </div>
+          
+          {mode !== 'reset' && (
+            <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '2rem', background: 'rgba(0,0,0,0.05)', padding: '4px', borderRadius: '12px' }}>
+              <button type="button" onClick={() => { setMode('password'); setStep('request'); resetState(); }} style={{ flex: 1, padding: '12px', borderRadius: '8px', border: 'none', background: mode === 'password' ? 'var(--accent-pink)' : 'transparent', color: mode === 'password' ? 'white' : 'var(--text-secondary)', fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s' }}>Password</button>
+              <button type="button" onClick={() => { setMode('otp'); setStep('request'); resetState(); }} style={{ flex: 1, padding: '12px', borderRadius: '8px', border: 'none', background: mode === 'otp' ? 'var(--accent-teal)' : 'transparent', color: mode === 'otp' ? 'white' : 'var(--text-secondary)', fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s' }}>Email Code</button>
+            </div>
+          )}
 
           {/* Standard Password Login */}
           {mode === 'password' && (
@@ -144,6 +181,36 @@ export default function Login() {
                 {loading ? 'Signing in...' : 'Sign In'}
               </button>
 
+
+            </form>
+          )}
+
+          {/* OTP Login */}
+          {mode === 'otp' && (
+            <form onSubmit={step === 'request' ? handleOTPRequest : handleOTPLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+              
+              {step === 'request' ? (
+                <input type="email" placeholder="Email Address" className="input-field" value={email} onChange={e => setEmail(e.target.value)} required autoComplete="email" style={{ padding: '16px 24px', fontSize: 15, background: 'transparent' }} />
+              ) : (
+                <>
+                  <div style={{ textAlign: 'center', marginBottom: '0.5rem' }}>
+                    <p style={{ color: 'var(--text-secondary)', fontSize: 14 }}>
+                      We sent a 6-digit code to <strong>{email}</strong>
+                    </p>
+                  </div>
+                  <input type="text" placeholder="Code" className="input-field" value={otpCode} onChange={e => setOtpCode(e.target.value)} required maxLength={6} style={{ padding: '16px 24px', fontSize: 24, letterSpacing: '12px', textAlign: 'center', background: 'transparent', fontFamily: 'monospace', fontWeight: 'bold' }} />
+                  <button type="button" onClick={() => setStep('request')} style={{ background: 'none', border: 'none', color: 'var(--accent-teal)', cursor: 'pointer', fontSize: 14, fontWeight: 600 }}>
+                    Wrong email? Go back
+                  </button>
+                </>
+              )}
+
+              {error && <div style={{ color: '#ef4444', fontSize: 14, fontWeight: 600, textAlign: 'center' }}>{error}</div>}
+              {message && <div style={{ color: 'var(--accent-teal)', fontSize: 14, fontWeight: 600, textAlign: 'center' }}>{message}</div>}
+              
+              <button type="submit" className="btn-primary card-teal" disabled={loading} style={{ padding: '18px', fontSize: 18, border: 'none' }}>
+                {loading ? 'Processing...' : (step === 'request' ? 'Send Code' : 'Sign In')}
+              </button>
 
             </form>
           )}

@@ -113,7 +113,7 @@ class OTPRequestView(APIView):
         if not email:
             return Response({'error': 'Email is required'}, status=400)
 
-        if purpose == 'reset':
+        if purpose in ['reset', 'login']:
             if not User.objects.filter(email=email).exists():
                 return Response({'error': 'No user found with this email'}, status=404)
         elif purpose == 'register':
@@ -208,3 +208,53 @@ class ResetPasswordView(APIView):
             return Response({'message': 'Password reset successfully'})
         except User.DoesNotExist:
             return Response({'error': 'User not found'}, status=404)
+
+class OTPVerifyView(APIView):
+    permission_classes = [permissions.AllowAny]
+    throttle_classes = [LoginThrottle]
+
+    def post(self, request):
+        email = request.data.get('email')
+        code = request.data.get('code')
+        purpose = request.data.get('purpose', 'login')
+
+        if not all([email, code, purpose]):
+            return Response({'error': 'Email, code, and purpose are required'}, status=400)
+
+        try:
+            otp_obj = OTPCode.objects.get(email=email, code=code, purpose=purpose, is_used=False)
+            if otp_obj.is_expired():
+                return Response({'error': 'OTP has expired'}, status=400)
+            
+            otp_obj.is_used = True
+            otp_obj.save()
+
+            if purpose == 'register':
+                serializer = RegisterSerializer(data=request.data)
+                if serializer.is_valid():
+                    user = serializer.save()
+                    refresh = RefreshToken.for_user(user)
+                    return Response({
+                        'access': str(refresh.access_token),
+                        'refresh': str(refresh),
+                        'user': UserSerializer(user).data
+                    }, status=status.HTTP_201_CREATED)
+                else:
+                    return Response(serializer.errors, status=400)
+
+            elif purpose == 'login':
+                try:
+                    user = User.objects.get(email=email)
+                    refresh = RefreshToken.for_user(user)
+                    return Response({
+                        'access': str(refresh.access_token),
+                        'refresh': str(refresh),
+                        'user': UserSerializer(user).data
+                    })
+                except User.DoesNotExist:
+                    return Response({'error': 'User not found'}, status=404)
+
+            return Response({'message': 'OTP verified successfully'})
+
+        except OTPCode.DoesNotExist:
+            return Response({'error': 'Invalid or expired OTP'}, status=400)
