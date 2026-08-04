@@ -114,9 +114,26 @@ function ScrollPathCard({ cardClass, pathData, steps, travelerIcon = "🚀" }) {
     }
   }, [scrollProgress, pathLength]);
 
-  // Wheel / touch intercept — bidirectional
+  // Wheel / touch intercept — bidirectional with smooth lerping
+  const currentRef = useRef(0);
+  const targetRef = useRef(0);
+
   useEffect(() => {
     const SPEED = 0.0010; // wheel delta → progress units
+    let animFrame = null;
+
+    const loop = () => {
+      const diff = targetRef.current - currentRef.current;
+      if (Math.abs(diff) > 0.001) {
+        currentRef.current += diff * 0.15;
+        setScrollProgress(currentRef.current);
+      } else if (currentRef.current !== targetRef.current) {
+        currentRef.current = targetRef.current;
+        setScrollProgress(currentRef.current);
+      }
+      animFrame = requestAnimationFrame(loop);
+    };
+    animFrame = requestAnimationFrame(loop);
 
     const onWheel = (e) => {
       if (!cardRef.current) return;
@@ -131,24 +148,18 @@ function ScrollPathCard({ cardClass, pathData, steps, travelerIcon = "🚀" }) {
       // Scrolling down: lock until animation reaches 1
       if (scrollingDown && !doneRef.current) {
         e.preventDefault();
-        const next = Math.min(1, progressRef.current + e.deltaY * SPEED);
-        progressRef.current = next;
-        setScrollProgress(next);
-        if (next >= 1) doneRef.current = true;
+        targetRef.current = Math.min(1, targetRef.current + e.deltaY * SPEED);
+        if (targetRef.current >= 1) doneRef.current = true;
         return;
       }
 
       // Scrolling up: if animation is in progress (> 0), re-lock and reverse
-      if (scrollingUp && progressRef.current > 0) {
+      if (scrollingUp && targetRef.current > 0) {
         e.preventDefault();
         doneRef.current = false; // re-engage forward lock for next downward scroll
-        const next = Math.max(0, progressRef.current + e.deltaY * SPEED);
-        progressRef.current = next;
-        setScrollProgress(next);
+        targetRef.current = Math.max(0, targetRef.current + e.deltaY * SPEED);
         return;
       }
-
-      // Otherwise let normal scroll happen (up from 0, or down after done)
     };
 
     // Touch support — bidirectional
@@ -160,21 +171,17 @@ function ScrollPathCard({ cardClass, pathData, steps, travelerIcon = "🚀" }) {
       const centred = rect.top < window.innerHeight * 0.6 && rect.bottom > window.innerHeight * 0.4;
       if (!centred) return;
 
-      const dy = lastY - e.touches[0].clientY; // positive = swipe up = scroll down
+      const dy = lastY - e.touches[0].clientY;
       lastY = e.touches[0].clientY;
 
       if (dy > 0 && !doneRef.current) {
         e.preventDefault();
-        const next = Math.min(1, progressRef.current + dy * SPEED * 5);
-        progressRef.current = next;
-        setScrollProgress(next);
-        if (next >= 1) doneRef.current = true;
-      } else if (dy < 0 && progressRef.current > 0) {
+        targetRef.current = Math.min(1, targetRef.current + dy * SPEED * 5);
+        if (targetRef.current >= 1) doneRef.current = true;
+      } else if (dy < 0 && targetRef.current > 0) {
         e.preventDefault();
         doneRef.current = false;
-        const next = Math.max(0, progressRef.current + dy * SPEED * 5);
-        progressRef.current = next;
-        setScrollProgress(next);
+        targetRef.current = Math.max(0, targetRef.current + dy * SPEED * 5);
       }
     };
 
@@ -182,11 +189,13 @@ function ScrollPathCard({ cardClass, pathData, steps, travelerIcon = "🚀" }) {
     document.addEventListener('touchstart', onTouchStart, { passive: true });
     document.addEventListener('touchmove', onTouchMove, { passive: false });
     return () => {
+      if (animFrame) cancelAnimationFrame(animFrame);
       document.removeEventListener('wheel', onWheel);
       document.removeEventListener('touchstart', onTouchStart);
       document.removeEventListener('touchmove', onTouchMove);
     };
   }, []);
+
 
   return (
     <div ref={cardRef} className={`bento-card ${cardClass}`}
@@ -205,7 +214,7 @@ function ScrollPathCard({ cardClass, pathData, steps, travelerIcon = "🚀" }) {
           d={pathData} fill="none" stroke="#ffffff" strokeWidth="4"
           strokeDasharray={pathLength || 1000}
           strokeDashoffset={(pathLength || 1000) * (1 - scrollProgress)}
-          style={{ transition: 'stroke-dashoffset 0.06s ease-out' }}
+          style={{ /* Smoothness handled by JS lerp loop */ }}
         />
       </svg>
 
@@ -218,7 +227,7 @@ function ScrollPathCard({ cardClass, pathData, steps, travelerIcon = "🚀" }) {
         backgroundColor: '#ffffff',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         fontSize: 26, boxShadow: '0 4px 15px rgba(0,0,0,0.35)', zIndex: 5,
-        transition: 'left 0.06s ease-out, top 0.06s ease-out',
+        /* Smoothness handled by JS lerp loop */
       }}>
         {travelerIcon}
       </div>
