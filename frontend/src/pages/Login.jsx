@@ -199,7 +199,7 @@ export default function Login() {
                     </p>
                   </div>
                   <input type="text" placeholder="Code" className="input-field" value={otpCode} onChange={e => setOtpCode(e.target.value)} required maxLength={6} style={{ padding: '16px 24px', fontSize: 24, letterSpacing: '12px', textAlign: 'center', background: 'transparent', fontFamily: 'monospace', fontWeight: 'bold' }} />
-                  <button type="button" onClick={() => setStep('request')} style={{ background: 'none', border: 'none', color: 'var(--accent-teal)', cursor: 'pointer', fontSize: 14, fontWeight: 600 }}>
+                  <button type="button" onClick={() => setStep('request')} style={{ background: 'none', border: 'none', color: 'var(--accent-orange)', cursor: 'pointer', fontSize: 14, fontWeight: 600 }}>
                     Wrong email? Go back
                   </button>
                 </>
