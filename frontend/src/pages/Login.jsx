@@ -10,6 +10,10 @@ export default function Login() {
   const [mode, setMode] = useState('password');
   // Steps: 'request' (ask for email) | 'verify' (ask for code)
   const [step, setStep] = useState('request');
+  // Reset Methods: 'dob' | 'otp'
+  const [resetMethod, setResetMethod] = useState('dob');
+  // Reset Steps: 'request' | 'verify' (only for resetMethod='otp')
+  const [resetStep, setResetStep] = useState('request');
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -90,6 +94,22 @@ export default function Login() {
     }
   };
 
+  const handleResetOTPRequest = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+    try {
+      const { requestOTP } = await import('../services/api');
+      await requestOTP({ email, purpose: 'reset' });
+      setResetStep('verify');
+      setMessage('A password reset code has been sent to your email.');
+    } catch (err) {
+      setError(err.response?.data?.error || 'Failed to send OTP.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const verifyOTPReset = async (e) => {
     e.preventDefault();
     if (newPassword !== confirmPassword) {
@@ -99,16 +119,16 @@ export default function Login() {
     setLoading(true);
     setError('');
     try {
-      await API.post('/accounts/reset-password/', {
-        email,
-        dob: dob,
-        new_password: newPassword
-      });
+      const payload = { email, new_password: newPassword };
+      if (resetMethod === 'dob') {
+        payload.dob = dob;
+      } else {
+        payload.otp_code = otpCode;
+      }
+      await API.post('/accounts/reset-password/', payload);
       setMessage('Password reset successfully! You can now log in.');
       setMode('password');
-      setDob('');
-      setNewPassword('');
-      setConfirmPassword('');
+      resetState();
     } catch (err) {
       setError(err.response?.data?.error || 'Password reset failed. Check your details.');
     } finally {
@@ -123,6 +143,7 @@ export default function Login() {
     setNewPassword('');
     setConfirmPassword('');
     setOtpCode('');
+    setResetStep('request');
   };
 
   return (
@@ -217,39 +238,78 @@ export default function Login() {
 
           {/* Reset Password */}
           {mode === 'reset' && (
-            <form onSubmit={verifyOTPReset} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-              
-              <input type="email" placeholder="Email Address" className="input-field" value={email} onChange={e => setEmail(e.target.value)} required autoComplete="email" style={{ padding: '16px 24px', fontSize: 15, background: 'transparent' }} />
-              
-              <div>
-                <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text-secondary)', fontSize: 14, fontWeight: 600, textAlign: 'left', paddingLeft: '4px' }}>Date of Birth</label>
-                <input type="date" className="input-field" value={dob} onChange={e => setDob(e.target.value)} onClick={(e) => { if(e.target.showPicker) e.target.showPicker(); }} required aria-label="Date of Birth" style={{ padding: '16px 24px', fontSize: 15, background: 'transparent', width: '100%', cursor: 'pointer' }} />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+              <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem', background: 'rgba(0,0,0,0.05)', padding: '4px', borderRadius: '12px' }}>
+                <button type="button" onClick={() => { setResetMethod('dob'); setResetStep('request'); resetState(); }} style={{ flex: 1, padding: '12px', borderRadius: '8px', border: 'none', background: resetMethod === 'dob' ? 'var(--accent-pink)' : 'transparent', color: resetMethod === 'dob' ? 'white' : 'var(--text-secondary)', fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s' }}>Date of Birth</button>
+                <button type="button" onClick={() => { setResetMethod('otp'); setResetStep('request'); resetState(); }} style={{ flex: 1, padding: '12px', borderRadius: '8px', border: 'none', background: resetMethod === 'otp' ? 'var(--accent-teal)' : 'transparent', color: resetMethod === 'otp' ? 'white' : 'var(--text-secondary)', fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s' }}>Email Code</button>
               </div>
 
-              <div style={{ position: 'relative' }}>
-                <input type={showPassword ? 'text' : 'password'} placeholder="New Password" className="input-field" value={newPassword} onChange={e => setNewPassword(e.target.value)} required autoComplete="new-password" minLength={8} style={{ padding: '16px 24px', fontSize: 15, background: 'transparent', paddingRight: '60px' }} />
-                <button type="button" onClick={() => setShowPassword(!showPassword)} style={{ position: 'absolute', right: '16px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: 14, fontWeight: 600 }}>
-                  {showPassword ? 'Hide' : 'Show'}
-                </button>
-              </div>
-              <div style={{ position: 'relative' }}>
-                <input type={showPassword ? 'text' : 'password'} placeholder="Confirm Password" className="input-field" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required autoComplete="new-password" minLength={8} style={{ padding: '16px 24px', fontSize: 15, background: 'transparent', paddingRight: '60px' }} />
-                <button type="button" onClick={() => setShowPassword(!showPassword)} style={{ position: 'absolute', right: '16px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: 14, fontWeight: 600 }}>
-                  {showPassword ? 'Hide' : 'Show'}
-                </button>
-              </div>
-              
-              {error && <div style={{ color: '#ef4444', fontSize: 14, fontWeight: 600, textAlign: 'center' }}>{error}</div>}
-              {message && <div style={{ color: 'var(--accent-teal)', fontSize: 14, fontWeight: 600, textAlign: 'center' }}>{message}</div>}
+              {resetMethod === 'dob' || (resetMethod === 'otp' && resetStep === 'verify') ? (
+                <form onSubmit={verifyOTPReset} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                  
+                  {resetMethod === 'dob' ? (
+                    <>
+                      <input type="email" placeholder="Email Address" className="input-field" value={email} onChange={e => setEmail(e.target.value)} required autoComplete="email" style={{ padding: '16px 24px', fontSize: 15, background: 'transparent' }} />
+                      <div>
+                        <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text-secondary)', fontSize: 14, fontWeight: 600, textAlign: 'left', paddingLeft: '4px' }}>Date of Birth</label>
+                        <input type="date" className="input-field" value={dob} onChange={e => setDob(e.target.value)} onClick={(e) => { if(e.target.showPicker) e.target.showPicker(); }} required aria-label="Date of Birth" style={{ padding: '16px 24px', fontSize: 15, background: 'transparent', width: '100%', cursor: 'pointer' }} />
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div style={{ textAlign: 'center', marginBottom: '0.5rem' }}>
+                        <p style={{ color: 'var(--text-secondary)', fontSize: 14 }}>
+                          We sent a 6-digit code to <strong>{email}</strong>
+                        </p>
+                      </div>
+                      <input type="text" placeholder="Code" className="input-field" value={otpCode} onChange={e => setOtpCode(e.target.value)} required maxLength={6} style={{ padding: '16px 24px', fontSize: 24, letterSpacing: '12px', textAlign: 'center', background: 'transparent', fontFamily: 'monospace', fontWeight: 'bold' }} />
+                      <button type="button" onClick={() => setResetStep('request')} style={{ background: 'none', border: 'none', color: 'var(--accent-orange)', cursor: 'pointer', fontSize: 14, fontWeight: 600 }}>
+                        Wrong email? Go back
+                      </button>
+                    </>
+                  )}
 
-              <button type="submit" className="btn-primary card-teal" disabled={loading} style={{ padding: '18px', fontSize: 18, border: 'none' }}>
-                {loading ? 'Processing...' : 'Reset Password'}
-              </button>
+                  <div style={{ position: 'relative' }}>
+                    <input type={showPassword ? 'text' : 'password'} placeholder="New Password" className="input-field" value={newPassword} onChange={e => setNewPassword(e.target.value)} required autoComplete="new-password" minLength={8} style={{ padding: '16px 24px', fontSize: 15, background: 'transparent', paddingRight: '60px' }} />
+                    <button type="button" onClick={() => setShowPassword(!showPassword)} style={{ position: 'absolute', right: '16px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: 14, fontWeight: 600 }}>
+                      {showPassword ? 'Hide' : 'Show'}
+                    </button>
+                  </div>
+                  <div style={{ position: 'relative' }}>
+                    <input type={showPassword ? 'text' : 'password'} placeholder="Confirm Password" className="input-field" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required autoComplete="new-password" minLength={8} style={{ padding: '16px 24px', fontSize: 15, background: 'transparent', paddingRight: '60px' }} />
+                    <button type="button" onClick={() => setShowPassword(!showPassword)} style={{ position: 'absolute', right: '16px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: 14, fontWeight: 600 }}>
+                      {showPassword ? 'Hide' : 'Show'}
+                    </button>
+                  </div>
+                  
+                  {error && <div style={{ color: '#ef4444', fontSize: 14, fontWeight: 600, textAlign: 'center' }}>{error}</div>}
+                  {message && <div style={{ color: 'var(--accent-teal)', fontSize: 14, fontWeight: 600, textAlign: 'center' }}>{message}</div>}
 
-              <button type="button" onClick={() => { setMode('password'); resetState(); }} className="btn-secondary" style={{ padding: '16px', fontSize: 16, border: 'none', background: 'transparent', color: 'var(--text-secondary)', fontWeight: 600 }}>
-                Cancel
-              </button>
-            </form>
+                  <button type="submit" className="btn-primary card-teal" disabled={loading} style={{ padding: '18px', fontSize: 18, border: 'none' }}>
+                    {loading ? 'Processing...' : 'Reset Password'}
+                  </button>
+
+                  <button type="button" onClick={() => { setMode('password'); resetState(); }} className="btn-secondary" style={{ padding: '16px', fontSize: 16, border: 'none', background: 'transparent', color: 'var(--text-secondary)', fontWeight: 600 }}>
+                    Cancel
+                  </button>
+                </form>
+              ) : (
+                <form onSubmit={handleResetOTPRequest} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                  <input type="email" placeholder="Email Address" className="input-field" value={email} onChange={e => setEmail(e.target.value)} required autoComplete="email" style={{ padding: '16px 24px', fontSize: 15, background: 'transparent' }} />
+                  
+                  {error && <div style={{ color: '#ef4444', fontSize: 14, fontWeight: 600, textAlign: 'center' }}>{error}</div>}
+                  {message && <div style={{ color: 'var(--accent-teal)', fontSize: 14, fontWeight: 600, textAlign: 'center' }}>{message}</div>}
+                  
+                  <button type="submit" className="btn-primary card-teal" disabled={loading} style={{ padding: '18px', fontSize: 18, border: 'none' }}>
+                    {loading ? 'Processing...' : 'Send Code'}
+                  </button>
+
+                  <button type="button" onClick={() => { setMode('password'); resetState(); }} className="btn-secondary" style={{ padding: '16px', fontSize: 16, border: 'none', background: 'transparent', color: 'var(--text-secondary)', fontWeight: 600 }}>
+                    Cancel
+                  </button>
+                </form>
+              )}
+            </div>
           )}
 
           {mode === 'password' && (

@@ -186,21 +186,34 @@ class ResetPasswordView(APIView):
     def post(self, request):
         email = request.data.get('email')
         dob = request.data.get('dob')
+        otp_code = request.data.get('otp_code')
         new_password = request.data.get('new_password')
 
-        if not all([email, dob, new_password]):
-            return Response({'error': 'Email, Date of Birth, and New Password are required'}, status=400)
+        if not email or not new_password:
+            return Response({'error': 'Email and New Password are required'}, status=400)
+            
+        if not dob and not otp_code:
+            return Response({'error': 'Either Date of Birth or OTP Code is required'}, status=400)
 
         try:
             user = User.objects.get(email=email)
             
-            # Check if DOB matches
-            # user.dob is a datetime.date object. We convert request dob (string) to compare.
-            if not user.dob:
-                return Response({'error': 'No Date of Birth is associated with this account. Password cannot be reset.'}, status=400)
-                
-            if str(user.dob) != str(dob):
-                return Response({'error': 'Incorrect Date of Birth'}, status=400)
+            if otp_code:
+                try:
+                    otp_obj = OTPCode.objects.get(email=email, code=otp_code, purpose='reset', is_used=False)
+                    if otp_obj.is_expired():
+                        return Response({'error': 'OTP has expired'}, status=400)
+                    otp_obj.is_used = True
+                    otp_obj.save()
+                except OTPCode.DoesNotExist:
+                    return Response({'error': 'Invalid or expired OTP'}, status=400)
+            else:
+                # Check if DOB matches
+                if not user.dob:
+                    return Response({'error': 'No Date of Birth is associated with this account. Password cannot be reset.'}, status=400)
+                    
+                if str(user.dob) != str(dob):
+                    return Response({'error': 'Incorrect Date of Birth'}, status=400)
 
             user.set_password(new_password)
             user.save()
