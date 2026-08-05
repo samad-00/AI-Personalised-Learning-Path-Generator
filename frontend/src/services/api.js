@@ -81,3 +81,8 @@ export const executeCode = async ({ code, language, stdin }) => {
   return json; // { output, error, status }
 };
 
+export const chatService = {
+  sendMessage: (message, sessionId = 'default') => API.post('/chat/', { message, session_id: sessionId }),
+  getHistory: (sessionId = 'default') => API.get(`/chat/history/?session_id=${sessionId}`),
+  clearHistory: (sessionId = 'default') => API.delete(`/chat/history/?session_id=${sessionId}`)
+};

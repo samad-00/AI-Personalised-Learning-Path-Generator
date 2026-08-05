@@ -1,0 +1,16 @@
+from django.db import models
+from django.conf import settings
+import uuid
+
+class Conversation(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='conversations')
+    session_id = models.CharField(max_length=255, default=uuid.uuid4)
+    user_message = models.TextField()
+    ai_response = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['timestamp']
+
+    def __str__(self):
+        return f"{self.user.email} - Session: {self.session_id}"

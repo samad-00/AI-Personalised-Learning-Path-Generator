@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'resources',
     'adaptation',
     'careers',
+    'chatbot',
 ]
 
 MIDDLEWARE = [

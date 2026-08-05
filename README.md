@@ -9,6 +9,8 @@ url- https://ai-learnpath.vercel.app/
 
 ## ✨ Features
 
+✅ **AI Learning Mentor & Career Assistant** (Sam) - A contextual chatbot that answers roadmap and resume questions
+
 ✅ **Personalized Goal-Based Learning Paths** (Beginner, Intermediate, Advanced)
 
 ✅ **Live Interactive AI Mock Interviews** (Technical, Analytical, Rapid Fire, Soft Skills)

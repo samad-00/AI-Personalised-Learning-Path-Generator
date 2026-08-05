@@ -13,6 +13,7 @@ import Settings from './pages/Settings';
 import AllPlans from './pages/AllPlans';
 import InterviewPrep from './pages/InterviewPrep';
 import CVAnalyzer from './pages/CVAnalyzer';
+import AIChatbot from './components/AIChatbot';
 
 function PrivateRoute({ children }) {
   const { user, loading } = useAuth();
@@ -25,11 +26,17 @@ function PrivateRoute({ children }) {
   return user ? children : <Navigate to="/login" />;
 }
 
+function GlobalChatbot() {
+  const { user } = useAuth();
+  return user ? <AIChatbot /> : null;
+}
+
 export default function App() {
   return (
     <ThemeProvider>
       <AuthProvider>
         <BrowserRouter>
+          <GlobalChatbot />
           <Routes>
             <Route path="/" element={<Landing />} />
             <Route path="/login" element={<Login />} />
