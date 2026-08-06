@@ -24,22 +24,22 @@ export default function AnimatedBackground() {
   return (
     <div style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none', overflow: 'hidden' }}>
       {/* Pills */}
-      <div className="pill-tag animate-float-reverse" style={{ position: 'absolute', top: '6%', left: '5%', background: 'var(--accent-pink)', color: 'white', border: 'none', padding: '8px 24px', fontSize: 14 }}>
+      <div className="pill-tag animate-float-reverse" style={{ position: 'absolute', top: '22%', left: '5%', background: 'var(--accent-pink)', color: 'white', border: 'none', padding: '8px 24px', fontSize: 14 }}>
         {pills[0] || '#Focus'}
       </div>
-      <div className="pill-tag animate-float" style={{ position: 'absolute', top: '7%', left: '38%', background: 'var(--accent-teal)', color: 'white', border: 'none', padding: '8px 24px', fontSize: 14 }}>
+      <div className="pill-tag animate-float" style={{ position: 'absolute', top: '25%', left: '38%', background: 'var(--accent-teal)', color: 'white', border: 'none', padding: '8px 24px', fontSize: 14 }}>
         {pills[1] || '#Growth'}
       </div>
-      <div className="pill-tag animate-float-horizontal" style={{ position: 'absolute', top: '22%', right: '42%', background: 'var(--surface-color)', color: 'var(--accent-orange)', border: 'none', padding: '8px 24px', fontSize: 14 }}>
+      <div className="pill-tag animate-float-horizontal" style={{ position: 'absolute', top: '35%', right: '42%', background: 'var(--surface-color)', color: 'var(--accent-orange)', border: 'none', padding: '8px 24px', fontSize: 14 }}>
         {pills[2] || '#Mastery'}
       </div>
-      <div className="pill-tag animate-float" style={{ position: 'absolute', top: '14%', right: '6%', background: 'var(--accent-mint)', color: 'var(--accent-teal)', border: 'none', padding: '8px 24px', fontSize: 14 }}>
+      <div className="pill-tag animate-float" style={{ position: 'absolute', top: '28%', right: '6%', background: 'var(--accent-mint)', color: 'var(--accent-teal)', border: 'none', padding: '8px 24px', fontSize: 14 }}>
         {pills[3] || '#Consistency'}
       </div>
       <div className="pill-tag animate-float-reverse" style={{ position: 'absolute', top: '46%', left: '4%', background: 'var(--accent-orange)', color: 'white', border: 'none', padding: '8px 24px', fontSize: 14 }}>
         {pills[4] || '#Learning'}
       </div>
-      <div className="pill-tag animate-float-horizontal" style={{ position: 'absolute', top: '20%', left: '18%', background: 'var(--accent-mint)', color: 'var(--accent-teal)', border: 'none', padding: '8px 24px', fontSize: 14, opacity: 0.8 }}>
+      <div className="pill-tag animate-float-horizontal" style={{ position: 'absolute', top: '32%', left: '18%', background: 'var(--accent-mint)', color: 'var(--accent-teal)', border: 'none', padding: '8px 24px', fontSize: 14, opacity: 0.8 }}>
         {pills[5] || '#Success'}
       </div>
       <div className="pill-tag animate-float" style={{ position: 'absolute', top: '56%', left: '16%', background: 'var(--accent-pink)', color: 'white', border: 'none', padding: '8px 24px', fontSize: 14, opacity: 0.9 }}>
@@ -62,19 +62,19 @@ export default function AnimatedBackground() {
       </div>
 
       {/* Emojis */}
-      <div className="animate-float" style={{ position: 'absolute', top: '26%', left: '5%', fontSize: 30, opacity: 0.8 }}>
+      <div className="animate-float" style={{ position: 'absolute', top: '30%', left: '5%', fontSize: 30, opacity: 0.8 }}>
         {emojis[0] || '🎯'}
       </div>
       <div className="animate-float-reverse" style={{ position: 'absolute', top: '68%', left: '5%', fontSize: 36, opacity: 0.6 }}>
         {emojis[1] || '💡'}
       </div>
-      <div className="animate-float" style={{ position: 'absolute', top: '5%', left: '22%', fontSize: 34, opacity: 0.7 }}>
+      <div className="animate-float" style={{ position: 'absolute', top: '22%', left: '22%', fontSize: 34, opacity: 0.7 }}>
         {emojis[2] || '🚀'}
       </div>
-      <div className="animate-float-horizontal" style={{ position: 'absolute', top: '6%', right: '36%', fontSize: 28, opacity: 0.7 }}>
+      <div className="animate-float-horizontal" style={{ position: 'absolute', top: '24%', right: '36%', fontSize: 28, opacity: 0.7 }}>
         {emojis[3] || '✨'}
       </div>
-      <div className="animate-float" style={{ position: 'absolute', top: '5%', right: '16%', fontSize: 32, opacity: 0.6 }}>
+      <div className="animate-float" style={{ position: 'absolute', top: '20%', right: '16%', fontSize: 32, opacity: 0.6 }}>
         {emojis[4] || '💻'}
       </div>
       <div className="animate-float-reverse" style={{ position: 'absolute', top: '35%', left: '28%', fontSize: 30, opacity: 0.8 }}>
