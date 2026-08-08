@@ -20,7 +20,7 @@ export const updateProfile = (data) => API.patch('/accounts/profile/', data);
 export const requestOTP = (data) => API.post('/accounts/otp/request/', data);
 export const verifyOTP = (data) => API.post('/accounts/otp/verify/', data);
 
-export const generateRoadmap = (data) => API.post('/roadmaps/generate/', data);
+export const generateRoadmap = (data) => API.post(`/roadmaps/generate/?t=${Date.now()}`, data);
 export const getRoadmaps = () => API.get('/roadmaps/');
 export const getRoadmap = (id) => API.get(`/roadmaps/${id}/`);
 export const deleteRoadmap = (id) => API.delete(`/roadmaps/${id}/`);
