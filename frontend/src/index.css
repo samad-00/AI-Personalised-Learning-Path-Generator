@@ -290,6 +290,28 @@ body.dark-mode input[type="date"] {
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)) !important;
     gap: 1.5rem;
   }
+  
+  /* Symmetrical Alignment Utilities */
+  .mobile-center-flex {
+    justify-content: center !important;
+    align-items: center !important;
+    text-align: center !important;
+  }
+
+  .mobile-center-shape {
+    /* Perfectly center background shapes symmetrically */
+    right: 0 !important;
+    left: 0 !important;
+    top: 50% !important;
+    bottom: auto !important;
+    transform: translateY(-50%) !important;
+    width: 100% !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    margin: 0 auto !important;
+    text-align: center !important;
+  }
 
   /* Padding & Sizing Constraints */
   .mobile-padding {

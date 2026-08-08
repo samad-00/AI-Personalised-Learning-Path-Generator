@@ -169,7 +169,7 @@ export default function RoadmapDetail() {
 
         {/* Header Hero Card */}
         <div className="bento-card card-orange mobile-hero" style={{ padding: '3rem', position: 'relative', overflow: 'hidden' }}>
-          <div style={{ position: 'absolute', right: -30, top: -50, fontSize: 200, opacity: 0.1, transform: 'rotate(15deg)' }}>🎯</div>
+          <div className="mobile-center-shape" style={{ position: 'absolute', right: -30, top: -50, fontSize: 200, opacity: 0.1, transform: 'rotate(15deg)' }}>🎯</div>
 
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative', zIndex: 1, flexWrap: 'wrap', gap: '2rem' }}>
             <div style={{ flex: 1, minWidth: 300 }}>
@@ -207,7 +207,7 @@ export default function RoadmapDetail() {
 
         {roadmap.topics_overview && roadmap.topics_overview.length > 0 && (
           <div className="bento-card rise-item-2" style={{ padding: '2.5rem', marginBottom: '2rem', background: 'var(--surface-color)', position: 'relative', overflow: 'hidden' }}>
-            <div style={{ position: 'absolute', right: -20, top: -20, fontSize: 100, opacity: 0.05, transform: 'rotate(-10deg)', pointerEvents: 'none' }}>🗺️</div>
+            <div className="mobile-center-shape" style={{ position: 'absolute', right: -20, top: -20, fontSize: 100, opacity: 0.05, transform: 'rotate(-10deg)', pointerEvents: 'none' }}>🗺️</div>
             <h3 style={{ fontSize: 24, fontWeight: 800, margin: '0 0 2rem', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '12px' }}>
               <span style={{ fontSize: 28 }}>🗺️</span> Course Overview Map
             </h3>

@@ -179,7 +179,7 @@ export default function CVAnalyzer() {
 
             {/* Upload Zone Bento Card */}
             <div className="bento-card card-teal anim-card-1 hover-lift" style={{ padding: '2rem', position: 'relative', overflow: 'hidden', borderRadius: 28 }}>
-              <div style={{ position: 'absolute', right: -20, top: -20, fontSize: 130, opacity: 0.15, transform: 'rotate(-10deg)', pointerEvents: 'none' }}>📎</div>
+              <div className="mobile-center-shape" style={{ position: 'absolute', right: -20, top: -20, fontSize: 130, opacity: 0.15, transform: 'rotate(-10deg)', pointerEvents: 'none' }}>📎</div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1.25rem', position: 'relative', zIndex: 1 }}>
                 <span style={{ fontSize: '1.6rem' }}>📤</span>
                 <h3 style={{ margin: 0, fontSize: '1.35rem', fontWeight: 800, fontFamily: 'Outfit, sans-serif', color: '#ffffff' }}>Upload Your Resume</h3>
@@ -202,7 +202,7 @@ export default function CVAnalyzer() {
 
             {/* Target Job Details Bento Card */}
             <form onSubmit={handleAnalyze} className="bento-card card-pink anim-card-2 hover-lift" style={{ padding: '2rem', borderRadius: 28, position: 'relative', overflow: 'hidden', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-              <div style={{ position: 'absolute', right: -20, bottom: -20, fontSize: 140, opacity: 0.12, pointerEvents: 'none' }}>🎯</div>
+              <div className="mobile-center-shape" style={{ position: 'absolute', right: -20, bottom: -20, fontSize: 140, opacity: 0.12, pointerEvents: 'none' }}>🎯</div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', position: 'relative', zIndex: 1 }}>
                 <span style={{ fontSize: '1.6rem' }}>🎯</span>
                 <h3 style={{ margin: 0, fontSize: '1.35rem', fontWeight: 800, fontFamily: 'Outfit, sans-serif', color: '#ffffff' }}>Target Job Details</h3>

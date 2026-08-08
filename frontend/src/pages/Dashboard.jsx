@@ -224,7 +224,7 @@ export default function Dashboard() {
           </div>
 
           <div className="bento-card card-teal rise-item-2 hover-card-effects" style={{ padding: '2.5rem', display: 'flex', flexDirection: 'column', gap: '1.5rem', position: 'relative', overflow: 'hidden', borderRadius: 28 }}>
-            <div style={{ position: 'absolute', right: -20, top: -20, fontSize: 150, opacity: 0.1, pointerEvents: 'none', animation: 'floatEmoji 6s infinite ease-in-out' }}>🧠</div>
+            <div className="mobile-center-shape" style={{ position: 'absolute', right: -20, top: -20, fontSize: 150, opacity: 0.1, pointerEvents: 'none', animation: 'floatEmoji 6s infinite ease-in-out' }}>🧠</div>
             <h2 style={{ fontSize: 24, margin: 0, position: 'relative', zIndex: 1, fontWeight: 800, color: '#ffffff' }}>Build a New Curriculum</h2>
 
             <form onSubmit={handleGenerate} style={{ display: 'flex', flexDirection: 'column', gap: 16, position: 'relative', zIndex: 1 }}>
@@ -289,7 +289,7 @@ export default function Dashboard() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
 
           {/* Quick Picks / Tags (Randomly Generative & Shuffled on Every Visit/Refresh) */}
-          <div className="rise-item-1" style={{ display: 'flex', flexWrap: 'wrap', gap: '12px 14px', padding: '0.5rem 0 1rem', alignItems: 'center' }}>
+          <div className="rise-item-1 mobile-center-flex" style={{ display: 'flex', flexWrap: 'wrap', gap: '12px 14px', padding: '0.5rem 0 1rem', alignItems: 'center' }}>
             {topics.map((t, index) => (
               <span
                 key={`${t.title}-${index}`}
