@@ -6,7 +6,7 @@ from groq import Groq
 from django.conf import settings
 
 # Timeout per individual URL check (seconds)
-URL_CHECK_TIMEOUT = 2.5
+URL_CHECK_TIMEOUT = 4
 
 
 def generate_roadmap(goal, experience_level='beginner'):
@@ -114,7 +114,7 @@ def _fix_resources_parallel(resources):
         if not is_valid:
             resource['url'] = get_fallback_url(resource['title'], resource['resource_type'])
 
-    with ThreadPoolExecutor(max_workers=40) as executor:
+    with ThreadPoolExecutor(max_workers=10) as executor:
         futures = {executor.submit(check_and_fix, r): r for r in resources}
         for future in as_completed(futures):
             try:
