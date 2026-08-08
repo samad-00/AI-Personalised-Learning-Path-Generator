@@ -31,6 +31,8 @@ url- https://ai-learnpath.vercel.app/
 
 ✅ **Interactive Modern UI** with Light & Dark Modes
 
+✅ **Fully Responsive Design** (Optimized for both Desktop and Mobile Smartphone views)
+
 ✅ **Throttled & Secured API Endpoints**
 
 ---
