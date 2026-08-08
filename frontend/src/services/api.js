@@ -20,7 +20,20 @@ export const updateProfile = (data) => API.patch('/accounts/profile/', data);
 export const requestOTP = (data) => API.post('/accounts/otp/request/', data);
 export const verifyOTP = (data) => API.post('/accounts/otp/verify/', data);
 
-export const generateRoadmap = (data) => API.post('/roadmaps/generate/', data);
+export const generateRoadmap = async (data) => {
+  const token = localStorage.getItem('token');
+  const res = await fetch(`${BASE_URL}/api/roadmaps/generate/`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  });
+  const json = await res.json();
+  if (!res.ok) throw new Error(json.error || `HTTP ${res.status}`);
+  return { data: json };
+};
 export const getRoadmaps = () => API.get('/roadmaps/');
 export const getRoadmap = (id) => API.get(`/roadmaps/${id}/`);
 export const deleteRoadmap = (id) => API.delete(`/roadmaps/${id}/`);

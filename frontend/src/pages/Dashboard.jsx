@@ -65,7 +65,7 @@ export default function Dashboard() {
       navigate(`/roadmap/${res.data.id}`);
     } catch (err) {
       clearInterval(interval);
-      alert(err.response?.data?.error || 'Generation failed');
+      alert(err.response?.data?.error || err.message || 'Generation failed');
     } finally {
       clearInterval(interval);
       setLoading(false);
