@@ -20,20 +20,7 @@ export const updateProfile = (data) => API.patch('/accounts/profile/', data);
 export const requestOTP = (data) => API.post('/accounts/otp/request/', data);
 export const verifyOTP = (data) => API.post('/accounts/otp/verify/', data);
 
-export const generateRoadmap = async (data) => {
-  const token = localStorage.getItem('token');
-  const res = await fetch(`${BASE_URL}/api/roadmaps/generate/`, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(data),
-  });
-  const json = await res.json();
-  if (!res.ok) throw new Error(json.error || `HTTP ${res.status}`);
-  return { data: json };
-};
+export const generateRoadmap = (data) => API.post('/roadmaps/generate/', data);
 export const getRoadmaps = () => API.get('/roadmaps/');
 export const getRoadmap = (id) => API.get(`/roadmaps/${id}/`);
 export const deleteRoadmap = (id) => API.delete(`/roadmaps/${id}/`);
@@ -47,52 +34,12 @@ export default { register, login, getProfile, requestOTP, verifyOTP, generateRoa
 export const searchResource = (q, type) => API.get(`/roadmaps/search/?q=${encodeURIComponent(q)}&type=${type}`);
 export const exportPDF = (id) => API.get(`/roadmaps/${id}/export-pdf/`, { responseType: 'blob' });
 
-// Career endpoints - use fetch directly to avoid axios CORS preflight issues
-export const generateMockInterview = async (data) => {
-  const token = localStorage.getItem('token');
-  const res = await fetch(`${BASE_URL}/api/careers/mock-interview/`, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(data),
-  });
-  const json = await res.json();
-  if (!res.ok) throw new Error(json.error || `HTTP ${res.status}`);
-  return { data: json };
-};
-
-export const analyzeCVText = async (formData) => {
-  const token = localStorage.getItem('token');
-  const res = await fetch(`${BASE_URL}/api/careers/cv-analyze/`, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      // Do NOT set Content-Type — browser sets it with boundary for FormData
-    },
-    body: formData,
-  });
-  const json = await res.json();
-  if (!res.ok) throw new Error(json.error || `HTTP ${res.status}`);
-  return { data: json };
-};
-
-// Code execution — runs on Django server (no CORS issues)
-export const executeCode = async ({ code, language, stdin }) => {
-  const token = localStorage.getItem('token');
-  const res = await fetch(`${BASE_URL}/api/careers/execute/`, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ code, language, stdin }),
-  });
-  const json = await res.json();
-  if (!res.ok) throw new Error(json.error || `HTTP ${res.status}`);
-  return json; // { output, error, status }
-};
+// Career endpoints
+export const generateMockInterview = (data) => API.post('/careers/mock-interview/', data);
+export const analyzeCVText = (formData) => API.post('/careers/cv-analyze/', formData, {
+  headers: { 'Content-Type': 'multipart/form-data' }
+});
+export const executeCode = (data) => API.post('/careers/execute/', data);
 
 export const chatService = {
   sendMessage: (message, sessionId = 'default') => API.post('/chat/', { message, session_id: sessionId }),

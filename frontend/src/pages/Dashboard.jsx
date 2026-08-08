@@ -65,8 +65,7 @@ export default function Dashboard() {
       navigate(`/roadmap/${res.data.id}`);
     } catch (err) {
       clearInterval(interval);
-      const apiUrl = import.meta.env.VITE_API_URL || 'empty';
-      alert(`Debug Info:\nURL: ${apiUrl}\nError: ${err.message}\nName: ${err.name}\n${err.response?.data?.error || ''}`);
+      alert(err.response?.data?.error || err.message || 'Generation failed');
     } finally {
       clearInterval(interval);
       setLoading(false);
