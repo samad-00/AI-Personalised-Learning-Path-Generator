@@ -792,7 +792,7 @@ export default function InterviewPrep() {
 
           {/* Rapid Fire */}
           {activeTab === 'rapid_fire' && (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))', gap: '1.5rem' }}>
+            <div className="mobile-grid-2col" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))', gap: '1.5rem' }}>
               {(testData.rapid_fire || []).map((q, i) => (
                 <div key={i} className="bento-card hover-lift" style={{ padding: '1.5rem' }}>
                   <div style={{ display: 'flex', gap: '0.85rem', marginBottom: '1rem', alignItems: 'flex-start' }}>
@@ -870,8 +870,8 @@ export default function InterviewPrep() {
       `}</style>
       <AnimatedBackground />
 
-      {/* Top Navbar Header */}
-      <nav style={{ padding: '2rem 3.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative', zIndex: 10 }}>
+      {/* Prominent Scaled-Up Top Navbar */}
+      <nav className="mobile-nav" style={{ padding: '2rem 3.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative', zIndex: 10 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 50 }}>
           <div onClick={() => navigate('/')} style={{ display: 'flex', alignItems: 'center', gap: 16, cursor: 'pointer' }}>
             <div style={{ width: 52, height: 52, borderRadius: '50%', background: 'var(--accent-pink)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 26, boxShadow: '0 4px 15px rgba(226, 85, 131, 0.25)' }}>
@@ -896,7 +896,8 @@ export default function InterviewPrep() {
         </div>
       </nav>
 
-      <div style={{ position: 'relative', zIndex: 1, padding: '1rem 2rem 4rem', maxWidth: 880, margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
+      {/* Main Content */}
+      <div className="mobile-padding" style={{ position: 'relative', zIndex: 1, padding: '1rem 2rem 4rem', maxWidth: 880, margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
         {/* Title Header */}
         <div className="rise-item-1" style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
 
@@ -911,7 +912,7 @@ export default function InterviewPrep() {
         {/* Test Mode Selector — Orange Theme */}
         <div className="rise-item-2" style={{ marginBottom: '2.5rem' }}>
           <p style={{ fontWeight: 800, color: 'var(--text-primary)', marginBottom: '1rem', fontSize: '1.05rem', fontFamily: 'Outfit, sans-serif' }}>Select Test Mode</p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '1rem' }}>
+          <div className="mobile-grid-2col" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '1rem' }}>
             {TEST_MODES.map(mode => {
               const isSelected = testMode === mode.id;
               return (

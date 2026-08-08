@@ -161,7 +161,7 @@ export default function Dashboard() {
       `}</style>
 
       {/* Prominent Scaled-Up Top Navbar */}
-      <nav style={{ padding: '2rem 3.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative', zIndex: 10 }}>
+      <nav className="mobile-nav" style={{ padding: '2rem 3.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative', zIndex: 10 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 50 }}>
           <div
             onClick={() => navigate('/')}
@@ -209,7 +209,7 @@ export default function Dashboard() {
       </nav>
 
       {/* Main Content Layout */}
-      <main style={{ flex: 1, maxWidth: 1400, margin: '0 auto', width: '100%', padding: '2rem', display: 'grid', gridTemplateColumns: '1.2fr 1fr 300px', gap: '2rem', position: 'relative', zIndex: 10 }}>
+      <main className="mobile-grid mobile-padding" style={{ flex: 1, maxWidth: 1400, margin: '0 auto', width: '100%', padding: '2rem', display: 'grid', gridTemplateColumns: '1.2fr 1fr 300px', gap: '2rem', position: 'relative', zIndex: 10 }}>
 
         {/* Left Column */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
@@ -265,7 +265,7 @@ export default function Dashboard() {
             </form>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+          <div className="mobile-grid-2col mobile-stack" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
             <div className="bento-card card-pink rise-item-3 hover-card-effects" style={{ padding: '2rem', borderRadius: 24, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
               <div style={{ fontSize: 28, marginBottom: '1rem', animation: 'floatEmoji 4s infinite ease-in-out 0.2s' }}>⏱️</div>
               <div>
@@ -457,7 +457,7 @@ export default function Dashboard() {
             </button>
           </div>
 
-          <div className="bento-card card-orange rise-item-3 hover-card-effects" style={{ padding: '2rem', display: 'flex', flexDirection: 'column', justifyContent: 'center', borderRadius: 28 }}>
+          <div className="bento-card card-orange rise-item-1 mobile-hero" style={{ padding: '3rem', position: 'relative', overflow: 'hidden', minHeight: 280, display: 'flex', flexDirection: 'column', justifyContent: 'center', borderRadius: 28 }}>
             <div style={{ display: 'flex', gap: 8, marginBottom: '1.5rem' }}>
               <span className="pill-tag hover-pill" style={{ background: '#ffffff', color: 'var(--accent-orange)', border: 'none', fontWeight: 800, cursor: 'pointer', padding: '6px 14px', borderRadius: 100, fontSize: 12 }}>#Focus</span>
               <span className="pill-tag hover-pill" style={{ background: 'rgba(255,255,255,0.25)', color: 'white', border: 'none', fontWeight: 800, cursor: 'pointer', padding: '6px 14px', borderRadius: 100, fontSize: 12 }}>#Learn</span>

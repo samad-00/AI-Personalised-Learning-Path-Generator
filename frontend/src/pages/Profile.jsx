@@ -53,8 +53,8 @@ export default function Profile() {
         .hover-pill:hover { transform: translateY(-3px) !important; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12) !important; }
       `}</style>
 
-      {/* Prominent Scaled-Up Top Navbar */}
-      <nav style={{ padding: '2rem 3.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative', zIndex: 10 }}>
+      {/* Top Navbar */}
+      <nav className="mobile-nav" style={{ padding: '2rem 3.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative', zIndex: 10 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 50 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 16, cursor: 'pointer' }} onClick={() => navigate('/dashboard')}>
             <div style={{ width: 52, height: 52, borderRadius: '50%', background: 'var(--accent-pink)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 26, boxShadow: '0 4px 15px rgba(226, 85, 131, 0.25)' }}>
@@ -97,7 +97,7 @@ export default function Profile() {
       </nav>
 
       {/* Main Content Layout */}
-      <main style={{ flex: 1, maxWidth: 1200, margin: '0 auto', width: '100%', padding: '2rem', display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '2rem', position: 'relative', zIndex: 10 }}>
+      <main className="mobile-grid mobile-padding" style={{ flex: 1, maxWidth: 1200, margin: '0 auto', width: '100%', padding: '2rem', display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '2rem', position: 'relative', zIndex: 10 }}>
         
         {/* Left Sidebar (Profile Info) */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
@@ -155,7 +155,7 @@ export default function Profile() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem', height: '100%' }}>
           
           {/* Top Stats Grid matching the image */}
-          <div className="rise-item-1" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem' }}>
+          <div className="rise-item-1 mobile-grid-2col" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem' }}>
             <div className="bento-card hover-card-effects" style={{ background: 'var(--accent-pink)', border: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '1.5rem 1rem', borderRadius: 24 }}>
               <div style={{ fontSize: 26, opacity: 1, marginBottom: 10, animation: 'floatEmoji 3s infinite ease-in-out 0.1s' }}>🎓</div>
               <div style={{ fontSize: 34, fontWeight: 800, fontFamily: 'Outfit', color: '#ffffff', lineHeight: 1, marginBottom: 6 }}>{roadmaps.length}</div>

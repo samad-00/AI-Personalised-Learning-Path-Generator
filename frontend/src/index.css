@@ -226,3 +226,68 @@ body.dark-mode input[type="date"] {
 .animate-float-horizontal {
   animation: float-horizontal 8s ease-in-out infinite;
 }
+
+/* -------------------------------------------------------------
+ * MOBILE RESPONSIVENESS (Overriding Inline Styles via !important)
+ * ------------------------------------------------------------- */
+@media (max-width: 768px) {
+  /* Typography Adjustments */
+  h1 { font-size: clamp(2rem, 8vw, 2.5rem) !important; text-align: center; }
+  h2 { font-size: 1.8rem !important; text-align: center; }
+  h3 { font-size: 1.4rem !important; }
+  
+  /* Navigation Bars */
+  .mobile-nav {
+    flex-direction: column !important;
+    padding: 1.5rem !important;
+    gap: 1.5rem !important;
+    text-align: center;
+  }
+  .mobile-nav > div {
+    flex-direction: column !important;
+    gap: 1.5rem !important;
+  }
+  
+  /* Grid & Flex Containers */
+  .mobile-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    padding: 1rem !important;
+    gap: 1.5rem !important;
+  }
+  
+  .mobile-grid-2col {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .mobile-padding {
+    padding: 1rem !important;
+    box-sizing: border-box !important;
+  }
+  
+  /* Elements */
+  .mobile-hide {
+    display: none !important;
+  }
+  
+  /* Hero Cards */
+  .mobile-hero {
+    padding: 1.5rem !important;
+    flex-direction: column !important;
+    text-align: center !important;
+    align-items: center !important;
+  }
+  
+  /* Utilities */
+  .mobile-w-full {
+    width: 100% !important;
+    min-width: unset !important;
+  }
+  
+  .mobile-stack {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+}
+

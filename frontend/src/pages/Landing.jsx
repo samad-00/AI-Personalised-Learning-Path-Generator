@@ -379,7 +379,7 @@ export default function Landing() {
       </nav>
 
       {/* Hero Section */}
-      <main style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '6rem 4rem', position: 'relative', zIndex: 10, maxWidth: 1400, margin: '0 auto', width: '100%' }}>
+      <main className="mobile-padding" style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '6rem 4rem', position: 'relative', zIndex: 10, maxWidth: 1400, margin: '0 auto', width: '100%' }}>
 
         <div style={{ maxWidth: 750 }}>
           <h1 className="land-rise-2" style={{ fontSize: 'clamp(3rem, 6vw, 5.5rem)', fontWeight: 800, margin: '0 0 1rem', lineHeight: 1.05, letterSpacing: '-2px' }}>
@@ -409,7 +409,7 @@ export default function Landing() {
             />
           </p>
 
-          <div className="bento-card land-rise-5" style={{ display: 'inline-flex', alignItems: 'center', gap: 16, padding: '12px 24px', borderRadius: 100, marginBottom: '3rem', border: '1px solid var(--border-color)', background: 'var(--surface-color)' }}>
+          <div className="bento-card land-rise-5" style={{ display: 'inline-flex', flexWrap: 'wrap', alignItems: 'center', gap: 16, padding: '12px 24px', borderRadius: 100, marginBottom: '3rem', border: '1px solid var(--border-color)', background: 'var(--surface-color)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <span style={{ width: 12, height: 12, borderRadius: '50%', background: 'var(--accent-teal)' }}></span>
               <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>Current activity</span>
@@ -578,7 +578,7 @@ export default function Landing() {
         <div style={{ maxWidth: 1380, margin: '0 auto', padding: '0 1.5rem' }}>
 
           {/* Widened Column-wise Grid: 3 Separated Parts without Unnecessary Spaces */}
-          <div style={{
+          <div className="mobile-grid-2col" style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))',
             gap: '1.4rem',
@@ -727,7 +727,7 @@ export default function Landing() {
                   <div style={{ fontSize: '0.84rem', color: 'white', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                     Quick Navigation
                   </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px', fontSize: '0.86rem', fontWeight: 800 }}>
+                  <div className="mobile-stack" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px', fontSize: '0.86rem', fontWeight: 800 }}>
                     <Link to={user ? "/dashboard" : "/register"} style={{ color: 'white', textDecoration: 'none', background: 'rgba(255, 255, 255, 0.16)', padding: '9px 4px', borderRadius: 12, display: 'block', textAlign: 'center', transition: 'background 0.2s ease', whiteSpace: 'nowrap' }}>
                       AI Paths
                     </Link>

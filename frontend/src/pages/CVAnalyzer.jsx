@@ -110,7 +110,7 @@ export default function CVAnalyzer() {
       <AnimatedBackground />
 
       {/* Prominent Scaled-Up Top Navbar */}
-      <nav style={{ padding: '2rem 3.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative', zIndex: 10 }}>
+      <nav className="mobile-nav" style={{ padding: '2rem 3.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative', zIndex: 10 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 50 }}>
           <div
             onClick={() => navigate('/')}
@@ -172,7 +172,7 @@ export default function CVAnalyzer() {
           </p>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(420px, 1fr) minmax(420px, 1.2fr)', gap: '2.5rem', alignItems: 'start' }}>
+        <div className="mobile-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(420px, 1fr) minmax(420px, 1.2fr)', gap: '2.5rem', alignItems: 'start' }}>
 
           {/* ---- LEFT: Upload + Form ---- */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
@@ -331,7 +331,7 @@ export default function CVAnalyzer() {
                 </div>
 
                 {/* Strengths & Weaknesses */}
-                <div className="anim-card-3" style={{ display: 'grid', gridTemplateColumns: 'minmax(250px, 1fr) minmax(250px, 1fr)', gap: '1.5rem' }}>
+                <div className="anim-card-3 mobile-grid-2col" style={{ display: 'grid', gridTemplateColumns: 'minmax(250px, 1fr) minmax(250px, 1fr)', gap: '1.5rem' }}>
                   {analysis.strengths?.length > 0 && (
                     <div className="hover-lift" style={{ background: 'rgba(46, 242, 108, 0.07)', borderRadius: 24, padding: '1.75rem', border: '1px solid rgba(46, 242, 108, 0.25)' }}>
                       <p style={{ margin: '0 0 1rem', fontWeight: 800, color: '#2ef26c', fontSize: '1.1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>

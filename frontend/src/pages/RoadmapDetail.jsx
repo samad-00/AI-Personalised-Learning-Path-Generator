@@ -144,7 +144,7 @@ export default function RoadmapDetail() {
       <AnimatedBackground />
 
       {/* Prominent Scaled-Up Top Navbar */}
-      <nav style={{ padding: '2rem 3.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative', zIndex: 10 }}>
+      <nav className="mobile-nav" style={{ padding: '2rem 3.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative', zIndex: 10 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 50 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 16, cursor: 'pointer' }} onClick={() => navigate('/dashboard')}>
             <div style={{ width: 52, height: 52, borderRadius: '50%', background: 'var(--accent-pink)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 26, boxShadow: '0 4px 15px rgba(226, 85, 131, 0.25)' }}>
@@ -165,10 +165,10 @@ export default function RoadmapDetail() {
       </nav>
 
       {/* Main Content */}
-      <main style={{ flex: 1, maxWidth: 1200, margin: '0 auto', width: '100%', padding: '2rem', display: 'flex', flexDirection: 'column', gap: '2rem', position: 'relative', zIndex: 10 }}>
+      <main className="mobile-grid mobile-padding" style={{ flex: 1, maxWidth: 1200, margin: '0 auto', width: '100%', padding: '2rem', display: 'flex', flexDirection: 'column', gap: '2rem', position: 'relative', zIndex: 10 }}>
 
         {/* Header Hero Card */}
-        <div className="bento-card card-orange" style={{ padding: '3rem', position: 'relative', overflow: 'hidden' }}>
+        <div className="bento-card card-orange mobile-hero" style={{ padding: '3rem', position: 'relative', overflow: 'hidden' }}>
           <div style={{ position: 'absolute', right: -30, top: -50, fontSize: 200, opacity: 0.1, transform: 'rotate(15deg)' }}>🎯</div>
 
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative', zIndex: 1, flexWrap: 'wrap', gap: '2rem' }}>
@@ -252,7 +252,7 @@ export default function RoadmapDetail() {
           </div>
         )}
 
-        <div style={{ display: 'grid', gridTemplateColumns: '300px 1fr', gap: '2rem', alignItems: 'start' }}>
+        <div className="mobile-grid" style={{ display: 'grid', gridTemplateColumns: '300px 1fr', gap: '2rem', alignItems: 'start' }}>
 
           {/* Sidebar / Week Navigation */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', position: 'sticky', top: '2rem' }}>
