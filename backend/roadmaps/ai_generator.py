@@ -6,7 +6,7 @@ from groq import Groq
 from django.conf import settings
 
 # Timeout per individual URL check (seconds)
-URL_CHECK_TIMEOUT = 4
+URL_CHECK_TIMEOUT = 2.5
 
 
 def generate_roadmap(goal, experience_level='beginner'):
@@ -79,7 +79,10 @@ Rules:
     )
 
     content = response.choices[0].message.content.strip()
-    content = content.replace('```json', '').replace('```', '').strip()
+    start_idx = content.find('{')
+    end_idx = content.rfind('}')
+    if start_idx != -1 and end_idx != -1:
+        content = content[start_idx:end_idx+1]
     roadmap_data = json.loads(content)
 
     # Collect all resources across all weeks for parallel verification
@@ -111,7 +114,7 @@ def _fix_resources_parallel(resources):
         if not is_valid:
             resource['url'] = get_fallback_url(resource['title'], resource['resource_type'])
 
-    with ThreadPoolExecutor(max_workers=10) as executor:
+    with ThreadPoolExecutor(max_workers=40) as executor:
         futures = {executor.submit(check_and_fix, r): r for r in resources}
         for future in as_completed(futures):
             try:
