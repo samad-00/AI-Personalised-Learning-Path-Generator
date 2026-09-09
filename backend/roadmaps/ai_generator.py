@@ -87,7 +87,7 @@ Rules:
         if not gemini_key:
             raise Exception("No fallback Gemini API key found")
         genai.configure(api_key=gemini_key)
-        model = genai.GenerativeModel('gemini-1.5-flash')
+        model = genai.GenerativeModel('gemini-flash-latest')
         gemini_response = model.generate_content(
             prompt,
             generation_config=genai.types.GenerationConfig(
@@ -220,7 +220,7 @@ Return ONLY the JSON, no extra text.
         if not gemini_key:
             raise Exception("No fallback Gemini API key found")
         genai.configure(api_key=gemini_key)
-        model = genai.GenerativeModel('gemini-1.5-flash')
+        model = genai.GenerativeModel('gemini-flash-latest')
         gemini_response = model.generate_content(
             prompt,
             generation_config=genai.types.GenerationConfig(

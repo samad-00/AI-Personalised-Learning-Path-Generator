@@ -44,8 +44,8 @@ def _groq_call(prompt, max_tokens=4000):
                 if gemini_key:
                     try:
                         genai.configure(api_key=gemini_key)
-                        # Use gemini-1.5-flash for fast text generation
-                        model = genai.GenerativeModel('gemini-1.5-flash')
+                        # Use gemini-flash-latest for fast text generation
+                        model = genai.GenerativeModel('gemini-flash-latest')
                         # Note: Gemini python SDK handles max_tokens via generation_config
                         gemini_response = model.generate_content(
                             prompt,

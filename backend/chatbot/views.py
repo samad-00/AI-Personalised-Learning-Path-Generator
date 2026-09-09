@@ -72,7 +72,7 @@ def _groq_chat_call(messages, max_tokens=1500):
                 if gemini_key:
                     try:
                         genai.configure(api_key=gemini_key)
-                        model = genai.GenerativeModel('gemini-1.5-flash')
+                        model = genai.GenerativeModel('gemini-flash-latest')
                         
                         # Convert messages format from OpenAI/Groq to Gemini
                         # Groq: [{"role": "system", "content": "..."}, {"role": "user", "content": "..."}]
