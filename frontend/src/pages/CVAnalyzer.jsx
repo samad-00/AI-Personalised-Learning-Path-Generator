@@ -211,13 +211,13 @@ export default function CVAnalyzer() {
               <div style={{ position: 'relative', zIndex: 1 }}>
                 <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.95rem', fontWeight: 700, color: '#ffffff' }}>Target Job Role *</label>
                 <input type="text" value={jobRole} onChange={e => setJobRole(e.target.value)} required placeholder="e.g. Senior Full Stack Engineer, AI Researcher"
-                  style={{ width: '100%', boxSizing: 'border-box', padding: '14px 18px', borderRadius: 14, border: 'none', background: '#ffffff', color: '#1e293b', fontSize: '1.05rem', fontWeight: 600, outline: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }} />
+                  style={{ width: '100%', boxSizing: 'border-box', padding: '14px 18px', borderRadius: 14, border: 'none', background: 'var(--surface-color)', color: 'var(--text-primary)', fontSize: '1.05rem', fontWeight: 600, outline: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }} />
               </div>
 
               <div style={{ position: 'relative', zIndex: 1 }}>
                 <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.95rem', fontWeight: 700, color: '#ffffff' }}>Job Description <span style={{ opacity: 0.8, fontWeight: 500 }}>(Optional for deep ATS match)</span></label>
                 <textarea value={jd} onChange={e => setJd(e.target.value)} placeholder="Paste target Job Description (JD) here to match keywords and qualifications exactly..."
-                  style={{ width: '100%', boxSizing: 'border-box', padding: '14px 18px', borderRadius: 14, border: 'none', background: 'rgba(255, 255, 255, 0.95)', color: '#1e293b', fontSize: '1rem', fontWeight: 500, minHeight: 130, outline: 'none', resize: 'vertical', lineHeight: 1.5, boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }} />
+                  style={{ width: '100%', boxSizing: 'border-box', padding: '14px 18px', borderRadius: 14, border: 'none', background: 'var(--surface-color)', color: 'var(--text-primary)', fontSize: '1rem', fontWeight: 500, minHeight: 130, outline: 'none', resize: 'vertical', lineHeight: 1.5, boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }} />
               </div>
 
               {error && <div style={{ padding: '0.9rem 1.2rem', background: 'rgba(255, 255, 255, 0.9)', borderRadius: 12, color: '#d91535', fontWeight: 700, fontSize: 14, position: 'relative', zIndex: 1 }}>⚠️ {error}</div>}
