@@ -11,10 +11,9 @@ const TypewriterText = ({ text, delay = 30 }) => {
   useEffect(() => {
     let timeout;
     let i = 0;
-    setCurrentText('');
     const typeWriter = () => {
-      if (i < text.length) {
-        setCurrentText(prev => prev + text.charAt(i));
+      if (i <= text.length) {
+        setCurrentText(text.substring(0, i));
         i++;
         timeout = setTimeout(typeWriter, delay);
       }
