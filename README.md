@@ -21,7 +21,7 @@ url- https://ai-learnpath.vercel.app/
 
 ✅ **Gamified Progress Tracking** (XP, Daily Streaks, Mastery Badges)
 
-✅ **Robust API Fallback System** (Groq Primary → Groq Fallback → OpenRouter) to prevent rate limit crashes
+✅ **Robust API Fallback System** (Groq Primary → Groq Fallback → Gemini Flash → OpenRouter) to prevent rate limit crashes
 
 ✅ **Seamless Authentication Flow** (Secure Registration & Login)
 
@@ -49,8 +49,9 @@ url- https://ai-learnpath.vercel.app/
 * Django REST Framework (DRF)
 
 ### AI Integration
-* Groq API (Primary: `llama-3.3-70b-versatile`, Backup: `llama-3.1-8b-instant`)
-* OpenRouter API (Secondary Backup)
+* Groq API (Primary: `llama3-70b-8192`, Backup: `llama-3.1-8b-instant`)
+* Google Gemini API (Tertiary Backup: `gemini-1.5-flash`)
+* OpenRouter API (Ultimate Backup)
 
 ### Database
 * SQLite (Default) / PostgreSQL
@@ -89,8 +90,8 @@ SECRET_KEY=your_django_secret_key
 
 # AI Keys
 GROQ_API_KEY=your_groq_api_key
-OPENROUTER_API_KEY=your_openrouter_api_key # Optional backup
-
+GEMINI_API_KEY=your_gemini_api_key       # Optional but recommended backup
+OPENROUTER_API_KEY=your_openrouter_key   # Optional ultimate backup
 ```
 
 Run migrations and start the server:
@@ -129,6 +130,7 @@ npm run dev
   - `DEBUG`: `False`
   - `DATABASE_URL`: Your Supabase Connection Pooling URL (delete `?pgbouncer=true` from the end if it exists)
   - `GROQ_API_KEY`
+  - `GEMINI_API_KEY`
   - `ALLOWED_HOSTS`: `.onrender.com`
   - `CORS_ALLOWED_ORIGINS` & `CSRF_TRUSTED_ORIGINS`: Your Vercel frontend URL (e.g. `https://your-app.vercel.app`) - **Important: Do not include a trailing slash `/` at the end!**
 
