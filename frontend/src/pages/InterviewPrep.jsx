@@ -5,6 +5,26 @@ import { useAuth } from '../store/AuthContext';
 import AnimatedBackground from '../components/AnimatedBackground';
 import ThemeToggle from '../components/ThemeToggle';
 
+const TypewriterText = ({ text, delay = 30 }) => {
+  const [currentText, setCurrentText] = useState('');
+  
+  useEffect(() => {
+    let timeout;
+    let i = 0;
+    setCurrentText('');
+    const typeWriter = () => {
+      if (i < text.length) {
+        setCurrentText(prev => prev + text.charAt(i));
+        i++;
+        timeout = setTimeout(typeWriter, delay);
+      }
+    };
+    typeWriter();
+    return () => clearTimeout(timeout);
+  }, [text, delay]);
+  
+  return <span>{currentText}<span className="blink-caret" style={{ color: 'var(--text-secondary)' }}>|</span></span>;
+};
 /* ─────────────────────────────────────────
    Piston API — free, no-key, supports 30+ languages
 ───────────────────────────────────────── */
@@ -905,7 +925,7 @@ export default function InterviewPrep() {
             Interview Preparation
           </h1>
           <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem', lineHeight: 1.6, maxWidth: 640, margin: '0 auto', fontWeight: 500 }}>
-            Generate realistic mock interview questions with interactive MCQs, live code evaluation, rapid fire rounds, and behavioral soft skills feedback.
+            <TypewriterText text="Generate realistic mock interview questions with interactive MCQs, live code evaluation, rapid fire rounds, and behavioral soft skills feedback." delay={30} />
           </p>
         </div>
 

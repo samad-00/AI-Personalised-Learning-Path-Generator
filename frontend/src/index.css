@@ -372,3 +372,5 @@ body.dark-mode input[type="date"] {
 
 /* Global Overflow Protection removed as per verification requirements to identify root overflow causes */
 
+.blink-caret { animation: blink-caret .75s step-end infinite; }
+@keyframes blink-caret { 50% { opacity: 0; } }
