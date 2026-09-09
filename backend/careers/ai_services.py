@@ -7,7 +7,7 @@ def _groq_call(prompt, max_tokens=4000):
     client = Groq(api_key=settings.GROQ_API_KEY)
     try:
         response = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
+            model="openai/gpt-oss-120b",
             messages=[{"role": "user", "content": prompt}],
             temperature=0.4,
             max_tokens=max_tokens,
@@ -15,14 +15,14 @@ def _groq_call(prompt, max_tokens=4000):
         content = response.choices[0].message.content.strip()
     except Exception as e:
         if '429' in str(e) or 'rate limit' in str(e).lower() or 'tokens per day' in str(e).lower():
-            print("Rate limit hit on primary model. Falling back to llama-3.1-8b-instant...")
+            print("Rate limit hit on primary model. Falling back to openai/gpt-oss-20b...")
             
             import time
             fallback_success = False
             for attempt in range(5):
                 try:
                     response = client.chat.completions.create(
-                        model="llama-3.1-8b-instant",
+                        model="openai/gpt-oss-20b",
                         messages=[{"role": "user", "content": prompt}],
                         temperature=0.4,
                         max_tokens=min(max_tokens, 2500),

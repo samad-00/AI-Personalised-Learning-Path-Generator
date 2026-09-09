@@ -41,7 +41,7 @@ def _groq_chat_call(messages, max_tokens=1500):
     client = Groq(api_key=settings.GROQ_API_KEY)
     try:
         response = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
+            model="openai/gpt-oss-120b",
             messages=messages,
             temperature=0.4,
             max_tokens=max_tokens,
@@ -53,7 +53,7 @@ def _groq_chat_call(messages, max_tokens=1500):
             for attempt in range(3):
                 try:
                     response = client.chat.completions.create(
-                        model="llama-3.1-8b-instant",
+                        model="openai/gpt-oss-20b",
                         messages=messages,
                         temperature=0.4,
                         max_tokens=max_tokens,

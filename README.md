@@ -49,7 +49,7 @@ url- https://ai-learnpath.vercel.app/
 * Django REST Framework (DRF)
 
 ### AI Integration
-* Groq API (Primary: `llama3-70b-8192`, Backup: `llama-3.1-8b-instant`)
+* Groq API (Primary: `openai/gpt-oss-120b`, Backup: `openai/gpt-oss-20b`)
 * Google Gemini API (Tertiary Backup: `gemini-1.5-flash`)
 * OpenRouter API (Ultimate Backup)
 
