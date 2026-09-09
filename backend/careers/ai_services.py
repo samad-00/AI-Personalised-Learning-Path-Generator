@@ -7,7 +7,7 @@ def _groq_call(prompt, max_tokens=4000):
     client = Groq(api_key=settings.GROQ_API_KEY)
     try:
         response = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
+            model="llama3-70b-8192",
             messages=[{"role": "user", "content": prompt}],
             temperature=0.4,
             max_tokens=max_tokens,
@@ -38,7 +38,29 @@ def _groq_call(prompt, max_tokens=4000):
                         raise fallback_e
             
             if not fallback_success:
-                print("Groq backup model also failed. Falling back to OpenRouter API...")
+                print("Groq backup model also failed. Falling back to Gemini API...")
+                import google.generativeai as genai
+                gemini_key = getattr(settings, 'GEMINI_API_KEY', os.environ.get('GEMINI_API_KEY', ''))
+                if gemini_key:
+                    try:
+                        genai.configure(api_key=gemini_key)
+                        # Use gemini-1.5-flash for fast text generation
+                        model = genai.GenerativeModel('gemini-1.5-flash')
+                        # Note: Gemini python SDK handles max_tokens via generation_config
+                        gemini_response = model.generate_content(
+                            prompt,
+                            generation_config=genai.types.GenerationConfig(
+                                max_output_tokens=min(max_tokens, 2500),
+                                temperature=0.4,
+                            )
+                        )
+                        content = gemini_response.text.strip()
+                        fallback_success = True
+                    except Exception as gemini_e:
+                        print(f"Gemini API also failed: {gemini_e}. Falling back to OpenRouter API...")
+
+            if not fallback_success:
+                print("Falling back to OpenRouter API...")
                 import requests
                 import os
                 or_key = getattr(settings, 'OPENROUTER_API_KEY', os.environ.get('OPENROUTER_API_KEY', ''))

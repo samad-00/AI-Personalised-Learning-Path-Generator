@@ -193,6 +193,7 @@ LOGGING = {
     },
 }
 GROQ_API_KEY = env('GROQ_API_KEY', default='')
+GEMINI_API_KEY = env('GEMINI_API_KEY', default='')
 
 SITE_ID = 1
 GOOGLE_CLIENT_ID = env('GOOGLE_CLIENT_ID', default='')

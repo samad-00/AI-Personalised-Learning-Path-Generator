@@ -41,7 +41,7 @@ def _groq_chat_call(messages, max_tokens=1500):
     client = Groq(api_key=settings.GROQ_API_KEY)
     try:
         response = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
+            model="llama3-70b-8192",
             messages=messages,
             temperature=0.4,
             max_tokens=max_tokens,
@@ -65,6 +65,33 @@ def _groq_chat_call(messages, max_tokens=1500):
                     else:
                         break
             
+            # Gemini fallback
+            if not fallback_success:
+                import google.generativeai as genai
+                gemini_key = getattr(settings, 'GEMINI_API_KEY', os.environ.get('GEMINI_API_KEY', ''))
+                if gemini_key:
+                    try:
+                        genai.configure(api_key=gemini_key)
+                        model = genai.GenerativeModel('gemini-1.5-flash')
+                        
+                        # Convert messages format from OpenAI/Groq to Gemini
+                        # Groq: [{"role": "system", "content": "..."}, {"role": "user", "content": "..."}]
+                        # Gemini: format is different. For simple fallback, just pass the system + user text
+                        prompt_text = ""
+                        for m in messages:
+                            prompt_text += f"{m['role'].upper()}: {m['content']}\n"
+                        
+                        gemini_response = model.generate_content(
+                            prompt_text,
+                            generation_config=genai.types.GenerationConfig(
+                                max_output_tokens=max_tokens,
+                                temperature=0.4,
+                            )
+                        )
+                        return gemini_response.text.strip()
+                    except Exception as gemini_e:
+                        print(f"Gemini chat API failed: {gemini_e}")
+
             # OpenRouter fallback
             or_key = getattr(settings, 'OPENROUTER_API_KEY', os.environ.get('OPENROUTER_API_KEY', ''))
             if or_key:

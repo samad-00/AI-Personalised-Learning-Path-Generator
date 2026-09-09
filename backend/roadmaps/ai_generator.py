@@ -70,15 +70,32 @@ Rules:
 - Return ONLY the JSON, no extra text
 """
 
-    client = Groq(api_key=settings.GROQ_API_KEY)
-    response = client.chat.completions.create(
-        model="llama-3.3-70b-versatile",
-        messages=[{"role": "user", "content": prompt}],
-        temperature=0.3,
-        max_tokens=4000,
-    )
-
-    content = response.choices[0].message.content.strip()
+    try:
+        client = Groq(api_key=settings.GROQ_API_KEY)
+        response = client.chat.completions.create(
+            model="llama3-70b-8192",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.3,
+            max_tokens=4000,
+        )
+        content = response.choices[0].message.content.strip()
+    except Exception as e:
+        print(f"Groq API failed in generate_roadmap: {e}. Falling back to Gemini...")
+        import google.generativeai as genai
+        import os
+        gemini_key = getattr(settings, 'GEMINI_API_KEY', os.environ.get('GEMINI_API_KEY', ''))
+        if not gemini_key:
+            raise Exception("No fallback Gemini API key found")
+        genai.configure(api_key=gemini_key)
+        model = genai.GenerativeModel('gemini-1.5-flash')
+        gemini_response = model.generate_content(
+            prompt,
+            generation_config=genai.types.GenerationConfig(
+                max_output_tokens=4000,
+                temperature=0.3,
+            )
+        )
+        content = gemini_response.text.strip()
     start_idx = content.find('{')
     end_idx = content.rfind('}')
     if start_idx != -1 and end_idx != -1:
@@ -186,15 +203,32 @@ Same URL rules as before - only use real, verified URLs you are 100 percent conf
 Return ONLY the JSON, no extra text.
 """
 
-    client = Groq(api_key=settings.GROQ_API_KEY)
-    response = client.chat.completions.create(
-        model="llama-3.3-70b-versatile",
-        messages=[{"role": "user", "content": prompt}],
-        temperature=0.3,
-        max_tokens=1000,
-    )
-
-    content = response.choices[0].message.content.strip()
+    try:
+        client = Groq(api_key=settings.GROQ_API_KEY)
+        response = client.chat.completions.create(
+            model="llama3-70b-8192",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.3,
+            max_tokens=1000,
+        )
+        content = response.choices[0].message.content.strip()
+    except Exception as e:
+        print(f"Groq API failed in generate_week_content: {e}. Falling back to Gemini...")
+        import google.generativeai as genai
+        import os
+        gemini_key = getattr(settings, 'GEMINI_API_KEY', os.environ.get('GEMINI_API_KEY', ''))
+        if not gemini_key:
+            raise Exception("No fallback Gemini API key found")
+        genai.configure(api_key=gemini_key)
+        model = genai.GenerativeModel('gemini-1.5-flash')
+        gemini_response = model.generate_content(
+            prompt,
+            generation_config=genai.types.GenerationConfig(
+                max_output_tokens=1000,
+                temperature=0.3,
+            )
+        )
+        content = gemini_response.text.strip()
     content = content.replace('```json', '').replace('```', '').strip()
     week_data = json.loads(content)
 
