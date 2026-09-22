@@ -4,14 +4,17 @@ export default async function handler(req, res) {
     const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY;
 
     if (!supabaseUrl || !supabaseKey) {
-      return res.status(500).json({ status: 'error', message: 'Missing Supabase env vars' });
+      return res.status(500).json({
+        status: 'error',
+        message: 'Missing Supabase env vars',
+      });
     }
 
-    // Ping Supabase REST API health endpoint — no table needed
+    // Ping Supabase — works with both old (anon) and new (sb_publishable_) keys
     const response = await fetch(`${supabaseUrl}/rest/v1/`, {
       headers: {
-        apikey: supabaseKey,
-        Authorization: `Bearer ${supabaseKey}`,
+        'apikey': supabaseKey,
+        'Authorization': `Bearer ${supabaseKey}`,
       },
     });
 
