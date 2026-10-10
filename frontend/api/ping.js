@@ -1,20 +1,24 @@
 export default async function handler(req, res) {
   try {
-    const supabaseUrl = process.env.VITE_SUPABASE_URL;
-    const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY;
+    // VITE_ prefix vars are build-time only — use non-prefixed versions at runtime.
+    // Add SUPABASE_URL and SUPABASE_ANON_KEY in Vercel Dashboard → Settings → Environment Variables.
+    const supabaseUrl =
+      process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
+    const supabaseKey =
+      process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY;
 
     if (!supabaseUrl || !supabaseKey) {
       return res.status(500).json({
         status: 'error',
-        message: 'Missing Supabase env vars',
+        message: 'Missing Supabase env vars (SUPABASE_URL / SUPABASE_ANON_KEY)',
       });
     }
 
-    // Ping Supabase — works with both old (anon) and new (sb_publishable_) keys
+    // Ping Supabase REST API to keep the project active
     const response = await fetch(`${supabaseUrl}/rest/v1/`, {
       headers: {
-        'apikey': supabaseKey,
-        'Authorization': `Bearer ${supabaseKey}`,
+        apikey: supabaseKey,
+        Authorization: `Bearer ${supabaseKey}`,
       },
     });
 
@@ -25,6 +29,10 @@ export default async function handler(req, res) {
       time: new Date().toISOString(),
     });
   } catch (err) {
-    return res.status(500).json({ status: 'error', message: err.message });
+    return res.status(500).json({
+      status: 'error',
+      message: err.message,
+      hint: 'Check that SUPABASE_URL and SUPABASE_ANON_KEY are set in Vercel env vars (without VITE_ prefix).',
+    });
   }
 }
